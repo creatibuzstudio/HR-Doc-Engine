@@ -3,6 +3,7 @@
 import React from "react";
 import { DocSettings, AgreementTemplate, SalesAgreementType } from "@/types";
 import { SliderField, TextInput } from "@/shared/ui/FormPrimitives";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 // ─── Internship settings tab ─────────────────────────────────────────────────
 interface InternshipSettingsTabProps {
@@ -16,11 +17,11 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
       <div className="flex flex-col gap-1.5">
         <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">Offer Date</label>
         <input
-          type="text"
-          placeholder="e.g. July 4, 2026"
-          value={docSettings.date}
-          onChange={(e) => setDocSettings((p) => ({ ...p, date: e.target.value }))}
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition"
+          type="date"
+          max={getTodayISO()}
+          value={toISODate(docSettings.date)}
+          onChange={(e) => setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))}
+          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition cursor-pointer"
         />
       </div>
       <div className="flex flex-col gap-1.5">
@@ -124,13 +125,13 @@ export function SettingsTab({ docSettings, setDocSettings }: SettingsTabProps) {
           Signing Date
         </label>
         <input
-          type="text"
-          placeholder="e.g. June 10, 2026"
-          value={docSettings.date}
+          type="date"
+          max={getTodayISO()}
+          value={toISODate(docSettings.date)}
           onChange={(e) =>
-            setDocSettings((p) => ({ ...p, date: e.target.value }))
+            setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))
           }
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition"
+          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition cursor-pointer"
         />
       </div>
 
@@ -173,7 +174,7 @@ export function HRSettingsTab({ docSettings, setDocSettings }: SettingsTabProps)
 
   return (
     <div className="space-y-4">
-      <TextInput label="Notice Date" value={docSettings.date} onChange={(e) => set({ date: e.target.value })} />
+      <TextInput label="Notice Date" type="date" max={getTodayISO()} value={toISODate(docSettings.date)} onChange={(e) => set({ date: toDisplayDate(e.target.value) })} />
       <TextInput label="Recipient Role" value={docSettings.hrRecipientRole || ""} onChange={(e) => set({ hrRecipientRole: e.target.value })} />
       <TextInput label="Notice Title" value={docSettings.hrNoticeTitle || ""} onChange={(e) => set({ hrNoticeTitle: e.target.value })} />
       <TextInput label="Subject" value={docSettings.hrSubject || ""} onChange={(e) => set({ hrSubject: e.target.value })} />
@@ -186,8 +187,8 @@ export function HRSettingsTab({ docSettings, setDocSettings }: SettingsTabProps)
       <TextInput label="Employment Type" value={docSettings.hrEmploymentType || ""} onChange={(e) => set({ hrEmploymentType: e.target.value })} />
       <TextInput label="Work Mode" value={docSettings.hrWorkMode || ""} onChange={(e) => set({ hrWorkMode: e.target.value })} />
       <TextInput label="Location" value={docSettings.hrLocation || ""} onChange={(e) => set({ hrLocation: e.target.value })} />
-      <TextInput label="Recruitment Start Date" value={docSettings.hrRecruitmentStartDate || ""} onChange={(e) => set({ hrRecruitmentStartDate: e.target.value })} />
-      <TextInput label="Recruitment End Date" value={docSettings.hrRecruitmentEndDate || ""} onChange={(e) => set({ hrRecruitmentEndDate: e.target.value })} />
+      <TextInput label="Recruitment Start Date" type="date" min={getTodayISO()} value={toISODate(docSettings.hrRecruitmentStartDate || "")} onChange={(e) => set({ hrRecruitmentStartDate: toDisplayDate(e.target.value) })} />
+      <TextInput label="Recruitment End Date" type="date" min={toISODate(docSettings.hrRecruitmentStartDate || "") || getTodayISO()} value={toISODate(docSettings.hrRecruitmentEndDate || "")} onChange={(e) => set({ hrRecruitmentEndDate: toDisplayDate(e.target.value) })} />
       <TextInput label="Prepared By" value={docSettings.hrPreparedByName || ""} onChange={(e) => set({ hrPreparedByName: e.target.value })} />
       <TextInput label="Designation" value={docSettings.hrPreparedByDesignation || ""} onChange={(e) => set({ hrPreparedByDesignation: e.target.value })} />
       <div className="flex flex-col gap-1">
@@ -232,26 +233,26 @@ function SkillInput({ skills, setDocSettings }: { skills: string[]; setDocSettin
 
 // ─── Sales settings tab ───────────────────────────────────────────────────────
 export function SalesSettingsTab({ docSettings, setDocSettings, salesAgreementType }: SettingsTabProps & { salesAgreementType: SalesAgreementType }) {
-const isCSP = salesAgreementType === "countrySales";
-const setNumber = (key: keyof DocSettings, min: number, max: number) => (e: React.ChangeEvent<HTMLInputElement>) =>
-  setDocSettings((p) => ({ ...p, [key]: Math.min(max, Math.max(min, Number(e.target.value) || min)) }));
-const setNotice = (e: React.ChangeEvent<HTMLInputElement>) =>
-  setDocSettings((p) => ({ ...p, noticePeriodSales: String(Math.min(90, Math.max(1, Number(e.target.value) || 1))) }));
+  const isCSP = salesAgreementType === "countrySales";
+  const setNumber = (key: keyof DocSettings, min: number, max: number) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDocSettings((p) => ({ ...p, [key]: Math.min(max, Math.max(min, Number(e.target.value) || min)) }));
+  const setNotice = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDocSettings((p) => ({ ...p, noticePeriodSales: String(Math.min(90, Math.max(1, Number(e.target.value) || 1))) }));
 
-return (
-  <div className="space-y-4">
-    <TextInput label="Agreement Reference" value={docSettings.salesRefId || ""} onChange={(e) => setDocSettings((p) => ({ ...p, salesRefId: e.target.value }))} />
-    <TextInput label="Agreement Date" value={docSettings.date} onChange={(e) => setDocSettings((p) => ({ ...p, date: e.target.value }))} />
-    <TextInput label={isCSP ? "Country / Territory" : "Assigned Territory / Region"} value={docSettings.territory || ""} onChange={(e) => setDocSettings((p) => ({ ...p, territory: e.target.value }))} />
-    <TextInput label="Governing Jurisdiction" value={docSettings.governingJurisdiction || ""} onChange={(e) => setDocSettings((p) => ({ ...p, governingJurisdiction: e.target.value }))} />
-    <SliderField label={isCSP ? "Base Commission" : "Sales Commission"} value={docSettings.baseCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("baseCommissionRate", 1, 100)} />
-    <SliderField label="Recurring Commission" value={docSettings.recurringCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("recurringCommissionRate", 1, 100)} />
-    {isCSP && <SliderField label="Override Commission" value={docSettings.overrideCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("overrideCommissionRate", 1, 100)} />}
-    {isCSP && <SliderField label="Initial Term" value={docSettings.initialTerm ?? 1} suffix=" Year(s)" min={1} max={10} onChange={setNumber("initialTerm", 1, 10)} />}
-    <SliderField label="Notice Period" value={Number(docSettings.noticePeriodSales) || 30} suffix=" Days" min={1} max={90} onChange={setNotice} />
-    <TextInput label="Payment Currency" value={docSettings.paymentCurrency || ""} onChange={(e) => setDocSettings((p) => ({ ...p, paymentCurrency: e.target.value }))} />
-  </div>
-);
+  return (
+    <div className="space-y-4">
+      <TextInput label="Agreement Reference" value={docSettings.salesRefId || ""} onChange={(e) => setDocSettings((p) => ({ ...p, salesRefId: e.target.value }))} />
+      <TextInput label="Agreement Date" type="date" max={getTodayISO()} value={toISODate(docSettings.date)} onChange={(e) => setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))} />
+      <TextInput label={isCSP ? "Country / Territory" : "Assigned Territory / Region"} value={docSettings.territory || ""} onChange={(e) => setDocSettings((p) => ({ ...p, territory: e.target.value }))} />
+      <TextInput label="Governing Jurisdiction" value={docSettings.governingJurisdiction || ""} onChange={(e) => setDocSettings((p) => ({ ...p, governingJurisdiction: e.target.value }))} />
+      <SliderField label={isCSP ? "Base Commission" : "Sales Commission"} value={docSettings.baseCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("baseCommissionRate", 1, 100)} />
+      <SliderField label="Recurring Commission" value={docSettings.recurringCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("recurringCommissionRate", 1, 100)} />
+      {isCSP && <SliderField label="Override Commission" value={docSettings.overrideCommissionRate ?? 10} suffix="%" min={1} max={100} onChange={setNumber("overrideCommissionRate", 1, 100)} />}
+      {isCSP && <SliderField label="Initial Term" value={docSettings.initialTerm ?? 1} suffix=" Year(s)" min={1} max={10} onChange={setNumber("initialTerm", 1, 10)} />}
+      <SliderField label="Notice Period" value={Number(docSettings.noticePeriodSales) || 30} suffix=" Days" min={1} max={90} onChange={setNotice} />
+      <TextInput label="Payment Currency" value={docSettings.paymentCurrency || ""} onChange={(e) => setDocSettings((p) => ({ ...p, paymentCurrency: e.target.value }))} />
+    </div>
+  );
 }
 
 // ─── Intern Certificate settings tab ─────────────────────────────────────────
@@ -271,8 +272,10 @@ export function InternCertificateSettingsTab({
     <div className="space-y-4">
       <TextInput
         label="Date of Issue"
-        value={docSettings.date}
-        onChange={(e) => set({ date: e.target.value })}
+        type="date"
+        max={getTodayISO()}
+        value={toISODate(docSettings.date)}
+        onChange={(e) => set({ date: toDisplayDate(e.target.value) })}
       />
       <TextInput
         label="Performance Rating / Grade"
@@ -281,13 +284,18 @@ export function InternCertificateSettingsTab({
       />
       <TextInput
         label="Internship Start Date"
-        value={docSettings.certStartDate || ""}
-        onChange={(e) => set({ certStartDate: e.target.value })}
+        type="date"
+        max={getTodayISO()}
+        value={toISODate(docSettings.certStartDate || "")}
+        onChange={(e) => set({ certStartDate: toDisplayDate(e.target.value) })}
       />
       <TextInput
         label="Internship End Date"
-        value={docSettings.certEndDate || ""}
-        onChange={(e) => set({ certEndDate: e.target.value })}
+        type="date"
+        max={getTodayISO()}
+        min={toISODate(docSettings.certStartDate || "")}
+        value={toISODate(docSettings.certEndDate || "")}
+        onChange={(e) => set({ certEndDate: toDisplayDate(e.target.value) })}
       />
       <div className="flex flex-col gap-1">
         <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">

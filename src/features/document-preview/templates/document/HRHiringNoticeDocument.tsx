@@ -9,6 +9,8 @@ import DocumentMetadata from "./DocumentMetadata";
 import DocumentFooter from "./DocumentFooter";
 import Image from "next/image";
 
+import { toDisplayDate } from "@/shared/utils/dateUtils";
+
 interface HRHiringNoticeDocumentProps {
     firstParty: FirstParty;
     settings: DocSettings;
@@ -36,14 +38,10 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
     );
 }
 
-/** Format ISO date (YYYY-MM-DD) to "July 23, 2026" */
+/** Ensure a date value is always shown in display format, handling any legacy ISO strings. */
 function fmtDate(val: string): string {
     if (!val) return "—";
-    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
-        try { return new Date(val + "T00:00:00").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }); }
-        catch { return val; }
-    }
-    return val;
+    return toDisplayDate(val) || val;
 }
 
 export default function HRHiringNoticeDocument({ firstParty, settings, previewRefs = [] }: HRHiringNoticeDocumentProps) {

@@ -43,17 +43,17 @@ export interface TextInputProps
   label: string;
 }
 
-export function TextInput({ label, value, onChange, ...rest }: TextInputProps) {
+export function TextInput({ label, value, onChange, type = "text", ...rest }: TextInputProps) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
         {label}
       </label>
       <input
-        type="text"
+        type={type}
         value={value}
         onChange={onChange}
-        className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-medium focus:outline-none focus:border-[#2563EB]"
+        className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-medium focus:outline-none focus:border-[#2563EB] cursor-pointer"
         {...rest}
       />
     </div>

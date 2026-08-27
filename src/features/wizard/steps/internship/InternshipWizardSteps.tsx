@@ -16,6 +16,7 @@ import {
 import SignaturePad from "@/features/candidate-portal/components/SignaturePad";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
 import { Field, IconInput, StepHeader } from "@/shared/ui/FormPrimitives";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 // ─── Step 1: Personal Info ────────────────────────────────────────────────────
 export interface InternStep1Props {
@@ -130,7 +131,7 @@ export function InternStep2({ docSettings, setDocSettings, secondParty, setSecon
       })
       .catch(console.error);
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -192,10 +193,10 @@ export function InternStep2({ docSettings, setDocSettings, secondParty, setSecon
           <Field label="Offer Date *">
             <IconInput
               icon={Calendar}
-              type="text"
-              placeholder="e.g. July 4, 2026"
-              value={docSettings.date}
-              onChange={(e) => setDocSettings((p) => ({ ...p, date: e.target.value }))}
+              type="date"
+              max={getTodayISO()}
+              value={toISODate(docSettings.date || "")}
+              onChange={(e) => setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))}
             />
           </Field>
         </div>
@@ -252,11 +253,10 @@ export function InternStep2({ docSettings, setDocSettings, secondParty, setSecon
                 key={String(paid)}
                 type="button"
                 onClick={() => setDocSettings((p) => ({ ...p, isPaid: paid }))}
-                className={`py-3 text-xs font-bold rounded-xl border transition cursor-pointer ${
-                  docSettings.isPaid === paid
-                    ? "bg-[#2563EB]/10 border-[#2563EB] text-[#2563EB]"
-                    : "bg-[#F8FAFC] border-[#DBEAFE] text-[#334155] hover:border-[#2563EB]"
-                }`}
+                className={`py-3 text-xs font-bold rounded-xl border transition cursor-pointer ${docSettings.isPaid === paid
+                  ? "bg-[#2563EB]/10 border-[#2563EB] text-[#2563EB]"
+                  : "bg-[#F8FAFC] border-[#DBEAFE] text-[#334155] hover:border-[#2563EB]"
+                  }`}
               >
                 {paid ? "Paid Internship" : "Unpaid Internship"}
               </button>

@@ -6,6 +6,7 @@ import { FileText, ChevronLeft, ChevronRight, Check, Plus, X, Upload } from "luc
 import { FirstParty, DocSettings } from "@/types";
 import SignaturePad from "@/features/candidate-portal/components/SignaturePad";
 import { StepHeader } from "@/shared/ui/FormPrimitives";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 const STEP_LABELS = ["1. Recipient & Title", "2. Job Details", "3. HR Signature"];
 const TOTAL_STEPS = 3;
@@ -46,14 +47,16 @@ const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
     />
 );
 
-/** Native date picker that stores ISO value internally but can display formatted */
-function DateField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+/** Native date picker — stores value as display format "July 5, 2026" */
+function DateField({ label, value, onChange, min, max }: { label: string; value: string; onChange: (v: string) => void; min?: string; max?: string }) {
     return (
         <Field label={label}>
             <Input
                 type="date"
-                value={value || ""}
-                onChange={(e) => onChange(e.target.value)}
+                value={toISODate(value)}
+                min={min}
+                max={max}
+                onChange={(e) => onChange(toDisplayDate(e.target.value))}
                 className="cursor-pointer"
             />
         </Field>
@@ -256,7 +259,7 @@ export default function HRHiringNoticeWizard({ activeStep, firstParty, setFirstP
                 <Input value={docSettings.hrNoticeTitle || ""} onChange={(e) => set({ hrNoticeTitle: e.target.value })} placeholder="e.g. UI/UX Designer Recruitment" />
             </Field>
             <Field label="Notice Date *">
-                <Input type="date" value={docSettings.date || ""} onChange={(e) => set({ date: e.target.value })} className="cursor-pointer" />
+                <Input type="date" max={getTodayISO()} value={toISODate(docSettings.date || "")} onChange={(e) => set({ date: toDisplayDate(e.target.value) })} className="cursor-pointer" />
             </Field>
             <div className="md:col-span-2">
                 <Field label="Subject Line *">
@@ -297,30 +300,30 @@ export default function HRHiringNoticeWizard({ activeStep, firstParty, setFirstP
             <Field label="Location">
                 <Input value={docSettings.hrLocation || ""} onChange={(e) => set({ hrLocation: e.target.value })} placeholder="e.g. Rajshahi" />
             </Field>
-            <DateField label="Recruitment Start Date" value={docSettings.hrRecruitmentStartDate || ""} onChange={(v) => set({ hrRecruitmentStartDate: v })} />
-            <DateField label="Recruitment End Date" value={docSettings.hrRecruitmentEndDate || ""} onChange={(v) => set({ hrRecruitmentEndDate: v })} />
-                <div>
+            <DateField label="Recruitment Start Date" value={docSettings.hrRecruitmentStartDate || ""} onChange={(v) => set({ hrRecruitmentStartDate: v })} min={getTodayISO()} />
+            <DateField label="Recruitment End Date" value={docSettings.hrRecruitmentEndDate || ""} onChange={(v) => set({ hrRecruitmentEndDate: v })} min={toISODate(docSettings.hrRecruitmentStartDate || "") || getTodayISO()} />
+            <div>
                 <label className="block text-xs font-semibold text-[#334155] uppercase tracking-wide mb-1.5">Required Skills *</label>
                 <SkillTagInput skills={skills} onAdd={addSkill} onRemove={removeSkill} />
                 <p className="text-[10px] text-[#94A3B8] mt-1">Press Enter or &ldquo;,&rdquo; after each skill.</p>
-                 </div>   
-                    <Field label="Experience Required">
-                        <Select
-                            value={docSettings.hrExperienceRequired || ""}
-                            onChange={(e) => set({ hrExperienceRequired: e.target.value })}
-                        >
-                            <option value="">— Select Level —</option>
-                            <option value="Fresher / No Experience Required">Fresher / No Experience Required</option>
-                            <option value="Less than 1 year">Less than 1 year</option>
-                            <option value="1+ year">1+ year</option>
-                            <option value="2+ years">2+ years</option>
-                            <option value="3+ years">3+ years</option>
-                            <option value="4+ years">4+ years</option>
-                            <option value="5+ years">5+ years</option>
-                            <option value="7+ years">7+ years</option>
-                            <option value="10+ years">10+ years</option>
-                        </Select>
-                    </Field>
+            </div>
+            <Field label="Experience Required">
+                <Select
+                    value={docSettings.hrExperienceRequired || ""}
+                    onChange={(e) => set({ hrExperienceRequired: e.target.value })}
+                >
+                    <option value="">— Select Level —</option>
+                    <option value="Fresher / No Experience Required">Fresher / No Experience Required</option>
+                    <option value="Less than 1 year">Less than 1 year</option>
+                    <option value="1+ year">1+ year</option>
+                    <option value="2+ years">2+ years</option>
+                    <option value="3+ years">3+ years</option>
+                    <option value="4+ years">4+ years</option>
+                    <option value="5+ years">5+ years</option>
+                    <option value="7+ years">7+ years</option>
+                    <option value="10+ years">10+ years</option>
+                </Select>
+            </Field>
         </div>
     );
 

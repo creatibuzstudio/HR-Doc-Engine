@@ -11,6 +11,7 @@ import {
   SecondParty,
 } from "@/types";
 import { useDataCache, CspOption } from "@/context/DataCacheContext";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 const labels = [
   "1. Agreement",
@@ -169,8 +170,10 @@ export default function SalesFormWizard(props: Props) {
         </Field>
         <Field label="Agreement Date *">
           <Input
-            value={docSettings.date || ""}
-            onChange={(e) => setSettings({ date: e.target.value })}
+            type="date"
+            max={getTodayISO()}
+            value={toISODate(docSettings.date || "")}
+            onChange={(e) => setSettings({ date: toDisplayDate(e.target.value) })}
           />
         </Field>
       </div>

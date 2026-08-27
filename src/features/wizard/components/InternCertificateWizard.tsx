@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Award, ChevronLeft, ChevronRight, Check, Upload, Calendar, User, Briefcase, ShieldCheck, Mail, BookOpen } from "lucide-react";
+import { Award, ChevronLeft, ChevronRight, Check, Upload } from "lucide-react";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
 import SignaturePad from "@/features/candidate-portal/components/SignaturePad";
 import { StepHeader } from "@/shared/ui/FormPrimitives";
 import { useDataCache, InternOption } from "@/context/DataCacheContext";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 const STEP_LABELS = ["1. Intern Lookup & Hydration", "2. Signature Block"];
 const TOTAL_STEPS = 2;
@@ -50,24 +51,6 @@ const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   />
 );
 
-function formatDateForInput(dateStr: string) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-  return d.toISOString().split("T")[0];
-}
-
-function formatDateReadable(dateStr: string) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 export default function InternCertificateWizard({
   activeStep,
   secondParty,
@@ -101,7 +84,7 @@ export default function InternCertificateWizard({
         fullName: selected.fullName,
         email: selected.email,
         position: selected.position,
-        department: selected.department || "Engineering",
+        department: selected.department || "Development",
         partnerId: selected.internId,
       }));
 
@@ -112,8 +95,9 @@ export default function InternCertificateWizard({
         ...prev,
         certOriginalAgreementId: selected.agreementId,
         certInternId: selected.internId,
-        certStartDate: formatDateReadable(selected.startDate),
-        certEndDate: formatDateReadable(selected.endDate),
+        // TEMP OVERRIDE — revert after current certificate batch is done
+        certStartDate: "July 1, 2026",
+        certEndDate: "August 15, 2026",
         certPerformanceGrade: selected.performanceGrade || "Outstanding",
       }));
     } else {
@@ -207,7 +191,7 @@ export default function InternCertificateWizard({
               <Input
                 value={secondParty.department || ""}
                 onChange={(e) => setSecondParty((p) => ({ ...p, department: e.target.value }))}
-                placeholder="e.g. Engineering Department"
+                placeholder="e.g. Development Department"
               />
             </Field>
 
@@ -244,16 +228,19 @@ export default function InternCertificateWizard({
             <Field label="Internship Start Date *">
               <Input
                 type="date"
-                value={formatDateForInput(docSettings.certStartDate || "")}
-                onChange={(e) => setDocSettings((p) => ({ ...p, certStartDate: formatDateReadable(e.target.value) }))}
+                max={getTodayISO()}
+                value={toISODate(docSettings.certStartDate || "")}
+                onChange={(e) => setDocSettings((p) => ({ ...p, certStartDate: toDisplayDate(e.target.value) }))}
               />
             </Field>
 
             <Field label="Internship End Date *">
               <Input
                 type="date"
-                value={formatDateForInput(docSettings.certEndDate || "")}
-                onChange={(e) => setDocSettings((p) => ({ ...p, certEndDate: formatDateReadable(e.target.value) }))}
+                max={getTodayISO()}
+                min={toISODate(docSettings.certStartDate || "")}
+                value={toISODate(docSettings.certEndDate || "")}
+                onChange={(e) => setDocSettings((p) => ({ ...p, certEndDate: toDisplayDate(e.target.value) }))}
               />
             </Field>
 

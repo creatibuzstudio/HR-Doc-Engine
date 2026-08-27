@@ -157,7 +157,7 @@ function HomeInner() {
         >
           <JevxoLogo />
           <div className="hidden sm:block h-6 w-[1.5px] bg-[#DBEAFE]" />
-          <p className="hidden sm:block text-xs text-[#64748B] font-medium uppercase tracking-wider">
+          <p className="hidden sm:block text-lg text-[#64748B] font-semibold uppercase tracking-wider">
             HR Document Engine
           </p>
         </div>

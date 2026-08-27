@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Calendar, Hash } from "lucide-react";
 import { SecondParty, DocSettings } from "@/types";
 import { Field, IconInput, StepHeader } from "@/shared/ui/FormPrimitives";
+import { toISODate, toDisplayDate, getTodayISO } from "@/shared/utils/dateUtils";
 
 export interface Step4Props {
   docSettings: DocSettings;
@@ -77,7 +78,7 @@ export function Step4({
         const res = await fetch(`/api/check-id?action=check&partnerId=${secondParty.partnerId}`);
         const data = await res.json();
         setPartnerWarning(data.partnerTaken ? "⚠️ This Partner ID is already taken." : "");
-      } catch {}
+      } catch { }
     }, 500);
     return () => clearTimeout(timer);
   }, [secondParty.partnerId]);
@@ -89,17 +90,17 @@ export function Step4({
         const res = await fetch(`/api/check-id?action=check&agreementId=${docSettings.refId}`);
         const data = await res.json();
         setRefWarning(data.agreementTaken ? "Warning: This Document ID is already taken." : "");
-      } catch {}
+      } catch { }
     }, 500);
     return () => clearTimeout(timer);
   }, [docSettings.refId]);
 
   const numericSetter =
     (key: keyof DocSettings, min: number, max: number) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = Math.min(max, Math.max(min, parseInt(e.target.value) || min));
-      setDocSettings((p) => ({ ...p, [key]: val }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = Math.min(max, Math.max(min, parseInt(e.target.value) || min));
+        setDocSettings((p) => ({ ...p, [key]: val }));
+      };
 
   const handlePartnerSerialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const serial = e.target.value.replace(/\D/g, "").slice(0, 3);
@@ -147,11 +148,11 @@ export function Step4({
           <Field label="Signing Date *">
             <IconInput
               icon={Calendar}
-              type="text"
-              placeholder="e.g. Present Date"
-              value={docSettings.date || ""}
+              type="date"
+              max={getTodayISO()}
+              value={toISODate(docSettings.date || "")}
               onChange={(e) =>
-                setDocSettings((p) => ({ ...p, date: e.target.value }))
+                setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))
               }
             />
           </Field>

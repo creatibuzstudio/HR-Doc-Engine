@@ -149,7 +149,7 @@ export default function InternCertificatePreview({
           </p>
 
           {/* details grid */}
-          <div className="flex justify-between items-center mt-4 px-10 py-3.5 bg-slate-50/60 border border-slate-100/80 rounded-2xl text-center w-full max-w-3xl">
+          <div className="flex justify-between items-center mt-4 px-5 py-3.5 bg-slate-50/60 border border-slate-100/80 rounded-2xl text-center w-full max-w-3xl">
             <div>
               <p style={{ fontFamily: "var(--font-opensans), 'Open Sans', sans-serif", fontSize: '10pt', fontWeight: 600 }} className="text-slate-400 uppercase tracking-wider">Position</p>
               <p style={{ fontFamily: "var(--font-opensans), 'Open Sans', sans-serif", fontSize: '11pt', fontWeight: 400 }} className="text-slate-800 mt-1">{d.position}</p>
@@ -176,13 +176,13 @@ export default function InternCertificatePreview({
             <p style={{ fontFamily: "var(--font-montserrat), 'Montserrat', sans-serif", fontSize: '10.5pt', fontWeight: 400 }} className="text-slate-800">{d.issueDate}</p>
           </div>
 
-          {/* Centered verification QR Code */}
+          {/* Centered verification QR Code
           <div className="flex flex-col items-center space-y-1 select-none pointer-events-none pb-1">
             <div className="bg-white p-1 border border-slate-200/80 rounded shadow-xs shrink-0">
               <QRCode value={verifyUrl} size={46} level="M" />
             </div>
             <p className="text-[7.5px] font-mono font-bold tracking-widest text-slate-400 uppercase">Verify Doc</p>
-          </div>
+          </div> */}
 
           <div className="text-right flex flex-col items-center">
             <div className="h-12 mb-1 flex items-center justify-center">

@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { User, Briefcase, Calendar, ShieldCheck } from "lucide-react";
 import { SecondParty } from "@/types";
 import { Field, IconInput, StepHeader } from "@/shared/ui/FormPrimitives";
+import { getTodayISO } from "@/shared/utils/dateUtils";
 
 export interface Step1Props {
   secondParty: SecondParty;
@@ -54,6 +55,7 @@ export function Step1({ secondParty, setSecondParty }: Step1Props) {
           <IconInput
             icon={Calendar}
             type="date"
+            max={getTodayISO()}
             value={secondParty.dob}
             onChange={(e) =>
               setSecondParty((p) => ({ ...p, dob: e.target.value }))
