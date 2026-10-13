@@ -1,12 +1,10 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import XLogo from "../../../../../assets/x-logo.jpg";
-
 export default function DocumentWatermark() {
   return (
     <Image
-      src={XLogo}
+      src="/x-logo.jpg"
       alt="Watermark"
       width={520}
       height={520}

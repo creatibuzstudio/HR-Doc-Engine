@@ -1,109 +1,69 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
-  
-  --font-cinzel: var(--font-cinzel), serif;
-  --font-montserrat: var(--font-montserrat), sans-serif;
-  --font-opensans: var(--font-opensans), sans-serif;
-  --font-playfair: var(--font-playfair), serif;
-  --font-ebgaramond: var(--font-ebgaramond), serif;
-  
-  /* JEVXO Centered Corporate Blue Palette */
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-dark: #1E3A8A;
-  --color-primary-light: #EFF6FF;
-  --color-primary-border: #DBEAFE;
-  --color-brand-accent: #06B6D4;
-  --color-brand-bg: #F8FAFC;
-  --color-brand-card: #FFFFFF;
-  --color-brand-text: #0F172A;
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0C0E12;
+  --foreground: #ffffff;
+  --primary: #FE5A00;
+  --primary-foreground: #ffffff;
+  --color-text: #767676;
+  --color-header: #BCBCBC;
+  --primary-gradient: linear-gradient(to right, #FE5A00, #1B0900);
+  --color-nav: #191919;
+  --color-card: #181A1E;
+  --card: #181A1E;
+  --card-foreground: #ffffff;
+  --popover: #181A1E;
+  --popover-foreground: #ffffff;
+  --secondary: #1F2228;
+  --secondary-foreground: #ffffff;
+  --muted: #1F2228;
+  --muted-foreground: #767676;
+  --accent: #262930;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #FE5A00;
+  --radius: 0.625rem;
 }
 
-/* Beautiful custom transitions and styling for modern web aesthetic */
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--color-text);
+  --color-header-text: var(--color-header);
+  --primary-gradient: var(--primary-gradient);
+  --color-nav: var(--color-nav);
+  --color-card: var(--color-card);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --font-sans: var(--font-bricolage), "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-dm-serif), "DM Serif Display", Georgia, serif;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
-/* A4 document scaler — disable transform during PDF capture for full-resolution output */
-html.a4-exporting .a4-scaler-spacer {
-  width: 794px !important;
-  height: auto !important;
+/* ─── Isolated Pure White Styles for Document Previews & PDF Captures ─── */
+.a4-document-sheet {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
 }
 
-html.a4-exporting .a4-scaler-inner {
-  transform: none !important;
-  position: relative !important;
-}
-
-#document-preview-container,
-#document-page-1,
-#document-page-2 {
-  --color-slate-950: #020617;
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-600: #475569;
-  --color-slate-500: #64748b;
-  --color-slate-400: #94a3b8;
-  --color-slate-300: #cbd5e1;
-  --color-slate-200: #e2e8f0;
-  --color-slate-100: #f1f5f9;
-  --color-slate-5: #f8fafc;
-  --color-slate-50: #f8fafc;
-  
-  --color-blue-950: #172554;
-  --color-blue-900: #1e3a8a;
-  --color-blue-800: #1e40af;
-  --color-blue-700: #1d4ed8;
-  --color-blue-600: #2563eb;
-  --color-blue-500: #3b82f6;
-  --color-blue-400: #60a5fa;
-  --color-blue-300: #93c5fd;
-  --color-blue-200: #bfdbfe;
-  --color-blue-100: #dbeafe;
-  --color-blue-50: #eff6ff;
-  
-  --color-indigo-950: #030712;
-  --color-indigo-900: #1e1b4b;
-  --color-indigo-800: #312e81;
-  --color-indigo-700: #4338ca;
-  --color-indigo-600: #4f46e5;
-  --color-indigo-500: #6366f1;
-  --color-indigo-400: #818cf8;
-  --color-indigo-300: #a5b4fc;
-  --color-indigo-200: #c7d2fe;
-  --color-indigo-100: #e0e7ff;
-  --color-indigo-50: #eef2ff;
-  
-  --color-cyan-950: #083344;
-  --color-cyan-900: #164e63;
-  --color-cyan-800: #155e75;
-  --color-cyan-700: #0e7490;
-  --color-cyan-600: #0891b2;
-  --color-cyan-500: #06b6d4;
-  --color-cyan-400: #22d3ee;
-  --color-cyan-300: #67e8f9;
-  --color-cyan-200: #a5f3fc;
-  --color-cyan-100: #cffafe;
-  --color-cyan-50: #ecfeff;
-  
-  --color-rose-950: #4c0519;
-  --color-rose-900: #881337;
-  --color-rose-800: #9f1239;
-  --color-rose-700: #be123c;
-  --color-rose-600: #e11d48;
-  --color-rose-500: #f43f5e;
-  --color-rose-400: #fb7185;
-  --color-rose-300: #fda4af;
-  --color-rose-200: #fecdd3;
-  --color-rose-100: #ffe4e6;
-  --color-rose-50: #fff1f2;
+.a4-document-sheet * {
+  color-scheme: light !important;
 }

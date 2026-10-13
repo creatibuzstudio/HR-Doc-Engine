@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import ToastProvider from "@/shared/ui/ToastProvider";
-import { Cinzel, Montserrat, Open_Sans, Playfair_Display, EB_Garamond } from "next/font/google";
+import {
+  Cinzel,
+  Montserrat,
+  Open_Sans,
+  Playfair_Display,
+  EB_Garamond,
+  Barlow_Condensed,
+  Oswald,
+  Orbitron,
+} from "next/font/google";
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -42,6 +51,28 @@ const ebGaramond = EB_Garamond({
   display: "swap",
 });
 
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-barlow-condensed",
+  display: "swap",
+});
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-oswald",
+  display: "swap",
+});
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  variable: "--font-orbitron",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "JEVXO — HR Document Engine",
   description: "Automated Documents generator for JEVXO HR.",
@@ -55,18 +86,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${cinzel.variable} ${montserrat.variable} ${openSans.variable} ${playfairDisplay.variable} ${ebGaramond.variable}`}
+      className={`h-full antialiased ${cinzel.variable} ${montserrat.variable} ${openSans.variable} ${playfairDisplay.variable} ${ebGaramond.variable} ${barlowCondensed.variable} ${oswald.variable} ${orbitron.variable}`}
     >
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Core JEVXO App Fonts */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,800;1,900&family=Oswald:wght@700&family=Orbitron:wght@500;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-full flex flex-col bg-[#F8FAFC]">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
         <ToastProvider />
       </body>

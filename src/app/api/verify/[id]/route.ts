@@ -1,5 +1,19 @@
 import { NextResponse } from "next/server";
-import { findAgreementByVerifyId } from "../../../../lib/verify";
+import { findDocumentById } from "@/core/services/document.service";
+
+interface VerificationDoc {
+  status?: string;
+  agreementId?: string;
+  noticeId?: string;
+  offerId?: string;
+  firstParty?: { companyName?: string };
+  secondParty?: { fullName?: string; position?: string };
+  recipient?: { name?: string };
+  employmentTerms?: { designation?: string };
+  title?: string;
+  signedAt?: string;
+  createdAt?: string;
+}
 
 export async function GET(
   _request: Request,
@@ -7,44 +21,46 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const agreement = await findAgreementByVerifyId(id);
+    const result = await findDocumentById(id);
 
-    if (!agreement) {
+    if (!result) {
       return NextResponse.json(
         {
           valid: false,
           status: "NOT_FOUND",
-          message: "No matching document was found in the JEVXO registry.",
+          message: "No matching document found in the JEVXO registry.",
         },
         { status: 404 }
       );
     }
 
-    const isExecuted = agreement.status === "FULLY_EXECUTED";
+    const doc = result.data as unknown as VerificationDoc;
+    const isExecuted =
+      doc.status === "FULLY_EXECUTED" ||
+      doc.status === "ACCEPTED_AND_SIGNED" ||
+      doc.status === "PUBLISHED";
 
     return NextResponse.json({
       valid: isExecuted,
-      status: agreement.status,
-      agreementId: agreement.agreementId,
-      partnerId: agreement.partnerId,
-      docType: agreement.docType || "appointment",
-      agreementTemplate:
-        agreement.docSettings?.agreementTemplate || "partner",
-      companyName: agreement.firstParty?.companyName || "",
-      partnerName: agreement.secondParty?.fullName || "",
-      position: agreement.secondParty?.position || "",
-      signedAt: agreement.signedAt?.toISOString?.() || null,
-      createdAt: agreement.createdAt?.toISOString?.() || null,
-      founderSigned: agreement.founderSigned,
-      partnerSigned: agreement.partnerSigned,
+      status: doc.status,
+      id: doc.agreementId || doc.noticeId || doc.offerId,
+      docType: result.type,
+      companyName: doc.firstParty?.companyName || "JEVXO",
+      recipientName: doc.secondParty?.fullName || doc.recipient?.name || "",
+      position:
+        doc.secondParty?.position ||
+        doc.employmentTerms?.designation ||
+        doc.title ||
+        "",
+      signedAt: doc.signedAt || null,
+      createdAt: doc.createdAt || null,
       message: isExecuted
-        ? "This document is authentic and fully executed."
-        : "This document exists but is not yet fully executed.",
+        ? "This document is verified and authenticated by JEVXO."
+        : "Document found, awaiting final execution signatures.",
     });
-  } catch (err: unknown) {
-    console.error("[Next.js API] Verification error:", err);
+  } catch {
     return NextResponse.json(
-      { valid: false, status: "ERROR", message: "Verification service unavailable." },
+      { valid: false, status: "ERROR", message: "Verification failed." },
       { status: 500 }
     );
   }
