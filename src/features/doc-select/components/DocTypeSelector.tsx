@@ -6,7 +6,7 @@ import { ArrowRight, LayoutDashboard, FileText, CreditCard, BriefcaseIcon, Award
 
 // Local union — covers all selectable doc types including the new sales types.
 // Not exported from types/index.ts intentionally (only used at the selector layer).
-type SelectableDocType = "partner" | "internship" | "countrySales" | "salesAgent" | "hrHiringNotice" | "internCertificate";
+type SelectableDocType = "contractual" | "partner" | "internship" | "countrySales" | "salesAgent" | "hrHiringNotice" | "internCertificate";
 
 interface DocTypeSelectorProps {
   onSelect: (type: SelectableDocType) => void;
@@ -26,24 +26,59 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
       <div className="w-full max-w-2xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <span className="text-[10px] bg-[#EFF6FF] border border-[#DBEAFE]/50 text-[#1E3A8A] font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
+          <span className="text-[10px] bg-[#FFF3EE] border border-[#FF5722]/30 text-[#EA580C] font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
             Step 2 of 2
           </span>
           <h1 className="text-2xl font-bold text-[#0F172A]">
             Select Agreement Template
           </h1>
           <p className="text-sm text-[#64748B]">
-            Each template generates a tailored appointment letter. The ID card is included in every package.
+            Choose a document template. Each template generates an official Creatibuz Studio agreement with automated email delivery and digital signatures.
           </p>
         </div>
 
         <div className="grid gap-4">
+          {/* Contractual Offer Letter & Work Agreement (Featured) */}
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            onClick={() => onSelect("contractual")}
+            className="w-full text-left p-6 rounded-2xl border-2 border-[#FF5722] bg-[#FFF8F5] shadow-md shadow-[#FF5722]/10 cursor-pointer group transition-all hover:shadow-lg hover:shadow-[#FF5722]/20"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex flex-col gap-1.5 shrink-0">
+                <div className="p-2.5 rounded-xl bg-[#FF5722]/15 text-[#FF5722]">
+                  <FileText className="w-5 h-5 text-[#FF5722]" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-[#0F172A] text-base leading-snug">
+                    Joining Offer Letter &amp; Work Agreement
+                  </h3>
+                  <span className="text-[9px] font-black uppercase tracking-wider bg-[#FF5722] text-white px-2 py-0.5 rounded-full">
+                    Contractual
+                  </span>
+                </div>
+                <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
+                  Project-Based or Full-Time Contract with Scope of Work, Compensation, Terms, and Dual Digital Signatures (Founder &amp; Candidate).
+                </p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {["Project-Based", "Full-Time", "Dual Signatures", "Scope of Work", "PDF Export"].map((tag) => (
+                    <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FF5722]/10 text-[#EA580C]">{tag}</span>
+                  ))}
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 shrink-0 mt-1 text-[#FF5722] group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </motion.button>
+
           {/* Partner */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
             onClick={() => onSelect("partner")}
-            className="w-full text-left p-6 rounded-2xl border-2 border-[#2563EB] bg-[#EFF6FF] shadow-md shadow-[#2563EB]/10 cursor-pointer group transition-all hover:shadow-lg hover:shadow-[#2563EB]/15"
+            className="w-full text-left p-6 rounded-2xl border border-[#DBEAFE] bg-white shadow-sm cursor-pointer group transition-all hover:border-[#2563EB] hover:shadow-md hover:shadow-[#2563EB]/10"
           >
             <div className="flex items-start gap-4">
               <div className="flex flex-col gap-1.5 shrink-0">

@@ -373,6 +373,7 @@ export function useAppOrchestrator() {
 
   const handleTemplateSelect = (
     type:
+      | "contractual"
       | "partner"
       | "internship"
       | "countrySales"
@@ -380,7 +381,38 @@ export function useAppOrchestrator() {
       | "hrHiringNotice"
       | "internCertificate",
   ) => {
-    if (type === "countrySales" || type === "salesAgent") {
+    if (type === "contractual") {
+      setSalesAgreementType(undefined);
+      setAgreementTemplate("contractual");
+      setDocSettings((prev) => ({
+        ...prev,
+        agreementTemplate: "contractual" as AgreementTemplate,
+        salesAgreementType: undefined,
+        employmentType: prev.employmentType || "Project-Based Contract",
+        contractSubject:
+          prev.contractSubject ||
+          `Subject: ${secondParty.position || "Full Stack Developer"} For A ${
+            prev.employmentType || "Project-Based Contract"
+          }`,
+        scopeOfWork:
+          prev.scopeOfWork ||
+          "You Agree To Complete The Assigned Tasks, Deliverables, Revisions, And Documentation Specified In The Approved Project Scope. Any Substantial Change To The Scope, Timeline, Or Deliverables Must Be Approved By Both Parties Before Implementation.",
+        compensationDetails:
+          prev.compensationDetails ||
+          "The Agency Will Pay The Agreed Project Fee According To The Payment Schedule Specified In This Offer. Payment Milestones, Acceptance Criteria, And Any Applicable Deductions Must Be Agreed Upon In Writing. Approved Additional Work May Be Compensated Separately.",
+        confidentialityTerms:
+          prev.confidentialityTerms ||
+          "You Must Protect All Confidential Information, Client Data, Credentials, Business Documents, Project Files, And Internal Communications. Such Information Must Not Be Disclosed, Misused, Or Shared With Unauthorized Individuals During Or After The Engagement, Subject To Applicable Law.",
+        ipOwnershipTerms:
+          prev.ipOwnershipTerms ||
+          "Ownership And Transfer Of Project Deliverables, Including Designs, Source Files, Code, And Other Work Products, Will Be Governed By The Written Agreement And Applicable Law. Unless Otherwise Agreed, The Transfer Of Ownership To The Agency Or Its Client Will Take Effect Upon Receipt Of The Agreed Payment For The Relevant Deliverables. Pre-Existing Tools, Third-Party Assets, And Properly Licensed Materials Remain Subject To Their Applicable Rights And Licenses.",
+      }));
+      setDocType("doc");
+      setIsOfferSent(false);
+      setActiveStep(1);
+      setAppState("form");
+      return;
+    } else if (type === "countrySales" || type === "salesAgent") {
       setSalesAgreementType(type);
       setAgreementTemplate("partner");
       setDocSettings((prev) => ({
@@ -428,7 +460,7 @@ export function useAppOrchestrator() {
         hrPreparedByDesignation:
           prev.hrPreparedByDesignation || "Head of HR Department",
         hrOrganization:
-          prev.hrOrganization || DEFAULT_FIRST_PARTY.companyName || "JEVXO",
+          prev.hrOrganization || DEFAULT_FIRST_PARTY.companyName || "Creatibuz Studio",
         hrVacancies: prev.hrVacancies ?? 1,
         hrEmploymentType: prev.hrEmploymentType || "Full-Time",
         hrWorkMode: prev.hrWorkMode || "Onsite",
@@ -606,7 +638,29 @@ export function useAppOrchestrator() {
     const isInternship = agreementTemplate === "internship";
     const isHrHiring = agreementTemplate === "hrHiringNotice";
     const isCertificate = agreementTemplate === "internCertificate";
+    const isContractual = agreementTemplate === "contractual";
     const isSalesAgreement = Boolean(salesAgreementType);
+
+    if (isContractual) {
+      if (activeStep === 1) {
+        if (!p.fullName.trim()) return "Candidate / Contractor Full Name is required.";
+        if (!p.position.trim()) return "Position / Role is required.";
+        if (!p.email.trim()) return "Email address is required.";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(p.email.trim()))
+          return "Please enter a valid email address.";
+        if (!p.mobileNumber.trim()) return "Phone number is required.";
+      } else if (activeStep === 2) {
+        if (!docSettings.date?.trim()) return "Date of Issue is required.";
+        if (!docSettings.contractSubject?.trim()) return "Subject line is required.";
+        if (!docSettings.refIdSerial?.trim()) return "Agreement Reference ID serial is required.";
+        if (!secondParty.partnerIdSerial?.trim()) return "Contractor ID serial is required.";
+      } else if (activeStep === 3) {
+        if (!firstParty.signatureImg)
+          return "Founder & CEO signature is required to authorize the agreement.";
+      }
+      return "";
+    }
 
     if (isCertificate) {
       if (activeStep === 1) {
@@ -781,7 +835,8 @@ export function useAppOrchestrator() {
     agreementTemplate === "internCertificate"
       ? 2
       : agreementTemplate === "internship" ||
-          agreementTemplate === "hrHiringNotice"
+          agreementTemplate === "hrHiringNotice" ||
+          agreementTemplate === "contractual"
         ? 3
         : TOTAL_STEPS;
 
@@ -861,7 +916,7 @@ export function useAppOrchestrator() {
           const noticeName =
             docSettings.hrNoticeTitle?.trim() || "HR Hiring Notice";
           pdf.save(
-            `${noticeName} - ${docSettings.hrNoticeRefId || "JEVXO"}.pdf`,
+            `${noticeName} - ${docSettings.hrNoticeRefId || "CREATIBUZ"}.pdf`,
           );
           document.documentElement.classList.remove("a4-exporting");
           setIsExporting(false);
@@ -926,22 +981,44 @@ export function useAppOrchestrator() {
             console.warn("ID card PDF generation skipped:", cardErr);
             toast.success("Your signed documents have been saved.");
           }
+        } else {
+          // Documents without ID cards (such as Contractual agreements)
+          try {
+            const cardRes = await fetch(`/api/offers/${offerId}/card-pdf`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            });
+            const cardData = await cardRes.json().catch(() => null);
+            toast.success(
+              cardData?.message ||
+                "The fully executed contractual agreement has been emailed to you and the Founder.",
+            );
+          } catch {
+            toast.success("Your signed agreement has been saved.");
+          }
         }
       } else {
         const isHrNotice = agreementTemplate === "hrHiringNotice";
         const isCertificate = agreementTemplate === "internCertificate";
+        const isContractual = agreementTemplate === "contractual";
         if (isHrNotice) {
           const noticeName = docSettings.hrNoticeTitle
             ? docSettings.hrNoticeTitle.trim()
             : "HR Hiring Notice";
           pdf.save(
-            `${noticeName} - ${docSettings.hrNoticeRefId || "JEVXO"}.pdf`,
+            `${noticeName} - ${docSettings.hrNoticeRefId || "CREATIBUZ"}.pdf`,
           );
         } else if (isCertificate) {
           const internName = secondParty.fullName
             ? secondParty.fullName.trim()
             : "Intern";
           pdf.save(`${internName} - Internship Certificate.pdf`);
+        } else if (isContractual) {
+          const candidateName = secondParty.fullName
+            ? secondParty.fullName.trim()
+            : "Contractor";
+          pdf.save(`${candidateName} - Joining Offer Letter & Work Agreement.pdf`);
         } else {
           const partnerName = secondParty.fullName
             ? secondParty.fullName.trim()
@@ -977,7 +1054,8 @@ export function useAppOrchestrator() {
         agreementTemplate === "internCertificate"
           ? 2
           : agreementTemplate === "internship" ||
-              agreementTemplate === "hrHiringNotice"
+              agreementTemplate === "hrHiringNotice" ||
+              agreementTemplate === "contractual"
             ? 3
             : 5;
       setActiveStep(lastStep);

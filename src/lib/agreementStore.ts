@@ -294,6 +294,55 @@ export async function generateCertificateIds() {
   };
 }
 
+export async function generateContractualIds() {
+  const currentYearStr = new Date().getFullYear().toString().slice(-2);
+  const refPrefix = `CRB-CON-REF-${currentYearStr}-`;
+  const conPrefix = `CRB-CON-${currentYearStr}-`;
+
+  const mongoIds = await tryMongo(async () => {
+    const docs = await Agreement.find(
+      {
+        agreementId: new RegExp(`^CRB-CON-REF-${currentYearStr}-`),
+      },
+      "agreementId",
+    );
+
+    let maxSequence = 0;
+    for (const doc of docs) {
+      const parts = doc.agreementId.split("-");
+      const seq = parseInt(parts[parts.length - 1], 10);
+      if (!isNaN(seq) && seq > maxSequence) maxSequence = seq;
+    }
+
+    const seq = (maxSequence + 1).toString().padStart(3, "0");
+    return {
+      contractualId: `${conPrefix}${seq}`,
+      contractualRefId: `${refPrefix}${seq}`,
+    };
+  });
+
+  if (mongoIds) return { ...mongoIds, storage: "mongodb" as const };
+
+  const fileList = await fileStore.fileListAgreements();
+  let maxSeq = 0;
+  for (const a of fileList) {
+    if (
+      typeof a.agreementId === "string" &&
+      a.agreementId.startsWith(refPrefix)
+    ) {
+      const parts = (a.agreementId as string).split("-");
+      const seq = parseInt(parts[parts.length - 1], 10);
+      if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
+    }
+  }
+  const seq = (maxSeq + 1).toString().padStart(3, "0");
+  return {
+    contractualId: `${conPrefix}${seq}`,
+    contractualRefId: `${refPrefix}${seq}`,
+    storage: "file" as const,
+  };
+}
+
 export async function saveAgreement(data: Record<string, unknown>) {
   const mongoDoc = await tryMongo(async () => {
     const doc = new Agreement(data);
@@ -389,15 +438,17 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
     signedAt: agreement.signedAt,
     createdAt: agreement.createdAt,
     partnerName: isHrHiring
-      ? (ds?.hrRecipientName as string) || sp?.fullName || ""
-      : sp?.fullName || "",
+      ? (ds?.hrRecipientName as string) || sp?.fullName || sp?.name || ""
+      : sp?.fullName || sp?.name || "",
     partnerEmail: isHrHiring
       ? (ds?.hrRecipientEmail as string) || sp?.email || ""
       : sp?.email || "",
     companyName:
       (agreement.firstParty as Record<string, string> | undefined)
-        ?.companyName || "",
-    position: sp?.position || "",
+        ?.companyName ||
+      (agreement.firstParty as Record<string, string> | undefined)?.company ||
+      "Creatibuz Studio",
+    position: sp?.position || sp?.role || "",
     hrRecipientName: isHrHiring
       ? (ds?.hrRecipientName as string) || ""
       : undefined,

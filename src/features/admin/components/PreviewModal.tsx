@@ -13,6 +13,7 @@ import A4DocumentScaler from "@/features/document-preview/components/A4DocumentS
 import DocumentPreview from "@/features/document-preview/components/DocumentPreview";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
 import SalesAgreementDocument from "@/features/document-preview/templates/document/SalesAgreementDocument";
+import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
 import IdCardWorkspace from "@/features/id-card/components/IdCardWorkspace";
 
 type PreviewTab = "agreement" | "idCard";
@@ -64,7 +65,7 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
         setDocSettings(data.docSettings);
         setAgreementTemplate(
           (data.docSettings?.agreementTemplate as AgreementTemplate) ||
-            "partner",
+            (data.docType?.toLowerCase().includes("contractual") ? "contractual" : "partner"),
         );
         const salesType = data.docSettings
           ?.salesAgreementType as SalesAgreementType | undefined;
@@ -78,11 +79,13 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
 
   const isSales = Boolean(salesAgreementType);
   const isInternship = agreementTemplate === "internship" && !isSales;
+  const isContractual = agreementTemplate === "contractual" && !isSales;
 
   // Count pages for scaler
   const pageCount = (() => {
     if (salesAgreementType === "countrySales") return 5;
     if (salesAgreementType === "salesAgent") return 3;
+    if (isContractual) return 1;
     if (isInternship) return 2;
     return 3; // standard partner
   })();
@@ -117,16 +120,18 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
                 >
                   <FileText className="w-3.5 h-3.5" /> Agreement
                 </button>
-                <button
-                  onClick={() => setTab("idCard")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                    tab === "idCard"
-                      ? "bg-[#2563EB] text-white border-[#2563EB]"
-                      : "bg-white border-[#DBEAFE] text-[#64748B] hover:border-[#2563EB]"
-                  }`}
-                >
-                  <CreditCard className="w-3.5 h-3.5" /> ID Card
-                </button>
+                {!isContractual && (
+                  <button
+                    onClick={() => setTab("idCard")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                      tab === "idCard"
+                        ? "bg-[#2563EB] text-white border-[#2563EB]"
+                        : "bg-white border-[#DBEAFE] text-[#64748B] hover:border-[#2563EB]"
+                    }`}
+                  >
+                    <CreditCard className="w-3.5 h-3.5" /> ID Card
+                  </button>
+                )}
               </>
             )}
             <button
@@ -156,7 +161,14 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
             <>
               {tab === "agreement" && (
                 <A4DocumentScaler pageCount={pageCount}>
-                  {isSales ? (
+                  {isContractual ? (
+                    <ContractualOfferDocument
+                      firstParty={firstParty}
+                      secondParty={secondParty}
+                      settings={docSettings}
+                      innerRef={dummyRefs[0]}
+                    />
+                  ) : isSales ? (
                     <SalesAgreementDocument
                       docType={salesAgreementType!}
                       firstParty={firstParty}

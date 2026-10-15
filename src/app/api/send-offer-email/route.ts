@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { findAgreementById } from "../../../lib/agreementStore";
-import { getBaseUrl, getResendFromAddress } from "../../../lib/emailConfig";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { getBaseUrl, getResendFromAddress, getResendClient } from "../../../lib/emailConfig";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Professional email signature block
 // ─────────────────────────────────────────────────────────────────────────────
 interface SignatureParams {
   name: string;
-  title: string;       // e.g. "Head of HR Department • JEVXO"
+  title: string;       // e.g. "Founder & CEO • Creatibuz Studio"
   email: string;
   phone: string;
   website: string;
@@ -37,11 +34,11 @@ function buildEmailSignature({
   const iconGlobe = `<img ${iconStyle} src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/globe.svg" alt="website" />`;
   const iconPin   = `<img ${iconStyle} src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/map-pin.svg" alt="address" />`;
 
-  // Real JEVXO logo — hosted public image URL compatible with HTML email clients
-  const logoUrl = `${baseUrl}/logo.png`;
-  const logoCell = `<td style="padding-right:15px;vertical-align:top;width:65px;">
+  // Real Creatibuz Studio logo / symbol
+  const logoUrl = `${baseUrl}/creatibuz-symbol.png`;
+  const logoCell = `<td style="padding-right:15px;vertical-align:top;width:60px;">
     <a href="https://${website}" target="_blank" style="text-decoration:none;">
-      <img src="${logoUrl}" alt="JEVXO" width="65" style="display:block;width:65px;max-width:65px;height:auto;border:0;outline:none;text-decoration:none;border-radius:6px;" />
+      <img src="${logoUrl}" alt="Creatibuz Studio" width="56" style="display:block;width:56px;max-width:56px;height:auto;border:0;outline:none;text-decoration:none;border-radius:10px;background:#0d0d0d;padding:4px;" />
     </a>
   </td>`;
 
@@ -63,8 +60,8 @@ function buildEmailSignature({
         ${iconPin}${address}
       </div>
       <div style="margin-top:8px;padding-top:6px;border-top:1px solid #f1f5f9;font-size:10.5px;color:#94a3b8;font-style:italic;">
-        Automated Notice &amp; Document dispatched via
-        <strong style="color:#8446EE;font-style:normal;">JEVXO Doc Engine</strong>
+        Official Document dispatched via
+        <strong style="color:#FF5722;font-style:normal;">Creatibuz Studio Engine</strong>
       </div>
     </td>
   </tr>
@@ -91,6 +88,10 @@ export async function POST(request: Request) {
     }
 
     const { firstParty, secondParty, docSettings } = agreement;
+
+    const isContractual =
+      agreementTemplate === "contractual" ||
+      (agreement.docSettings as Record<string, unknown>)?.agreementTemplate === "contractual";
 
     const isInternship =
       agreementTemplate === "internship" ||
@@ -128,14 +129,24 @@ export async function POST(request: Request) {
     const sender  = getResendFromAddress();
 
     // ── Shared fallbacks ────────────────────────────────────────────────────
-    const website = (firstParty.website || "www.jevxo.com").replace(/^https?:\/\//, "");
-    const address = firstParty.currentAddress || "Silicon Tower (9th Floor), Hi-Tech Park, Rajshahi";
+    const website = (firstParty.website || "www.creatibuzstudio.com").replace(/^https?:\/\//, "");
+    const address = firstParty.currentAddress || "Dhaka, Bangladesh";
 
     // ── Build per-doc-type signature ────────────────────────────────────────
+    const contractualSignature = buildEmailSignature({
+      name:         firstParty.representedBy || "Md. Abdul Hakim",
+      title:        `Founder & CEO &bull; ${firstParty.companyName || "Creatibuz Studio"}`,
+      email:        firstParty.email  || "info@creatibuzstudio.com",
+      phone:        firstParty.mobileNumber || "+8801968657353",
+      website,
+      address,
+      accentColor:  "#FF5722",
+    });
+
     const hrSignature = buildEmailSignature({
       name:         docSettings.hrPreparedByName  || firstParty.hrName  || firstParty.representedBy,
       title:        `${docSettings.hrPreparedByDesignation || "Head of HR Department"} &bull; ${firstParty.companyName}`,
-      email:        firstParty.email  || "info@jevxo.com",
+      email:        firstParty.email  || "info@creatibuzstudio.com",
       phone:        firstParty.hrMobile || firstParty.mobileNumber || "",
       website,
       address,
@@ -143,37 +154,39 @@ export async function POST(request: Request) {
     });
 
     const ceoSignature = buildEmailSignature({
-      name:         firstParty.representedBy,
-      title:        `${firstParty.role} &bull; ${firstParty.companyName}`,
-      email:        firstParty.email  || "info@jevxo.com",
-      phone:        firstParty.mobileNumber || "",
+      name:         firstParty.representedBy || "Md. Abdul Hakim",
+      title:        `${firstParty.role || "Founder & CEO"} &bull; ${firstParty.companyName || "Creatibuz Studio"}`,
+      email:        firstParty.email  || "info@creatibuzstudio.com",
+      phone:        firstParty.mobileNumber || "+8801968657353",
       website,
       address,
-      accentColor:  "#2563eb",
+      accentColor:  "#FF5722",
     });
 
     const salesSignature = buildEmailSignature({
-      name:         firstParty.representedBy,
-      title:        `${firstParty.role} &bull; ${firstParty.companyName}`,
-      email:        firstParty.email  || "info@jevxo.com",
-      phone:        firstParty.mobileNumber || "",
+      name:         firstParty.representedBy || "Md. Abdul Hakim",
+      title:        `${firstParty.role || "Founder & CEO"} &bull; ${firstParty.companyName || "Creatibuz Studio"}`,
+      email:        firstParty.email  || "info@creatibuzstudio.com",
+      phone:        firstParty.mobileNumber || "+8801968657353",
       website,
       address,
       accentColor:  "#10b981",
     });
 
     // ── Subject ─────────────────────────────────────────────────────────────
-    const subject = isInternship
-      ? "Internship Offer Letter — JEVXO"
+    const subject = isContractual
+      ? `Joining Offer Letter & Work Agreement — ${firstParty.companyName || "Creatibuz Studio"}`
+      : isInternship
+      ? `Internship Offer Letter — ${firstParty.companyName || "Creatibuz Studio"}`
       : isHrHiring
       ? `HR Hiring Notice: ${docSettings.hrPositionName || "Open Position"}`
       : isCertificate
-      ? "Certificate of Internship Completion — JEVXO"
+      ? `Certificate of Internship Completion — ${firstParty.companyName || "Creatibuz Studio"}`
       : isCountrySales
-      ? "Country Sales Partner Agreement — JEVXO"
+      ? `Country Sales Partner Agreement — ${firstParty.companyName || "Creatibuz Studio"}`
       : isSalesAgent
-      ? "Sales Agent Agreement — JEVXO"
-      : "JEVXO Offer Letter & Partnership Agreement";
+      ? `Sales Agent Agreement — ${firstParty.companyName || "Creatibuz Studio"}`
+      : `${firstParty.companyName || "Creatibuz Studio"} Offer Letter & Agreement`;
 
     // ── HR resolved values ──────────────────────────────────────────────────
     const hrPosition  = docSettings.hrPositionName               || "Open Position";
@@ -358,17 +371,75 @@ export async function POST(request: Request) {
   ${salesSignature}
 </div>`
 
+      : isContractual
+      ? /* ── Contractual / Joining Offer Letter & Work Agreement ── */ `
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px 20px; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff; color: #0f172a;">
+  <div style="background-color: #0d0d0d; border-radius: 14px; padding: 22px 20px; text-align: left; margin-bottom: 25px; border-bottom: 4px solid #FF5722;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.5px;">Creatibuz Studio</h2>
+        <p style="margin: 3px 0 0; font-size: 10px; color: #A1A1AA; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;">DESIGN &middot; DEVELOP &middot; TRANSFORM</p>
+      </div>
+    </div>
+    <div style="margin-top: 14px; border-top: 1px solid #27272A; padding-top: 12px;">
+      <h3 style="color: #ffffff; margin: 0; font-size: 17px; font-weight: 700;">Joining Offer Letter &amp; Work Agreement</h3>
+      <p style="margin: 4px 0 0; font-size: 12px; color: #E4E4E7;">Role: <strong>${secondParty.position || "Developer / Designer"}</strong> &bull; ${docSettings.employmentType || "Project-Based Contract"}</p>
+    </div>
+  </div>
+
+  <p style="font-size: 16px; font-weight: 700; margin-top: 0; color: #0f172a;">Dear ${candidateName},</p>
+  <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 14px;">
+    We are pleased to offer you a <strong>${docSettings.employmentType || "Project-Based Contract"}</strong> at <strong>${firstParty.companyName || "Creatibuz Studio"}</strong> as <strong>${secondParty.position || "Team Member"}</strong>.
+  </p>
+  <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 16px;">
+    We appreciate your skills, professional potential, and look forward to collaborating with you on client projects and delivering high-quality design and development solutions.
+  </p>
+
+  <div style="background-color: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 12px; padding: 15px 20px; margin: 20px 0;">
+    <h4 style="margin: 0 0 10px 0; color: #C2410C; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">Engagement Highlights</h4>
+    <table style="width: 100%; font-size: 13px; color: #475569; border-collapse: collapse;">
+      <tr>
+        <td style="padding: 4px 0; font-weight: 600;">Role / Position:</td>
+        <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #0f172a;">${secondParty.position || "Developer"}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: 600;">Contract Model:</td>
+        <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #FF5722;">${docSettings.employmentType || "Project-Based Contract"}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: 600;">Issue Date:</td>
+        <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #0f172a;">${docSettings.date || "Immediate"}</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 22px;">
+    Please review the terms of this offer and apply your digital signature. You can view and sign the agreement directly through the secure portal below:
+  </p>
+
+  <div style="margin: 30px 0; text-align: center;">
+    <a href="${ctaLink}" target="_blank"
+       style="background-color: #FF5722; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block; font-size: 14px; box-shadow: 0 4px 14px rgba(255,87,34,0.3);">
+      View &amp; Sign Offer Letter &rarr;
+    </a>
+  </div>
+  <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-bottom: 24px;">
+    Both parties will receive the finalized, dual-signed PDF copy once submitted.
+  </p>
+  ${contractualSignature}
+</div>`
+
       : /* ── Partner / appointment ── */ `
 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px 20px; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff; color: #0f172a;">
   <div style="text-align: center; margin-bottom: 25px;">
-    <h2 style="color: #2563eb; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">JEVXO</h2>
-    <div style="height: 3px; background: linear-gradient(to right, transparent, #2563eb, transparent); margin-top: 12px; width: 100%;"></div>
+    <h2 style="color: #FF5722; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 0.5px;">${firstParty.companyName || "Creatibuz Studio"}</h2>
+    <div style="height: 3px; background: linear-gradient(to right, transparent, #FF5722, transparent); margin-top: 12px; width: 100%;"></div>
   </div>
 
   <p style="font-size: 16px; font-weight: 700; margin-top: 0; color: #0f172a;">Dear ${candidateName},</p>
   <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 16px;">
     On behalf of <strong>${firstParty.companyName}</strong>, I am thrilled to extend to you our official offer of
-    partnership for the position of <strong style="color: #2563eb;">${secondParty.position}</strong>.
+    partnership for the position of <strong style="color: #FF5722;">${secondParty.position}</strong>.
   </p>
 
   <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px 20px; margin: 20px 0;">
@@ -376,7 +447,7 @@ export async function POST(request: Request) {
     <table style="width: 100%; font-size: 13px; color: #475569; border-collapse: collapse;">
       <tr>
         <td style="padding: 4px 0; font-weight: 600;">Vested Equity Share:</td>
-        <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #2563eb;">${docSettings.equityShare}%</td>
+        <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #FF5722;">${docSettings.equityShare}%</td>
       </tr>
       <tr>
         <td style="padding: 4px 0; font-weight: 600;">Minimum Service Period:</td>
@@ -396,7 +467,7 @@ export async function POST(request: Request) {
 
   <div style="margin: 30px 0; text-align: center;">
     <a href="${ctaLink}" target="_blank"
-       style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block; font-size: 14px; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+       style="background-color: #FF5722; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block; font-size: 14px; box-shadow: 0 4px 12px rgba(255,87,34,0.25);">
       View &amp; Sign Offer Letter
     </a>
   </div>
@@ -410,6 +481,7 @@ export async function POST(request: Request) {
       ? `Internship_Certificate_${(secondParty.fullName || "Intern").replace(/\s+/g, "_")}.pdf`
       : undefined;
 
+    const resend = getResendClient();
     const emailResult = await resend.emails.send({
       from: sender,
       to:   [candidateEmail],

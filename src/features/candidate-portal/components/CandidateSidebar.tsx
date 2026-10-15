@@ -15,6 +15,7 @@ interface CandidateSidebarProps {
   offerId: string;
   isPhotoUploaded?: boolean;
   isPendingCSP?: boolean;
+  agreementTemplate?: string;
   onSwitchToIdCard?: () => void;
   onSignatureSaved?: (hasSignature: boolean) => void;
 }
@@ -29,6 +30,7 @@ export default function CandidateSidebar({
   offerId,
   isPhotoUploaded = false,
   isPendingCSP = false,
+  agreementTemplate,
   onSwitchToIdCard,
   onSignatureSaved,
 }: CandidateSidebarProps) {
@@ -109,7 +111,8 @@ export default function CandidateSidebar({
       setSigError("Please draw and save your signature before exporting.");
       return;
     }
-    if (!isPendingCSP && !isPhotoUploaded) {
+    const isContractual = agreementTemplate === "contractual";
+    if (!isContractual && !isPendingCSP && !isPhotoUploaded) {
       setSigError(
         "Please upload your photo in the ID Card tab before signing.",
       );

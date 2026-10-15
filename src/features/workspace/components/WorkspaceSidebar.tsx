@@ -3,14 +3,20 @@
 import React from "react";
 import { Settings, User, BookOpen, Mail, RefreshCw, Download } from "lucide-react";
 import { FirstParty, SecondParty, DocSettings, AgreementTemplate, SalesAgreementType } from "@/types";
-import { SettingsTab, InternshipSettingsTab, SalesSettingsTab, HRSettingsTab, InternCertificateSettingsTab } from "./sidebar/SettingsTab";
+import { SettingsTab, InternshipSettingsTab, SalesSettingsTab, HRSettingsTab, InternCertificateSettingsTab, ContractualSettingsTab } from "./sidebar/SettingsTab";
 import { FirstPartyTab, SecondPartyTab, SalesPartyTab } from "./sidebar/PartiesTab";
 
 // ─── Main sidebar tabs configuration ─────────────────────────────────────────
+const CONTRACT_TABS = [
+  { id: "settings", label: "Contract Terms", icon: Settings },
+  { id: "secondParty", label: "Contractor Info", icon: User },
+  { id: "firstParty", label: "Issuer (Creatibuz)", icon: BookOpen },
+];
+
 const PARTNER_TABS = [
   { id: "settings", label: "Agreement Cl.", icon: Settings },
   { id: "secondParty", label: "2nd Party (You)", icon: User },
-  { id: "firstParty", label: "1st Party (Jevxo)", icon: BookOpen },
+  { id: "firstParty", label: "1st Party (Creatibuz)", icon: BookOpen },
 ];
 
 const INTERN_TABS = [
@@ -22,7 +28,7 @@ const INTERN_TABS = [
 const SALES_TABS = [
   { id: "settings", label: "Sales Terms", icon: Settings },
   { id: "secondParty", label: "Parties", icon: User },
-  { id: "firstParty", label: "JEVXO Approval", icon: BookOpen },
+  { id: "firstParty", label: "Creatibuz Approval", icon: BookOpen },
 ];
 
 const HR_TABS = [
@@ -73,6 +79,7 @@ export default function WorkspaceSidebar({
   agreementTemplate,
   salesAgreementType,
 }: WorkspaceSidebarProps) {
+  const isContractual = agreementTemplate === "contractual";
   const isInternship = agreementTemplate === "internship";
   const isHrHiring = agreementTemplate === "hrHiringNotice";
   const isCertificate = agreementTemplate === "internCertificate";
@@ -86,7 +93,9 @@ export default function WorkspaceSidebar({
         {/* Header */}
         <div className="space-y-2">
           <span className={`text-[10px] border font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block ${
-            isCertificate
+            isContractual
+              ? "bg-[#FFF3EE] border-[#FF5722]/30 text-[#EA580C]"
+              : isCertificate
               ? "bg-indigo-50 border-indigo-200 text-indigo-700"
               : isInternship
               ? "bg-[#F0F9FF] border-[#BAE6FD] text-[#0EA5E9]"
@@ -94,13 +103,15 @@ export default function WorkspaceSidebar({
               ? "bg-violet-50 border-violet-200 text-violet-700"
               : "bg-[#EFF6FF] border-[#DBEAFE]/50 text-[#1E3A8A]"
           }`}>
-            {isCertificate ? "Intern Certificate Ready!" : isInternship ? "Internship Offer Ready!" : isHrHiring ? "HR Hiring Notice Ready!" : isSalesAgreement ? `${salesAgreementType === "countrySales" ? "Country Sales Partner" : "Sales Agent"} Agreement Ready!` : "Agreement ready!"}
+            {isContractual ? "Contractual Offer Ready!" : isCertificate ? "Intern Certificate Ready!" : isInternship ? "Internship Offer Ready!" : isHrHiring ? "HR Hiring Notice Ready!" : isSalesAgreement ? `${salesAgreementType === "countrySales" ? "Country Sales Partner" : "Sales Agent"} Agreement Ready!` : "Agreement ready!"}
           </span>
           <h2 className="text-xl font-bold text-[#0F172A]">
             Document Workspace
           </h2>
           <p className="text-[#64748B] text-xs">
-            {isCertificate
+            {isContractual
+              ? "Fine-tune scope of work, compensation, and contract terms with live document preview."
+              : isCertificate
               ? "Adjust certificate details with live landscape preview."
               : isInternship
               ? "Adjust internship offer details with live preview."
@@ -114,12 +125,12 @@ export default function WorkspaceSidebar({
 
         {/* Tab headers */}
         <div className="flex border-b border-[#DBEAFE]">
-          {(isCertificate ? CERT_TABS : isInternship ? INTERN_TABS : isHrHiring ? HR_TABS : isSalesAgreement ? SALES_TABS : PARTNER_TABS).map(({ id, label, icon: Icon }) => (
+          {(isContractual ? CONTRACT_TABS : isCertificate ? CERT_TABS : isInternship ? INTERN_TABS : isHrHiring ? HR_TABS : isSalesAgreement ? SALES_TABS : PARTNER_TABS).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
               className={`flex-1 pb-3 text-xs font-bold tracking-wide border-b-2 transition flex flex-col md:flex-row items-center justify-center gap-1.5 cursor-pointer ${activeTab === id
-                ? "border-[#2563EB] text-[#2563EB]"
+                ? "border-[#FF5722] text-[#EA580C]"
                 : "border-transparent text-[#64748B] hover:text-[#0F172A]"
                 }`}
             >
@@ -132,7 +143,9 @@ export default function WorkspaceSidebar({
         {/* Tab content */}
         <div className="space-y-5">
           {activeTab === "settings" && (
-            isCertificate ? (
+            isContractual ? (
+              <ContractualSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
+            ) : isCertificate ? (
               <InternCertificateSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
             ) : isInternship ? (
               <InternshipSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
@@ -197,6 +210,33 @@ export default function WorkspaceSidebar({
                 )}
               </button>
             </div>
+          ) : isContractual ? (
+            <div className="space-y-2.5">
+              <button
+                onClick={onSendOffer}
+                disabled={isOfferSent || isOpeningModal}
+                className="w-full py-3.5 px-6 bg-[#FF5722] hover:bg-[#EA580C] disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-white text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-[#FF5722]/15 hover:shadow-[#FF5722]/30 cursor-pointer"
+              >
+                {isOpeningModal ? (
+                  <><RefreshCw className="w-4 h-4 animate-spin" /> Preparing Offer Link…</>
+                ) : isOfferSent ? (
+                  <><Mail className="w-4 h-4" /> Sent Offer Letter Successfully</>
+                ) : (
+                  <><Mail className="w-4 h-4" /> Send Offer to Candidate</>
+                )}
+              </button>
+              <button
+                onClick={onExport}
+                disabled={isExporting}
+                className="w-full py-3 px-6 bg-white border-2 border-[#FF5722]/30 hover:border-[#FF5722] hover:bg-[#FFF8F5] text-[#EA580C] font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isExporting ? (
+                  <><RefreshCw className="w-4 h-4 animate-spin" /> Generating PDF…</>
+                ) : (
+                  <><Download className="w-4 h-4" /> Download PDF</>
+                )}
+              </button>
+            </div>
           ) : (
             <button
               onClick={onSendOffer}
@@ -214,7 +254,7 @@ export default function WorkspaceSidebar({
           )}
           <div className="flex justify-between text-[11px] text-[#64748B] px-1 font-semibold">
             <span>A4 dimensions output</span>
-            <span>{isDemo ? "1 page" : isInternship ? "1 page" : isHrHiring ? "1 page" : isCertificate ? "1 page" : isCSPAgreement ? "5 pages" : isSAGAgreement ? "3 pages" : "2 pages"} automatic layout</span>
+            <span>{isDemo ? "1 page" : isInternship ? "1 page" : isContractual ? "1 page" : isHrHiring ? "1 page" : isCertificate ? "1 page" : isCSPAgreement ? "5 pages" : isSAGAgreement ? "3 pages" : "2 pages"} automatic layout</span>
           </div>
         </div>
       </div>

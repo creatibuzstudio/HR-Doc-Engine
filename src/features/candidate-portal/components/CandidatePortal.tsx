@@ -117,6 +117,7 @@ export default function CandidatePortal({
     };
   }, [candidatePhotoUrl, isCompleted, offerId]);
 
+  const isContractual = agreementTemplate === "contractual";
   const isInternship = agreementTemplate === "internship";
   const isHrHiring = agreementTemplate === "hrHiringNotice";
   const isCSP = salesAgreementType === "countrySales";
@@ -274,8 +275,8 @@ export default function CandidatePortal({
 
 
   const handleConfirmSign = () => {
-    // Both internship and partner require a photo before signing
-    if (!isPendingCSP && !candidatePhotoUrl) {
+    // Both internship and partner require a photo before signing (contractual does not)
+    if (!isContractual && !isPendingCSP && !candidatePhotoUrl) {
       toast.error(
         "Please upload your photo in the ID Card tab before signing.",
         { autoClose: 5000 },
@@ -372,7 +373,9 @@ export default function CandidatePortal({
         {[
           {
             id: "letter" as const,
-            label: isInternship
+            label: isContractual
+              ? "📄 Joining Offer Letter & Work Agreement"
+              : isInternship
               ? "📄 Internship Offer Letter"
               : isCSP
                 ? "📄 Country Sales Partner Agreement"
@@ -380,7 +383,7 @@ export default function CandidatePortal({
                   ? "📄 Sales Agent Agreement"
                   : "📄 Appointment Letter",
           },
-          !(isSalesAgent && isPendingCSP) ? {
+          !isContractual && !(isSalesAgent && isPendingCSP) ? {
             id: "idcard" as const,
             label: isInternship
               ? "🪪 Your Internee ID Card"
@@ -422,6 +425,7 @@ export default function CandidatePortal({
                 onExport={handleConfirmSign}
                 offerId={offerId}
                 isPhotoUploaded={!!candidatePhotoUrl}
+                agreementTemplate={agreementTemplate}
                 onSwitchToIdCard={() => setActiveTab("idcard")}
                 onSignatureSaved={handleSignatureSaved}
               />

@@ -43,9 +43,15 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "JEVXO — HR Document Engine",
-  description: "Automated Documents generator for JEVXO HR.",
+  title: "Creatibuz Studio — Document Engine",
+  description: "Official Document & Agreement Engine for Creatibuz Studio. Design · Develop · Transform.",
+  icons: {
+    icon: "/fav.jpg",
+    shortcut: "/fav.jpg",
+    apple: "/fav.jpg",
+  },
 };
+
 
 export default function RootLayout({
   children,

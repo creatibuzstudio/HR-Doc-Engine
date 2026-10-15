@@ -56,6 +56,10 @@ function DocTypeBadge({
   salesAgreementType?: string;
   agreementTemplate?: string;
 }) {
+  const isContractual =
+    agreementTemplate === "contractual" ||
+    docType === "Joining Offer Letter & Work Agreement" ||
+    docType?.toLowerCase().includes("contractual");
   const isCSP =
     salesAgreementType === "countrySales" ||
     docType === "Country Sales Partner Agreement & ID Card";
@@ -69,6 +73,7 @@ function DocTypeBadge({
     !isCSP &&
     !isSA &&
     !isCert &&
+    !isContractual &&
     (docType?.toLowerCase().includes("intern") ||
       docType === "Intern Offerletter & ID Card");
   const isHrHiring =
@@ -76,8 +81,15 @@ function DocTypeBadge({
     !isSA &&
     !isCert &&
     !isIntern &&
+    !isContractual &&
     (agreementTemplate === "hrHiringNotice" || docType === "HR Hiring Notice");
 
+  if (isContractual)
+    return (
+      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FFF3EE] text-[#EA580C] border border-[#FF5722]/30">
+        Contractual Offer
+      </span>
+    );
   if (isCSP)
     return (
       <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">

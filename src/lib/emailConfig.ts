@@ -1,6 +1,8 @@
+import { Resend } from "resend";
+
 const DEFAULT_BASE_URL = "http://localhost:3000";
-const DEFAULT_FROM_ADDRESS = "JEVXO <info@jevxo.com>";
-const DEFAULT_FOUNDER_EMAIL = "info@jevxo.com";
+const DEFAULT_FROM_ADDRESS = "Creatibuz Studio <info@creatibuzstudio.com>";
+const DEFAULT_FOUNDER_EMAIL = "info@creatibuzstudio.com";
 
 function isUsableEmail(value: string | undefined): value is string {
   return Boolean(value && value.includes("@"));
@@ -14,6 +16,10 @@ export function getResendFromAddress() {
   return process.env.RESEND_FROM_ADDRESS?.trim() || DEFAULT_FROM_ADDRESS;
 }
 
+export function getResendClient(): Resend {
+  return new Resend(process.env.RESEND_API_KEY || "re_not_configured");
+}
+
 export function getFounderNotificationRecipients(...emails: Array<string | undefined>) {
   const deduped = new Map<string, string>();
 
@@ -24,3 +30,4 @@ export function getFounderNotificationRecipients(...emails: Array<string | undef
 
   return Array.from(deduped.values());
 }
+

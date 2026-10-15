@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import {
   findAgreementById,
   updateAgreement,
@@ -7,16 +6,17 @@ import {
 import {
   getFounderNotificationRecipients,
   getResendFromAddress,
+  getResendClient,
 } from "../../../../../lib/emailConfig";
 
 // Increase body size — card PDF base64 can be several MB
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-async function sendWithRetry(payload: Parameters<typeof resend.emails.send>[0]) {
+async function sendWithRetry(payload: Parameters<ReturnType<typeof getResendClient>["emails"]["send"]>[0]) {
+  const resend = getResendClient();
   let result = await resend.emails.send(payload);
   if (!result.error) return result;
 
@@ -24,6 +24,7 @@ async function sendWithRetry(payload: Parameters<typeof resend.emails.send>[0]) 
   result = await resend.emails.send(payload);
   return result;
 }
+
 
 /**
  * POST /api/offers/[id]/card-pdf
@@ -52,13 +53,6 @@ export async function POST(
       "",
     );
 
-    if (!cardPDFdata) {
-      return NextResponse.json(
-        { error: "No card PDF data provided." },
-        { status: 400 },
-      );
-    }
-
     const agreement = await findAgreementById(id);
     if (!agreement) {
       return NextResponse.json(
@@ -67,9 +61,16 @@ export async function POST(
       );
     }
 
-    const isInternship =
-      (agreement.docSettings as Record<string, string> | undefined)
-        ?.agreementTemplate === "internship";
+    const template = (agreement.docSettings as Record<string, string> | undefined)?.agreementTemplate;
+    const isContractual = template === "contractual" || agreement.docType === "contractual" || agreement.docType?.toLowerCase().includes("contract");
+    const isInternship = template === "internship";
+
+    if (!isContractual && !cardPDFdata) {
+      return NextResponse.json(
+        { error: "No card PDF data provided." },
+        { status: 400 },
+      );
+    }
 
     const salesType = (agreement.docSettings as Record<string, unknown> | undefined)
       ?.salesAgreementType as string | undefined;
@@ -82,7 +83,8 @@ export async function POST(
       ? (agreement.secondParty as Record<string, string> | undefined)?.salesPartnerId ||
         (agreement.docSettings as Record<string, string> | undefined)?.salesPartnerId ||
         (agreement.secondParty as Record<string, string> | undefined)?.partnerId
-      : (agreement.secondParty as Record<string, string> | undefined)?.partnerId;
+      : (agreement.secondParty as Record<string, string> | undefined)?.contractualId ||
+        (agreement.secondParty as Record<string, string> | undefined)?.partnerId;
 
     // Pull the appointment letter that /sign already saved to the DB
     const letterPDFdata =
@@ -93,11 +95,13 @@ export async function POST(
           )
         : "";
 
-    // Save the correct (candidate-photo) card PDF to DB
-    await updateAgreement(id, {
-      cardPDFdata,
-      idCardGenerated: true,
-    });
+    // Save the correct (candidate-photo) card PDF to DB if present
+    if (cardPDFdata) {
+      await updateAgreement(id, {
+        cardPDFdata,
+        idCardGenerated: true,
+      });
+    }
 
     let founderEmailSent = false;
     let partnerEmailSent = false;
@@ -108,64 +112,79 @@ export async function POST(
         agreement.firstParty.email,
       );
       const partnerEmail = agreement.secondParty.email?.trim();
-      const founderName = agreement.firstParty.representedBy;
-      const partnerName = agreement.secondParty.fullName;
-      const partnerID = resolvedPartnerId;
+      const founderName = agreement.firstParty.representedBy || agreement.firstParty.name || "Md. Abdul Hakim";
+      const partnerName = agreement.secondParty.fullName || agreement.secondParty.name || "Candidate";
+      const partnerID = resolvedPartnerId || id;
+      const company = agreement.firstParty.companyName || agreement.firstParty.company || "Creatibuz Studio";
 
       console.log(
         `[card-pdf] Sending combined emails — founder: ${founderRecipients.join(", ")}, partner: ${partnerEmail}`,
       );
 
-      // Build attachments — always include the card; add letter if available
-      const docLabel = isInternship
+      // Build attachments — add letter if available, and card if available
+      const docLabel = isContractual
+        ? "contractual-offer-agreement"
+        : isInternship
         ? "internship-offer"
         : isCountrySales
         ? "sales-partner-agreement"
         : isSalesAgent
         ? "sales-agent-agreement"
         : "appointment";
-      const attachments: { filename: string; content: string }[] = [
-        { filename: `${id}-id-card.pdf`, content: cardPDFdata },
-      ];
+      const attachments: { filename: string; content: string }[] = [];
       if (letterPDFdata) {
-        attachments.unshift({
+        attachments.push({
           filename: `${id}-${docLabel}.pdf`,
           content: letterPDFdata,
         });
       }
+      if (cardPDFdata) {
+        attachments.push({
+          filename: `${id}-id-card.pdf`,
+          content: cardPDFdata,
+        });
+      }
 
       // ── Per-template email copy ─────────────────────────────────────────────
-      const founderSubject = isInternship
+      const founderSubject = isContractual
+        ? `Joining Offer Letter & Work Agreement Signed — ${partnerName}`
+        : isInternship
         ? `Internship Offer Signed — ${partnerName}`
         : isCountrySales
         ? `Country Sales Partner Agreement Signed — ${partnerName}`
         : isSalesAgent
         ? `Sales Agent Agreement Signed — ${partnerName}`
-        : "Appointment Letter Fully Executed";
+        : `Appointment Letter Fully Executed — ${partnerName}`;
 
-      const founderText = isInternship
-        ? `Dear ${founderName},\n\nThe internship offer letter and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\nJEVXO HR System`
+      const founderText = isContractual
+        ? `Dear ${founderName},\n\nThe Joining Offer Letter & Work Agreement for ${partnerName} (Ref: ${partnerID}) has been fully executed with both signatures. Please find the finalized PDF document attached.\n\nBest regards,\n${company} Team`
+        : isInternship
+        ? `Dear ${founderName},\n\nThe internship offer letter and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\n${company} HR System`
         : isCountrySales
-        ? `Dear ${founderName},\n\nThe Country Sales Partner Agreement and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\nJEVXO HR System`
+        ? `Dear ${founderName},\n\nThe Country Sales Partner Agreement and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\n${company} HR System`
         : isSalesAgent
-        ? `Dear ${founderName},\n\nThe Sales Agent Agreement and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\nJEVXO HR System`
-        : `Dear ${founderName},\n\nThe appointment letter for ${partnerName} (ID: ${partnerID}) has been fully executed. Please find the attached documents.\n\nBest,\nJEVXO HR System`;
+        ? `Dear ${founderName},\n\nThe Sales Agent Agreement and ID card for ${partnerName} (ID: ${partnerID}) have been fully executed. Please find the attached documents.\n\nBest,\n${company} HR System`
+        : `Dear ${founderName},\n\nThe appointment letter for ${partnerName} (ID: ${partnerID}) has been fully executed. Please find the attached documents.\n\nBest,\n${company} HR System`;
 
-      const partnerSubject = isInternship
-        ? "Your JEVXO Internship Offer Letter & ID Card"
+      const partnerSubject = isContractual
+        ? `Your Executed Joining Offer Letter & Work Agreement — ${company}`
+        : isInternship
+        ? `Your ${company} Internship Offer Letter & ID Card`
         : isCountrySales
-        ? "Your JEVXO Country Sales Partner Agreement & ID Card"
+        ? `Your ${company} Country Sales Partner Agreement & ID Card`
         : isSalesAgent
-        ? "Your JEVXO Sales Agent Agreement & ID Card"
-        : "Your Appointment Letter & ID Card from JEVXO";
+        ? `Your ${company} Sales Agent Agreement & ID Card`
+        : `Your Appointment Letter & ID Card from ${company}`;
 
-      const partnerText = isInternship
-        ? `Dear ${partnerName},\n\nWelcome aboard! Your signed internship offer letter and JEVXO ID card are attached.\n\nBest,\nJEVXO`
+      const partnerText = isContractual
+        ? `Dear ${partnerName},\n\nCongratulations and welcome aboard! Your Joining Offer Letter & Work Agreement with ${company} has been fully executed by both parties. Please find your official signed copy attached.\n\nBest regards,\n${company}`
+        : isInternship
+        ? `Dear ${partnerName},\n\nWelcome aboard! Your signed internship offer letter and ${company} ID card are attached.\n\nBest,\n${company}`
         : isCountrySales
-        ? `Dear ${partnerName},\n\nWelcome to JEVXO! Your signed Country Sales Partner Agreement and ID card are attached.\n\nBest,\nJEVXO`
+        ? `Dear ${partnerName},\n\nWelcome to ${company}! Your signed Country Sales Partner Agreement and ID card are attached.\n\nBest,\n${company}`
         : isSalesAgent
-        ? `Dear ${partnerName},\n\nWelcome to JEVXO! Your signed Sales Agent Agreement and ID card are attached.\n\nBest,\nJEVXO`
-        : `Dear ${partnerName},\n\nYour appointment letter and ID card from JEVXO are attached.\n\nBest,\nJEVXO`;
+        ? `Dear ${partnerName},\n\nWelcome to ${company}! Your signed Sales Agent Agreement and ID card are attached.\n\nBest,\n${company}`
+        : `Dear ${partnerName},\n\nYour appointment letter and ID card from ${company} are attached.\n\nBest,\n${company}`;
 
       const founderResult = founderRecipients.length > 0
         ? await sendWithRetry({

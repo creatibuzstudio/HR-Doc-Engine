@@ -16,6 +16,7 @@ import SalesFormWizard from "@/features/wizard/components/SalesFormWizard";
 import InternshipFormWizard from "@/features/wizard/components/InternshipFormWizard";
 import HRHiringNoticeWizard from "@/features/wizard/components/HRHiringNoticeWizard";
 import InternCertificateWizard from "@/features/wizard/components/InternCertificateWizard";
+import ContractualFormWizard from "@/features/wizard/components/ContractualFormWizard";
 import CeoWorkspace from "@/features/workspace/components/CeoWorkspace";
 import CandidatePortal from "@/features/candidate-portal/components/CandidatePortal";
 import EmailPortalModal from "@/features/email/components/EmailPortalModal";
@@ -274,7 +275,22 @@ function HomeInner() {
           )}
 
           {appState === "form" && (
-            agreementTemplate === "internCertificate" ? (
+            agreementTemplate === "contractual" ? (
+              <ContractualFormWizard
+                key="contractualForm"
+                activeStep={activeStep}
+                secondParty={secondParty}
+                setSecondParty={setSecondParty}
+                firstParty={firstParty}
+                setFirstParty={setFirstParty}
+                validationError={validationError}
+                onClearError={() => setValidationError("")}
+                onNext={handleNext}
+                onPrev={handlePrev}
+                docSettings={docSettings}
+                setDocSettings={setDocSettings}
+              />
+            ) : agreementTemplate === "internCertificate" ? (
               <InternCertificateWizard
                 key="internCertificateForm"
                 activeStep={activeStep}

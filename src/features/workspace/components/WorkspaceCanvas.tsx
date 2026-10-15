@@ -6,6 +6,7 @@ import InternshipDocumentPreview from "@/features/document-preview/components/In
 import InternCertificatePreview from "@/features/document-preview/components/InternCertificatePreview";
 import SalesAgreementDocument from "@/features/document-preview/templates/document/SalesAgreementDocument";
 import HRHiringNoticeDocument from "@/features/document-preview/templates/document/HRHiringNoticeDocument";
+import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
 import { TOTAL_DOCUMENT_PAGES } from "@/lib/documentConstants";
 import {
@@ -42,13 +43,14 @@ export default function WorkspaceCanvas({
   const isInternship = template === "internship";
   const isHrHiring = template === "hrHiringNotice";
   const isCertificate = template === "internCertificate";
+  const isContractual = template === "contractual";
 
   const salesType = salesAgreementType ?? settings.salesAgreementType;
   const isSalesAgreement =
     salesType === "countrySales" || salesType === "salesAgent";
 
   // Page count depends on document type
-  const pageCount = isInternship || isHrHiring || isCertificate
+  const pageCount = isInternship || isHrHiring || isCertificate || isContractual
     ? 1
     : isSalesAgreement
       ? salesType === "countrySales" ? 5 : 3
@@ -58,7 +60,15 @@ export default function WorkspaceCanvas({
     <div className="flex-1 bg-[#F1F5F9] flex flex-col items-center justify-start p-6 overflow-y-auto scroll-smooth">
       <div className={`w-full transition-all duration-300 ${isCertificate ? "max-w-[1180px]" : "max-w-[860px]"}`}>
         <A4DocumentScaler pageCount={pageCount} orientation={isCertificate ? "landscape" : "portrait"}>
-          {isCertificate ? (
+          {isContractual ? (
+            <ContractualOfferDocument
+              firstParty={firstParty}
+              secondParty={secondParty}
+              settings={settings}
+              innerRef={previewRefs[0]}
+              isExporting={isExporting}
+            />
+          ) : isCertificate ? (
             <InternCertificatePreview
               firstParty={firstParty}
               secondParty={secondParty}

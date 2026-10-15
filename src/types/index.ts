@@ -4,6 +4,8 @@ export interface FirstParty {
   role: string;
   ceoName?: string;
   ceoMobile?: string;
+  cooName?: string;
+  cooMobile?: string;
   hrName?: string;
   hrMobile?: string;
   currentAddress: string;
@@ -43,7 +45,8 @@ export type AgreementTemplate =
   | "sales_agent"
   | "country_sales_partner"
   | "hrHiringNotice"
-  | "internCertificate";
+  | "internCertificate"
+  | "contractual";
 
 export type SalesAgreementType = "countrySales" | "salesAgent";
 
@@ -58,6 +61,7 @@ export interface SalesPartnerInfo {
 
 export interface DocSettings {
   date: string;
+
   minimumServicePeriod: number;
   equityShare: number;
   noticePeriod: number;
@@ -129,6 +133,17 @@ export interface DocSettings {
   certOriginalAgreementId?: string;
   certInternId?: string;
   certificateGenerated?: boolean;
+  // ── Contractual-specific ─────────────────────────────────────────────────
+  contractId?: string; // e.g. "CRB-CON-26-001"
+  contractIdSerial?: string;
+  contractRefId?: string; // e.g. "CRB-CON-REF-26-001"
+  contractRefIdSerial?: string;
+  employmentType?: "Project-Based Contract" | "Full-Time Contract";
+  contractSubject?: string; // e.g. "Web Developer For A Project-Based Contract"
+  scopeOfWork?: string;
+  compensationDetails?: string;
+  confidentialityTerms?: string;
+  ipOwnershipTerms?: string;
 }
 
 export interface EmployeeCard {
@@ -147,7 +162,12 @@ export type DocType =
   | "Partner Agreement & ID Card"
   | "Intern Offerletter & ID Card"
   | "Country Sales Partner Agreement & ID Card"
-  | "Sales Agent Agreement & ID Card";
+  | "Sales Agent Agreement & ID Card"
+  | "Joining Offer Letter & Work Agreement"
+  | "HR Hiring Notice"
+  | "Intern Certificate"
+  | string;
+
 
 export type AppState =
   | "home"

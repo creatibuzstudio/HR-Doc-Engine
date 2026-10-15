@@ -5,6 +5,7 @@ import {
   generateCountrySalesPartnerIds,
   generateSalesAgentIds,
   generateHrHiringIds,
+  generateContractualIds,
   listAgreements,
   saveAgreement,
   toAgreementSummary,
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     const resolvedTemplate = agreementTemplate || docSettings?.agreementTemplate || "partner";
     const isInternship = resolvedTemplate === "internship";
     const isHrHiring   = resolvedTemplate === "hrHiringNotice";
+    const isContractual = resolvedTemplate === "contractual";
     const salesType: string | undefined = salesAgreementType || docSettings?.salesAgreementType;
     const isCountrySales = salesType === "countrySales";
     const isSalesAgent   = salesType === "salesAgent";
@@ -48,7 +50,12 @@ export async function POST(request: Request) {
     let partnerId: string;
     let storage: string;
 
-    if (isHrHiring) {
+    if (isContractual) {
+      const generated = await generateContractualIds();
+      agreementId = docSettings?.contractualRefId || generated.contractualRefId;
+      partnerId   = docSettings?.contractualId    || generated.contractualId;
+      storage     = generated.storage;
+    } else if (isHrHiring) {
       const generated = await generateHrHiringIds();
       agreementId = docSettings?.hrNoticeRefId || generated.hrNoticeRefId;
       partnerId   = docSettings?.hrNoticeId    || generated.hrNoticeId;
@@ -78,7 +85,9 @@ export async function POST(request: Request) {
 
     // ── Derive a descriptive docType label for MongoDB ────────────────────────
     let resolvedDocType: string = docType;
-    if (docType === "both" || isSalesAgreement || isHrHiring) {
+    if (isContractual) {
+      resolvedDocType = "Contractual Offer";
+    } else if (docType === "both" || isSalesAgreement || isHrHiring) {
       if (isHrHiring) {
         resolvedDocType = "HR Hiring Notice";
       } else if (isInternship) {
@@ -93,14 +102,18 @@ export async function POST(request: Request) {
     }
 
     // ── Build updated secondParty — use salesPartnerId for sales types ────────
-    const updatedSecondParty = isSalesAgreement
+    const updatedSecondParty = isContractual
+      ? { ...secondParty, contractualId: partnerId, partnerId }
+      : isSalesAgreement
       ? { ...secondParty, salesPartnerId: partnerId }
       : { ...secondParty, partnerId };
 
     const updatedDocSettings = {
       ...docSettings,
       agreementTemplate: resolvedTemplate,
-      ...(isHrHiring
+      ...(isContractual
+        ? { contractualRefId: agreementId, contractualId: partnerId }
+        : isHrHiring
         ? { hrNoticeRefId: agreementId, hrNoticeId: partnerId }
         : isInternship
         ? { internRefId: agreementId, internId: partnerId }
