@@ -38,6 +38,5 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-# local agreement fallback & data
-/data/
-/data/**
+# local agreement fallback (when MongoDB unavailable)
+/data/agreements/
