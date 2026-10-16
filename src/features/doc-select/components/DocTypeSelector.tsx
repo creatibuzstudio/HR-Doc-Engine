@@ -4,8 +4,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { ArrowRight, LayoutDashboard, FileText, CreditCard, BriefcaseIcon, Award } from "lucide-react";
 
-// Local union — covers all selectable doc types including the new sales types.
-// Not exported from types/index.ts intentionally (only used at the selector layer).
+// Local union — covers the 4 supported document types.
 export type SelectableDocType = "contractual" | "internship" | "hrHiringNotice" | "internCertificate";
 
 interface DocTypeSelectorProps {
@@ -89,10 +88,10 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
                   Internship Offer Letter
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                  Internship appointment with learning objectives, duration, and ID card.
+                  Internship appointment with learning objectives, duration, and work terms.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Internship Duration", "NDA", "PDF Export", "ID Card"].map((tag) => (
+                  {["Internship Duration", "NDA", "PDF Export", "Work Terms"].map((tag) => (
                     <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
                   ))}
                 </div>

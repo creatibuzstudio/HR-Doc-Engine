@@ -13,10 +13,7 @@ interface CandidateSidebarProps {
   isCompleted: boolean;
   onExport: () => void;
   offerId: string;
-  isPhotoUploaded?: boolean;
-  isPendingCSP?: boolean;
   agreementTemplate?: string;
-  onSwitchToIdCard?: () => void;
   onSignatureSaved?: (hasSignature: boolean) => void;
 }
 
@@ -28,10 +25,6 @@ export default function CandidateSidebar({
   isCompleted,
   onExport,
   offerId,
-  isPhotoUploaded = false,
-  isPendingCSP = false,
-  agreementTemplate,
-  onSwitchToIdCard,
   onSignatureSaved,
 }: CandidateSidebarProps) {
   const [sigError, setSigError] = useState("");
@@ -40,13 +33,13 @@ export default function CandidateSidebar({
     setSigError("");
     setSecondParty((p) => {
       const updated = { ...p, signatureImg: dataUrl };
-      const stored = localStorage.getItem("jevxo_offer_" + offerId);
+      const stored = localStorage.getItem("creatibuz_offer_" + offerId);
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
           parsed.secondParty = updated;
           localStorage.setItem(
-            "jevxo_offer_" + offerId,
+            "creatibuz_offer_" + offerId,
             JSON.stringify(parsed),
           );
         } catch (e) {
@@ -58,23 +51,26 @@ export default function CandidateSidebar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ signatureImg: dataUrl }),
-      }).catch((err) => console.error("Failed to save signature:", err));
+      }).catch((e) => console.error("Auto-sync signature failed:", e));
 
       return updated;
     });
-    if (onSignatureSaved) onSignatureSaved(!!dataUrl);
+
+    if (onSignatureSaved) {
+      onSignatureSaved(true);
+    }
   };
 
   const handleClearSignature = () => {
     setSecondParty((p) => {
       const updated = { ...p, signatureImg: "" };
-      const stored = localStorage.getItem("jevxo_offer_" + offerId);
+      const stored = localStorage.getItem("creatibuz_offer_" + offerId);
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
           parsed.secondParty = updated;
           localStorage.setItem(
-            "jevxo_offer_" + offerId,
+            "creatibuz_offer_" + offerId,
             JSON.stringify(parsed),
           );
         } catch (e) {
@@ -86,11 +82,14 @@ export default function CandidateSidebar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ signatureImg: "" }),
-      }).catch((err) => console.error("Failed to clear signature:", err));
+      }).catch((e) => console.error("Auto-clear signature failed:", e));
 
       return updated;
     });
-    if (onSignatureSaved) onSignatureSaved(false);
+
+    if (onSignatureSaved) {
+      onSignatureSaved(false);
+    }
   };
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,14 +110,6 @@ export default function CandidateSidebar({
       setSigError("Please draw and save your signature before exporting.");
       return;
     }
-    const isContractual = agreementTemplate === "contractual";
-    if (!isContractual && !isPendingCSP && !isPhotoUploaded) {
-      setSigError(
-        "Please upload your photo in the ID Card tab before signing.",
-      );
-      if (onSwitchToIdCard) onSwitchToIdCard();
-      return;
-    }
     setSigError("");
     onExport();
   };
@@ -135,31 +126,23 @@ export default function CandidateSidebar({
           <h2 className="text-xl font-bold text-foreground">Candidate Portal</h2>
           <p className="text-muted-foreground text-xs">
             Review the terms, draw your signature, and generate your
-            counter-signed partnership contract.
+            counter-signed contract.
           </p>
         </div>
 
-        {/* Info card */}
-        <div className="p-4 bg-secondary border border-border rounded-2xl space-y-2 text-xs">
+        {/* Candidate & Position Info */}
+        <div className="bg-secondary/40 border border-border rounded-2xl p-4 space-y-2 text-xs">
           <div className="flex justify-between">
             <span className="text-muted-foreground font-semibold">Candidate:</span>
-            <span className="font-bold text-foreground">
-              {secondParty.fullName}
-            </span>
+            <span className="font-bold text-foreground">{secondParty.fullName || "—"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground font-semibold">
-              Position Offered:
-            </span>
-            <span className="font-bold text-primary">
-              {secondParty.position}
-            </span>
+            <span className="text-muted-foreground font-semibold">Position Offered:</span>
+            <span className="font-bold text-primary">{secondParty.position || "—"}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground font-semibold">Company:</span>
-            <span className="font-bold text-foreground">
-              {firstParty.companyName}
-            </span>
+            <span className="font-bold text-foreground">{firstParty.companyName}</span>
           </div>
         </div>
 
@@ -170,7 +153,7 @@ export default function CandidateSidebar({
               Draw Your Signature *
             </h3>
             <p className="text-[10px] text-muted-foreground">
-              Draw inside the pad below to accept the partnership terms.
+              Draw inside the pad below to accept the document terms.
             </p>
           </div>
 
@@ -186,14 +169,12 @@ export default function CandidateSidebar({
             savedImage={secondParty.signatureImg}
           />
 
-          {/* Or divider */}
           <div className="flex items-center gap-4 my-2 text-muted-foreground text-xs font-bold uppercase tracking-wider">
             <div className="flex-1 h-[1px] bg-border" />
             <span>Or</span>
             <div className="flex-1 h-[1px] bg-border" />
           </div>
 
-          {/* Upload option */}
           <div className="flex flex-col gap-2">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Option B: Upload Signature Photo File
@@ -211,7 +192,7 @@ export default function CandidateSidebar({
               </p>
               <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[280px]">
                 Accepts PNG, JPG, or SVG formats containing clear black or blue
-                ink signatures with high contrast backgrounds.
+                ink signatures.
               </p>
             </div>
 
@@ -260,8 +241,7 @@ export default function CandidateSidebar({
             </>
           ) : isExporting ? (
             <>
-              <RefreshCw className="w-5 h-5 animate-spin" /> Generating Signed
-              PDF...
+              <RefreshCw className="w-5 h-5 animate-spin" /> Generating Signed PDF...
             </>
           ) : (
             <>

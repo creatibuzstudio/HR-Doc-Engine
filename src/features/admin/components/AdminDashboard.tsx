@@ -2,217 +2,31 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import {
-  RefreshCw,
-  Send,
-  ShieldCheck,
-  Clock,
-  CheckCircle2,
-  ExternalLink,
-  Loader2,
-  Eye,
-  FileSearch,
-  Trash2,
-} from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import Swal from "sweetalert2";
-import { AgreementSummary } from "@/types";
-import { buildVerifyUrl } from "@/lib/verifyUrl";
 import { useRegistryData } from "../hooks/useRegistryData";
 import RegistryToolbar from "./RegistryToolbar";
 import RegistryPagination from "./RegistryPagination";
 import DetailsModal from "./DetailsModal";
 import PreviewModal from "./PreviewModal";
-
-// ─── Shared badge components ──────────────────────────────────────────────────
-
-function StatusBadge({ status, agreementTemplate, docType }: {
-  status: string;
-  agreementTemplate?: string;
-  docType?: string;
-}) {
-  const isHrHiring =
-    agreementTemplate === "hrHiringNotice" || docType === "HR Hiring Notice";
-
-  if (isHrHiring || status === "FULLY_EXECUTED") {
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
-        <CheckCircle2 className="w-3 h-3" /> Executed
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
-      <Clock className="w-3 h-3" /> Pending
-    </span>
-  );
-}
-
-function DocTypeBadge({
-  docType,
-  salesAgreementType,
-  agreementTemplate,
-}: {
-  docType: string;
-  salesAgreementType?: string;
-  agreementTemplate?: string;
-}) {
-  const isContractual =
-    agreementTemplate === "contractual" ||
-    docType === "Joining Offer Letter & Work Agreement" ||
-    docType?.toLowerCase().includes("contractual");
-  const isCSP =
-    salesAgreementType === "countrySales" ||
-    docType === "Country Sales Partner Agreement & ID Card";
-  const isSA =
-    salesAgreementType === "salesAgent" ||
-    docType === "Sales Agent Agreement & ID Card";
-  const isCert =
-    agreementTemplate === "internCertificate" ||
-    docType === "Intern Certificate";
-  const isIntern =
-    !isCSP &&
-    !isSA &&
-    !isCert &&
-    !isContractual &&
-    (docType?.toLowerCase().includes("intern") ||
-      docType === "Intern Offerletter & ID Card");
-  const isHrHiring =
-    !isCSP &&
-    !isSA &&
-    !isCert &&
-    !isIntern &&
-    !isContractual &&
-    (agreementTemplate === "hrHiringNotice" || docType === "HR Hiring Notice");
-
-  if (isContractual)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FFF3EE] text-[#EA580C] border border-[#FF5722]/30">
-        Contractual Offer
-      </span>
-    );
-  if (isCSP)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-        Country Sales Partner
-      </span>
-    );
-  if (isSA)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-        Sales Agent
-      </span>
-    );
-  if (isCert)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
-        Internship Certificate
-      </span>
-    );
-  if (isIntern)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
-        Internship Offer Letter
-      </span>
-    );
-  if (isHrHiring)
-    return (
-      <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-100">
-        HR Hiring Notice
-      </span>
-    );
-  return (
-    <span className="inline-block text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-      Partner
-    </span>
-  );
-}
-
-// ─── Row actions ─────────────────────────────────────────────────────────────
-
-interface RowActionsProps {
-  agreement: AgreementSummary;
-  resendingId: string | null;
-  deletingId: string | null;
-  onResend: (id: string) => void;
-  onDetails: (id: string) => void;
-  onPreview: (id: string) => void;
-  onDelete: (id: string) => void;
-}
-
-function RowActions({
-  agreement: a,
-  resendingId,
-  deletingId,
-  onResend,
-  onDetails,
-  onPreview,
-  onDelete,
-}: RowActionsProps) {
-  return (
-    <div className="flex items-center justify-start gap-3 flex-wrap">
-      {a.status !== "FULLY_EXECUTED" && (
-        <button
-          onClick={() => onResend(a.agreementId)}
-          disabled={resendingId === a.agreementId}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#DBEAFE] rounded-lg text-[10px] font-bold text-[#2563EB] cursor-pointer disabled:opacity-50"
-        >
-          {resendingId === a.agreementId ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <Send className="w-3 h-3" />
-          )}
-          Resend
-        </button>
-      )}
-      <button
-        onClick={() => onDetails(a.agreementId)}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#F8FAFC] hover:bg-[#EFF6FF] border border-[#DBEAFE] rounded-lg text-[10px] font-bold text-[#64748B] hover:text-[#2563EB] cursor-pointer"
-      >
-        <Eye className="w-3 h-3" />
-        Details
-      </button>
-      <button
-        onClick={() => onPreview(a.agreementId)}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#F8FAFC] hover:bg-[#EFF6FF] border border-[#DBEAFE] rounded-lg text-[10px] font-bold text-[#64748B] hover:text-[#2563EB] cursor-pointer"
-      >
-        <FileSearch className="w-3 h-3" />
-        Preview
-      </button>
-      <a
-        href={buildVerifyUrl(a.agreementId)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#F8FAFC] hover:bg-[#EFF6FF] border border-[#DBEAFE] rounded-lg text-[10px] font-bold text-[#64748B] hover:text-[#2563EB]"
-      >
-        <ShieldCheck className="w-3 h-3" />
-        Verify
-        <ExternalLink className="w-2.5 h-2.5" />
-      </a>
-      <button
-        onClick={() => onDelete(a.agreementId)}
-        disabled={deletingId === a.agreementId}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg text-[10px] font-bold text-[#EF4444] cursor-pointer disabled:opacity-50"
-      >
-        {deletingId === a.agreementId ? (
-          <Loader2 className="w-3 h-3 animate-spin" />
-        ) : (
-          <Trash2 className="w-3 h-3" />
-        )}
-        Delete
-      </button>
-    </div>
-  );
-}
-
-// ─── Main dashboard ───────────────────────────────────────────────────────────
+import { RegistryTable } from "./RegistryTable";
 
 interface AdminDashboardProps {
   onBack?: () => void;
 }
 
 export default function AdminDashboard({ onBack }: AdminDashboardProps) {
-  const { loading, error, filters, patchFilter, processed, stats, reload, removeAgreement, PAGE_SIZE } =
-    useRegistryData();
+  const {
+    loading,
+    error,
+    filters,
+    patchFilter,
+    processed,
+    stats,
+    reload,
+    removeAgreement,
+    PAGE_SIZE,
+  } = useRegistryData();
 
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -337,7 +151,11 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
             disabled={loading}
             className="group self-start flex items-center gap-2 px-4 py-2.5 bg-card border border-border hover:border-primary rounded-xl text-xs font-bold text-primary cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 transition-transform duration-500 ${loading ? "animate-spin" : "group-hover:rotate-180"}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 transition-transform duration-500 ${
+                loading ? "animate-spin" : "group-hover:rotate-180"
+              }`}
+            />
             Refresh
           </button>
         </div>
@@ -373,97 +191,16 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-          {loading ? (
-            <div className="p-12 flex justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            </div>
-          ) : processed.list.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground">
-              No agreements match your filters.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/70 text-center">
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Agreement
-                    </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Partner
-                    </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Created
-                    </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {processed.list.map((a) => (
-                    <tr
-                      key={a.agreementId}
-                      className="border-b border-border/50 hover:bg-secondary/40 text-center transition-colors"
-                    >
-                      <td className="px-4 py-3 text-left">
-                        <div className="font-mono font-bold text-foreground text-xs">
-                          {a.agreementId}
-                        </div>
-                        <div className="mt-0.5">
-                          <DocTypeBadge
-                            docType={a.docType}
-                            salesAgreementType={a.salesAgreementType}
-                            agreementTemplate={a.agreementTemplate}
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="font-semibold text-foreground">
-                          {a.hrRecipientName || a.partnerName}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          {a.hrRecipientEmail || a.partnerEmail}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge
-                          status={a.status}
-                          agreementTemplate={a.agreementTemplate}
-                          docType={a.docType}
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {a.createdAt
-                          ? new Date(a.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                          : "—"}
-                      </td>
-                      <td className="px-4 py-3 flex justify-end">
-                        <RowActions
-                          agreement={a}
-                          resendingId={resendingId}
-                          deletingId={deletingId}
-                          onResend={handleResend}
-                          onDetails={setDetailsId}
-                          onPreview={setPreviewId}
-                          onDelete={handleDelete}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <RegistryTable
+          loading={loading}
+          agreements={processed.list}
+          resendingId={resendingId}
+          deletingId={deletingId}
+          onResend={handleResend}
+          onDetails={setDetailsId}
+          onPreview={setPreviewId}
+          onDelete={handleDelete}
+        />
 
         {/* Pagination */}
         {!loading && processed.total > 0 && (

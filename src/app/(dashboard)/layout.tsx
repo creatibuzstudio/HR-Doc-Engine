@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DataCacheProvider } from "@/context/DataCacheContext";
+import { DataCacheProvider } from "@/lib/context/DataCacheContext";
 
 export default function DashboardLayout({
   children,

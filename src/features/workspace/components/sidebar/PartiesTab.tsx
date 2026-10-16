@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { FirstParty, SecondParty, DocSettings, SalesAgreementType } from "@/types";
-import { TextInput, TextArea } from "@/shared/ui/FormPrimitives";
+import { FirstParty, SecondParty } from "@/types";
+import { TextInput, TextArea } from "@/components/forms/FormPrimitives";
 
 interface FirstPartyTabProps {
   firstParty: FirstParty;
@@ -137,31 +137,3 @@ export function SecondPartyTab({ secondParty, setSecondParty }: SecondPartyTabPr
   );
 }
 
-export function SalesPartyTab({ secondParty, setSecondParty, docSettings, setDocSettings, salesAgreementType }: {
-  secondParty: SecondParty; setSecondParty: React.Dispatch<React.SetStateAction<SecondParty>>; docSettings: DocSettings; setDocSettings: React.Dispatch<React.SetStateAction<DocSettings>>; salesAgreementType: SalesAgreementType;
-}) {
-  const isCSP = salesAgreementType === "countrySales";
-  const partner = docSettings.salesPartner || { fullName: "", email: "", phone: "", address: "", partnerId: "" };
-  const setAgent = (key: keyof SecondParty) => (e: React.ChangeEvent<HTMLInputElement>) => setSecondParty((p) => ({ ...p, [key]: e.target.value }));
-  const setPartner = (key: keyof typeof partner) => (e: React.ChangeEvent<HTMLInputElement>) => setDocSettings((p) => ({ ...p, salesPartner: { ...(p.salesPartner || partner), [key]: e.target.value } }));
-  return (
-    <div className="space-y-4">
-      {!isCSP && (
-        <>
-          <p className="text-[11px] text-[#64748B] font-semibold uppercase tracking-wide">Country Sales Partner</p>
-          <TextInput label="Partner Full Name" value={partner.fullName} onChange={setPartner("fullName")} />
-          <TextInput label="Partner Email" value={partner.email} onChange={setPartner("email")} />
-          <TextInput label="Partner Phone" value={partner.phone} onChange={setPartner("phone")} />
-          <TextInput label="Partner Agreement Reference" value={docSettings.partnerAgreementRef || ""} onChange={(e) => setDocSettings((p) => ({ ...p, partnerAgreementRef: e.target.value }))} />
-          <div className="border-t border-[#DBEAFE]" />
-        </>
-      )}
-      <p className="text-[11px] text-[#64748B] font-semibold uppercase tracking-wide">{isCSP ? "Country Sales Partner" : "Sales Agent"}</p>
-      <TextInput label="Full Name" value={secondParty.fullName} onChange={setAgent("fullName")} />
-      <TextInput label="Email" value={secondParty.email} onChange={setAgent("email")} />
-      <TextInput label="Phone" value={secondParty.mobileNumber} onChange={setAgent("mobileNumber")} />
-      <TextInput label={isCSP ? "Partner ID" : "Sales Agent ID"} value={secondParty.salesPartnerId || ""} onChange={setAgent("salesPartnerId")} />
-      <TextArea label="Address" value={secondParty.presentAddress} onChange={(e) => setSecondParty((p) => ({ ...p, presentAddress: e.target.value, permanentAddress: e.target.value }))} />
-    </div>
-  );
-}

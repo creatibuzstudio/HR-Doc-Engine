@@ -2,7 +2,7 @@
 
 import React from "react";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
-import JevxoLogo from "@/shared/layout/JevxoLogo";
+import Logo from "@/components/layout/Logo";
 import { buildVerifyUrl } from "@/lib/verifyUrl";
 import QRCode from "react-qr-code";
 
@@ -28,7 +28,7 @@ export default function InternCertificatePreview({
     performanceGrade: settings.certPerformanceGrade || "Outstanding",
     certId: settings.certId || "JVX-CRT-26-001",
     internId: secondParty.partnerId || settings.certInternId || "JVX-INT-2026-04",
-    companyName: firstParty.companyName || "JEVXO",
+    companyName: firstParty.companyName || "Creatibuz Studio",
     ceoName: firstParty.representedBy || "Founder Name",
     ceoRole: firstParty.role || "Founder & CEO",
     ceoSig: firstParty.signatureImg || "",
@@ -97,7 +97,7 @@ export default function InternCertificatePreview({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-watermark.png"
-          alt="Jevxo Watermark"
+          alt="Creatibuz Watermark"
           className="w-[333px] h-[333px] object-contain opacity-[0.1] select-none pointer-events-none"
         />
       </div>
@@ -108,7 +108,7 @@ export default function InternCertificatePreview({
         {/* Top: Header branding & IDs */}
         <div className="flex justify-between items-start">
           <div className="flex flex-col">
-           <JevxoLogo/>
+           <Logo/>
           </div>
           <div className="text-right space-y-0.5">
             <p style={{ fontFamily: "var(--font-opensans), 'Open Sans', sans-serif", fontSize: '10pt', fontWeight: 600 }} className="text-slate-400 uppercase tracking-wider">
@@ -145,7 +145,7 @@ export default function InternCertificatePreview({
 
           {/* completion phrased text */}
           <p style={{ fontFamily: "var(--font-ebgaramond), 'EB Garamond', serif", fontSize: '15pt', lineHeight: '1.6', textAlign: 'justify' }} className="text-slate-700 max-w-3xl mx-auto my-4">
-            In recognition of their successful completion of the professional internship at JEVXO. During this tenure, they demonstrated exemplary technical competence, dedication, and professional excellence. We highly appreciate their valuable contributions and wish them the very best in their future career.
+            In recognition of their successful completion of the professional internship at Creatibuz Studio. During this tenure, they demonstrated exemplary technical competence, dedication, and professional excellence. We highly appreciate their valuable contributions and wish them the very best in their future career.
           </p>
 
           {/* details grid */}

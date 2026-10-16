@@ -3,12 +3,28 @@ import {
   findAgreementById,
   updateAgreement,
 } from "../../../../../lib/agreementStore";
-import { generateIdCardPdf } from "../../../../../lib/idCardPdf";
+import {
+  getFounderNotificationRecipients,
+  getResendFromAddress,
+  getResendClient,
+} from "../../../../../lib/emailConfig";
+import { uploadPdfToStorage } from "@/services/storage.service";
 
-// Increase body size limit — the signed PDF + ID card PDF base64 can exceed
-// Next.js's default 1 MB limit when processing multi-page agreements.
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function sendWithRetry(
+  payload: Parameters<ReturnType<typeof getResendClient>["emails"]["send"]>[0],
+) {
+  const resend = getResendClient();
+  let result = await resend.emails.send(payload);
+  if (!result.error) return result;
+  console.warn("[sign] Email delivery failed; retrying once:", result.error);
+  result = await resend.emails.send(payload);
+  return result;
+}
 
 export async function POST(
   request: Request,
@@ -16,17 +32,12 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-
-    // Read the raw body as text first, then parse — this bypasses Next.js's
-    // built-in body-size limit which causes 413 for large PDF payloads.
     const rawText = await request.text();
     const body = JSON.parse(rawText) as Record<string, unknown>;
 
     const {
       signatureImg,
       letterPDFdata: rawLetterPdf,
-      cardPDFdata: rawCardPdf,
-      photoUrl,
     } = body;
 
     const normalizedLetterPdf =
@@ -37,11 +48,6 @@ export async function POST(
           )
         : "";
 
-    // Client-generated pixel-perfect card PDF (strip data URI prefix if present)
-    const clientCardPdf =
-      typeof rawCardPdf === "string"
-        ? rawCardPdf.replace(/^data:application\/pdf(?:;[^;]*)?;base64,/, "")
-        : "";
     const isFinalizing = normalizedLetterPdf.length > 0;
 
     const agreement = await findAgreementById(id);
@@ -49,46 +55,12 @@ export async function POST(
       return NextResponse.json({ error: "Offer not found." }, { status: 404 });
     }
 
-    
-    const isPendingCSP = agreement.status === "PENDING_CSP_SIGNATURE";
-    const salesType = (agreement.docSettings as Record<string, unknown>)?.salesAgreementType as string | undefined;
-    const isSalesAgent = salesType === "salesAgent";
-
-    if (isPendingCSP && isSalesAgent) {
-      const updatedDocSettings = {
-        ...agreement.docSettings,
-        salesPartner: {
-          ...(agreement.docSettings as any).salesPartner,
-          signatureImg: signatureImg,
-        }
-      };
-
-      if (!isFinalizing) {
-        await updateAgreement(id, { docSettings: updatedDocSettings });
-        return NextResponse.json({ success: true, message: "CSP Signature saved." });
-      }
-
-      await updateAgreement(id, {
-        docSettings: updatedDocSettings,
-        status: "PENDING_PARTNER_SIGNATURE",
-        letterPDFdata: normalizedLetterPdf,
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: "Agreement forwarded to Sales Agent successfully.",
-        isPendingCSP: true // Tell frontend it was CSP
-      });
-    }
-
     const updatedSecondParty = {
-
       ...agreement.secondParty,
-      signatureImg,
-      ...(typeof photoUrl === "string" ? { photoUrl } : {}),
+      ...(signatureImg ? { signatureImg } : {}),
     };
 
-    // ── Signature-only save (not finalizing yet) ──────────────────────────────
+    // ── Signature-only draft save ────────────────────────────────────────────
     if (!isFinalizing) {
       const updated = await updateAgreement(id, {
         secondParty: updatedSecondParty,
@@ -96,39 +68,23 @@ export async function POST(
 
       if (!updated) {
         return NextResponse.json(
-          { error: "Failed to update agreement." },
+          { error: "Failed to update signature." },
           { status: 500 },
         );
       }
 
-      console.log(`[Next.js API] Candidate signature updated: ${id}`);
       return NextResponse.json({ success: true, message: "Signature saved." });
     }
 
-    // ── Finalizing: generate ID card PDF, update DB, send emails ─────────────
+    // ── Finalizing: apply signature, mark executed, and send emails ─────────
     console.log(`[Next.js API] Finalizing offer: ${id}`);
 
-    // Prefer the exact client/workspace-generated PDF before using the simplified server fallback.
-    const storedCardPdf =
-      typeof agreement.cardPDFdata === "string"
-        ? agreement.cardPDFdata.replace(
-            /^data:application\/pdf(?:;[^;]*)?;base64,/,
-            "",
-          )
-        : "";
-
-    let idCardPdfBase64 = clientCardPdf || storedCardPdf;
-    if (!idCardPdfBase64) {
-      try {
-        idCardPdfBase64 = await generateIdCardPdf({
-          ...agreement,
-          secondParty: updatedSecondParty,
-        });
-      } catch (pdfErr) {
-        console.error("[Next.js API] ID card PDF generation failed:", pdfErr);
+    let pdfUrl: string | undefined;
+    if (normalizedLetterPdf) {
+      const uploadRes = await uploadPdfToStorage(id, normalizedLetterPdf);
+      if (uploadRes.url) {
+        pdfUrl = uploadRes.url;
       }
-    } else {
-      console.log(`[Next.js API] Using pre-generated ID card PDF for: ${id}`);
     }
 
     const updated = await updateAgreement(id, {
@@ -137,9 +93,7 @@ export async function POST(
       partnerSigned: true,
       signedAt: new Date().toISOString(),
       letterPDFdata: normalizedLetterPdf,
-      letterSentToBoth: false,
-      idCardGenerated: idCardPdfBase64.length > 0,
-      cardPDFdata: idCardPdfBase64 || undefined,
+      ...(pdfUrl ? { pdfUrl } : {}),
     });
 
     if (!updated) {
@@ -149,17 +103,72 @@ export async function POST(
       );
     }
 
-    console.log(`[Next.js API] Offer fully executed: ${id}`);
+    // ── Send finalized PDF email to founder and candidate ───────────────────
+    let founderEmailSent = false;
+    let partnerEmailSent = false;
 
-    // ── Email dispatch deferred to /card-pdf for ALL templates ───────────────
-    // /card-pdf receives the candidate-photo ID card PDF and sends ONE combined
-    // email (letter + card) to both parties.  We never send email here so that
-    // internship and partner flows behave identically and both attachments always
-    // arrive in a single message.
+    if (process.env.RESEND_API_KEY && normalizedLetterPdf) {
+      try {
+        const founderRecipients = getFounderNotificationRecipients(
+          process.env.FOUNDER_EMAIL,
+          agreement.firstParty.email,
+        );
+        const partnerEmail = agreement.secondParty?.email?.trim();
+        const founderName =
+          agreement.firstParty.representedBy ||
+          agreement.firstParty.ceoName ||
+          "Founder";
+        const partnerName = agreement.secondParty?.fullName || "Candidate";
+        const company =
+          agreement.firstParty.companyName || "Creatibuz Studio";
+
+        const attachments = [
+          {
+            filename: `${id}-executed-document.pdf`,
+            content: normalizedLetterPdf,
+          },
+        ];
+
+        const founderSubject = `Document Executed & Signed — ${partnerName} (${id})`;
+        const founderText = `Dear ${founderName},\n\nThe document for ${partnerName} (ID: ${id}) has been fully executed with both signatures. Please find the finalized PDF attached.\n\nBest regards,\n${company}`;
+
+        const partnerSubject = `Your Signed Document — ${company}`;
+        const partnerText = `Dear ${partnerName},\n\nCongratulations! Your document with ${company} has been fully executed. Please find your official signed copy attached.\n\nBest regards,\n${company}`;
+
+        if (founderRecipients.length > 0) {
+          const fRes = await sendWithRetry({
+            from: getResendFromAddress(),
+            to: founderRecipients,
+            subject: founderSubject,
+            text: founderText,
+            attachments,
+          });
+          founderEmailSent = !fRes.error;
+        }
+
+        if (partnerEmail && EMAIL_PATTERN.test(partnerEmail)) {
+          const pRes = await sendWithRetry({
+            from: getResendFromAddress(),
+            to: [partnerEmail],
+            subject: partnerSubject,
+            text: partnerText,
+            attachments,
+          });
+          partnerEmailSent = !pRes.error;
+        }
+
+        await updateAgreement(id, {
+          letterSentToBoth: founderEmailSent && partnerEmailSent,
+        });
+      } catch (mailErr) {
+        console.error("[sign] Failed to dispatch finalized emails:", mailErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Signature applied successfully! Generating your ID card…",
+      message: "Signature applied and document finalized successfully!",
+      delivery: { founder: founderEmailSent, partner: partnerEmailSent },
     });
   } catch (err: unknown) {
     console.error("[Next.js API] Error signing offer:", err);

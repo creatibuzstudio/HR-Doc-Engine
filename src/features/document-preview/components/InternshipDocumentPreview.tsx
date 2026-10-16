@@ -36,12 +36,12 @@ export default function InternshipDocumentPreview({
     refId: settings.internRefId || "JVX-INT-REF-26-001",
     duration: settings.internshipDuration || "3 months",
     isPaid: settings.isPaid ?? false,
-    companyName: firstParty.companyName || "JEVXO",
+    companyName: firstParty.companyName || "Creatibuz Studio",
     founderName: firstParty.representedBy || "Founder Name",
     founderRole: firstParty.role || "Founder",
-    companyEmail: firstParty.email || "info@jevxo.com",
+    companyEmail: firstParty.email || "info@creatibuzstudio.com",
     founderSig: firstParty.signatureImg || "",
-    location: firstParty.currentAddress || "Rajshahi, Bangladesh",
+    location: firstParty.currentAddress || "Delduar Road, Tangail Shadar, Dhaka",
   };
 
   const verifyUrl = buildVerifyUrl(d.internId);
@@ -234,7 +234,7 @@ export default function InternshipDocumentPreview({
 
         <DocumentFooter
           email={d.companyEmail}
-          website={firstParty.website || "www.jevxo.com"}
+          website={firstParty.website || "www.creatibuzstudio.com"}
           address={d.location}
         />
       </DocumentLayout>

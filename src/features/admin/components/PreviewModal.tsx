@@ -1,21 +1,18 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { X, Loader2, FileText, CreditCard } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import {
   FirstParty,
   SecondParty,
   DocSettings,
   AgreementTemplate,
-  SalesAgreementType,
 } from "@/types";
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
-import DocumentPreview from "@/features/document-preview/components/DocumentPreview";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
 import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
-import IdCardWorkspace from "@/features/id-card/components/IdCardWorkspace";
-
-type PreviewTab = "agreement" | "idCard";
+import HRHiringNoticeDocument from "@/features/document-preview/templates/document/HRHiringNoticeDocument";
+import InternCertificatePreview from "@/features/document-preview/components/InternCertificatePreview";
 
 interface Props {
   agreementId: string | null;
@@ -26,16 +23,10 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
   const [firstParty, setFirstParty] = useState<FirstParty | null>(null);
   const [secondParty, setSecondParty] = useState<SecondParty | null>(null);
   const [docSettings, setDocSettings] = useState<DocSettings | null>(null);
-  const [agreementTemplate, setAgreementTemplate] =
-    useState<AgreementTemplate>("partner");
-  const [salesAgreementType, setSalesAgreementType] = useState<
-    SalesAgreementType | undefined
-  >(undefined);
+  const [agreementTemplate, setAgreementTemplate] = useState<AgreementTemplate>("contractual");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<PreviewTab>("agreement");
 
-  // Dummy refs — preview is view-only, no PDF capture needed
   const dummyRefs = [
     useRef<HTMLDivElement>(null),
     useRef<HTMLDivElement>(null),
@@ -50,7 +41,6 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
     setSecondParty(null);
     setDocSettings(null);
     setError("");
-    setTab("agreement");
     setLoading(true);
 
     fetch(`/api/offers/${encodeURIComponent(agreementId)}`)
@@ -62,32 +52,23 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
         setFirstParty(data.firstParty);
         setSecondParty(data.secondParty);
         setDocSettings(data.docSettings);
-        setAgreementTemplate(
-          (data.docSettings?.agreementTemplate as AgreementTemplate) ||
-            (data.docType?.toLowerCase().includes("contractual") ? "contractual" : "partner"),
-        );
-        const salesType = data.docSettings
-          ?.salesAgreementType as SalesAgreementType | undefined;
-        setSalesAgreementType(salesType || undefined);
+        const t = (data.docSettings?.agreementTemplate as AgreementTemplate) ||
+          (data.docType?.toLowerCase().includes("intern")
+            ? "internship"
+            : data.docType?.toLowerCase().includes("hiring")
+            ? "hrHiringNotice"
+            : data.docType?.toLowerCase().includes("certificate")
+            ? "internCertificate"
+            : "contractual");
+        setAgreementTemplate(t);
       })
-      .catch((e: unknown) => setError((e as Error).message))
+      .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }, [agreementId]);
 
-  if (!agreementId) return null;
-
-  const isSales = Boolean(salesAgreementType);
-  const isInternship = agreementTemplate === "internship" && !isSales;
-  const isContractual = agreementTemplate === "contractual" && !isSales;
-
-  // Count pages for scaler
-  const pageCount = (() => {
-    if (salesAgreementType === "countrySales") return 5;
-    if (salesAgreementType === "salesAgent") return 3;
-    if (isContractual) return 1;
-    if (isInternship) return 2;
-    return 3; // standard partner
-  })();
+  const isInternship = agreementTemplate === "internship";
+  const isHrHiring = agreementTemplate === "hrHiringNotice";
+  const isCert = agreementTemplate === "internCertificate";
 
   return (
     <div
@@ -98,124 +79,62 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <div>
-            <h2 className="font-bold text-foreground text-base">
-              Document Preview
-            </h2>
-            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
-              {agreementId}
-            </p>
+            <h2 className="font-bold text-foreground text-base">Document Preview</h2>
+            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{agreementId}</p>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Tab toggles */}
-            {!loading && firstParty && (
-              <>
-                <button
-                  onClick={() => setTab("agreement")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                    tab === "agreement"
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-secondary border-border text-muted-foreground hover:border-primary hover:text-foreground"
-                  }`}
-                >
-                  <FileText className="w-3.5 h-3.5" /> Agreement
-                </button>
-                {!isContractual && (
-                  <button
-                    onClick={() => setTab("idCard")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      tab === "idCard"
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-secondary border-border text-muted-foreground hover:border-primary hover:text-foreground"
-                    }`}
-                  >
-                    <CreditCard className="w-3.5 h-3.5" /> ID Card
-                  </button>
-                )}
-              </>
-            )}
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-4 py-4 bg-background">
           {loading && (
             <div className="flex justify-center py-16">
-              <Loader2 className="w-7 h-7 animate-spin text-[#2563EB]" />
+              <Loader2 className="w-7 h-7 animate-spin text-primary" />
             </div>
           )}
 
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800">
+            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400">
               {error}
             </div>
           )}
 
-          {!loading && firstParty && secondParty && docSettings && (
-            <>
-              {tab === "agreement" && (
-                <A4DocumentScaler pageCount={pageCount}>
-                  {isContractual ? (
-                    <ContractualOfferDocument
-                      firstParty={firstParty}
-                      secondParty={secondParty}
-                      settings={docSettings}
-                      innerRef={dummyRefs[0]}
-                    />
-                  ) : isInternship ? (
-                    <InternshipDocumentPreview
-                      firstParty={firstParty}
-                      secondParty={secondParty}
-                      settings={docSettings}
-                      previewRefs={dummyRefs}
-                    />
-                  ) : (
-                    <DocumentPreview
-                      firstParty={firstParty}
-                      secondParty={secondParty}
-                      settings={docSettings}
-                      previewRefs={dummyRefs}
-                      agreementTemplate={agreementTemplate}
-                    />
-                  )}
-                </A4DocumentScaler>
-              )}
-
-              {tab === "idCard" && (
-                <div className="max-w-lg mx-auto">
-                  <IdCardWorkspace
-                    initialData={{
-                      fullName: secondParty.fullName || "",
-                      position:
-                        salesAgreementType === "countrySales"
-                          ? "Country Sales Partner"
-                          : salesAgreementType === "salesAgent"
-                            ? "Sales Agent"
-                            : secondParty.position || "",
-                      bloodGroup: secondParty.bloodGroup || "Select",
-                      employeeId:
-                        secondParty.salesPartnerId ||
-                        secondParty.partnerId ||
-                        docSettings.salesPartnerId ||
-                        docSettings.refId ||
-                        "",
-                      issueDate: docSettings.date || "",
-                      expiryDate:
-                        docSettings.salesExpiryDate ||
-                        docSettings.internExpiryDate ||
-                        "",
-                    }}
-                    controlledPhotoUrl={secondParty.photoUrl || ""}
-                    hidePhotoUpload
-                  />
-                </div>
-              )}
-            </>
+          {!loading && firstParty && docSettings && (
+            <A4DocumentScaler pageCount={1} orientation={isCert ? "landscape" : "portrait"}>
+              {isCert && secondParty ? (
+                <InternCertificatePreview
+                  firstParty={firstParty}
+                  secondParty={secondParty}
+                  settings={docSettings}
+                  previewRefs={dummyRefs}
+                />
+              ) : isHrHiring ? (
+                <HRHiringNoticeDocument
+                  firstParty={firstParty}
+                  settings={docSettings}
+                  previewRefs={dummyRefs}
+                />
+              ) : isInternship && secondParty ? (
+                <InternshipDocumentPreview
+                  firstParty={firstParty}
+                  secondParty={secondParty}
+                  settings={docSettings}
+                  previewRefs={dummyRefs}
+                />
+              ) : secondParty ? (
+                <ContractualOfferDocument
+                  firstParty={firstParty}
+                  secondParty={secondParty}
+                  settings={docSettings}
+                  innerRef={dummyRefs[0]}
+                />
+              ) : null}
+            </A4DocumentScaler>
           )}
         </div>
       </div>

@@ -14,7 +14,7 @@ export async function GET(
         {
           valid: false,
           status: "NOT_FOUND",
-          message: "No matching document was found in the JEVXO registry.",
+          message: "No matching document was found in the Creatibuz Studio registry.",
         },
         { status: 404 }
       );
@@ -27,9 +27,9 @@ export async function GET(
       status: agreement.status,
       agreementId: agreement.agreementId,
       partnerId: agreement.partnerId,
-      docType: agreement.docType || "appointment",
+      docType: agreement.docType || "contractual",
       agreementTemplate:
-        agreement.docSettings?.agreementTemplate || "partner",
+        agreement.docSettings?.agreementTemplate || "contractual",
       companyName: agreement.firstParty?.companyName || "",
       partnerName: agreement.secondParty?.fullName || "",
       position: agreement.secondParty?.position || "",

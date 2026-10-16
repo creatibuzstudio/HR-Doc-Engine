@@ -2,9 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
-import { Phone, Globe, Mail, Check } from "lucide-react";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
 import { A4_WIDTH, A4_HEIGHT } from "../../components/A4DocumentScaler";
+import ContractualOfferHeader from "./contractual/ContractualOfferHeader";
+import ContractualOfferSignatures from "./contractual/ContractualOfferSignatures";
 
 interface ContractualOfferDocumentProps {
   firstParty: FirstParty;
@@ -47,97 +48,11 @@ export default function ContractualOfferDocument({
         boxSizing: "border-box",
       }}
     >
-      {/* ── TOP HEADER (Dark Theme as in Template) ─────────────────────────── */}
-      <div className="bg-[#0D0D0E] text-white px-8 pt-7 pb-5 relative shrink-0">
-        {/* Top bar: Brand + Employment Type */}
-        <div className="flex items-start justify-between">
-          {/* Logo & Brand text */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-[#FF5722] shadow-md border border-white/10 flex items-center justify-center">
-              <Image
-                src="/fav.jpg"
-                alt="Creatibuz Studio"
-                width={48}
-                height={48}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-2xl tracking-tight leading-none text-white">
-                Creatibuz <span className="font-normal text-white/90">Studio</span>
-              </span>
-              <span className="text-[8.5px] font-bold uppercase tracking-[2.5px] text-[#A1A1AA] mt-1">
-                DESIGN &middot; DEVELOP &middot; TRANSFORM
-              </span>
-            </div>
-          </div>
-
-          {/* Employment Type Selector Badges */}
-          <div className="flex flex-col items-start gap-1.5 text-right">
-            <span className="text-xs font-semibold text-white/90">
-              Employment Type:
-            </span>
-            <div className="flex flex-col gap-1 items-start">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] ${
-                    employmentType === "Project-Based Contract"
-                      ? "bg-[#22C55E] text-white"
-                      : "bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]"
-                  }`}
-                >
-                  <Check className="w-3 h-3 stroke-[3]" />
-                </span>
-                <span
-                  className={`text-[11px] ${
-                    employmentType === "Project-Based Contract"
-                      ? "text-white font-medium"
-                      : "text-white/70"
-                  }`}
-                >
-                  Project-Based Contract
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span
-                  className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] ${
-                    employmentType === "Full-Time Contract"
-                      ? "bg-[#22C55E] text-white"
-                      : "bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]"
-                  }`}
-                >
-                  <Check className="w-3 h-3 stroke-[3]" />
-                </span>
-                <span
-                  className={`text-[11px] ${
-                    employmentType === "Full-Time Contract"
-                      ? "text-white font-medium"
-                      : "text-white/70"
-                  }`}
-                >
-                  Full-Time Contract
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Document Title */}
-        <h1 className="text-[29px] font-extrabold text-white mt-6 tracking-tight leading-none">
-          Joining Offer Letter &amp; Work Agreement
-        </h1>
-
-        {/* Divider */}
-        <div className="h-[1px] bg-white/20 my-3.5 w-full" />
-
-        {/* Subject & Date of Issue row */}
-        <div className="flex items-center justify-between text-xs text-[#E4E4E7]">
-          <span className="font-medium text-white/95">{subjectLine}</span>
-          <span className="font-medium text-white/80">
-            Date Of Issue: {dateOfIssue}
-          </span>
-        </div>
-      </div>
+      <ContractualOfferHeader
+        employmentType={employmentType}
+        subjectLine={subjectLine}
+        dateOfIssue={dateOfIssue}
+      />
 
       {/* ── BODY CONTENT ──────────────────────────────────────────────────── */}
       <div className="relative px-10 py-5 flex-1 flex flex-col justify-between">
@@ -220,94 +135,15 @@ export default function ContractualOfferDocument({
           </div>
         </div>
 
-        {/* ── SIGNATURES & CONTACT SECTION ─────────────────────────────────── */}
-        <div className="relative z-10 pt-4 pb-2 border-t border-[#E2E8F0] mt-3">
-          <div className="flex items-end justify-between gap-6">
-            {/* Dual Signature Area */}
-            <div className="flex items-end gap-10">
-              {/* Authorized Founder & CEO Signature */}
-              <div className="flex flex-col items-start">
-                <div className="h-11 flex items-end mb-1">
-                  {firstParty.signatureImg ? (
-                    <img
-                      src={firstParty.signatureImg}
-                      alt="Authorized Signature"
-                      className="h-10 max-w-[150px] object-contain"
-                    />
-                  ) : (
-                    <span className="font-serif italic text-lg text-slate-800">
-                      Abdul Hakim
-                    </span>
-                  )}
-                </div>
-                <div className="w-40 border-b border-[#94A3B8]" />
-                <span className="text-[10px] font-semibold text-[#475569] mt-1">
-                  Authorize Signature
-                </span>
-                <span className="text-[9.5px] font-bold text-[#0F172A]">
-                  {founderName}
-                </span>
-                <span className="text-[8px] text-[#64748B] uppercase tracking-wider">
-                  Founder &amp; CEO
-                </span>
-              </div>
-
-              {/* Candidate / Contractor Signature */}
-              <div className="flex flex-col items-start">
-                <div className="h-11 flex items-end mb-1">
-                  {secondParty.signatureImg ? (
-                    <img
-                      src={secondParty.signatureImg}
-                      alt="Candidate Signature"
-                      className="h-10 max-w-[150px] object-contain"
-                    />
-                  ) : (
-                    <div className="h-9 px-3 border border-dashed border-[#CBD5E1] rounded bg-slate-50 flex items-center justify-center text-[9px] text-[#94A3B8] italic">
-                      Pending Signature
-                    </div>
-                  )}
-                </div>
-                <div className="w-40 border-b border-[#94A3B8]" />
-                <span className="text-[10px] font-semibold text-[#475569] mt-1">
-                  Candidate Signature
-                </span>
-                <span className="text-[9.5px] font-bold text-[#0F172A]">
-                  {candidateName}
-                </span>
-                <span className="text-[8px] text-[#64748B] uppercase tracking-wider">
-                  Contractor
-                </span>
-              </div>
-            </div>
-
-            {/* Contact Details Card on the right */}
-            <div className="flex flex-col items-start gap-2 bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-xl shadow-xs">
-              {/* Phone */}
-              <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-                <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-                  <Phone className="w-2.5 h-2.5 fill-white text-white" />
-                </div>
-                <span>{phone}</span>
-              </div>
-
-              {/* Website */}
-              <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-                <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-                  <Globe className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span>{website}</span>
-              </div>
-
-              {/* Email */}
-              <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-                <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-                  <Mail className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span>{email}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ContractualOfferSignatures
+          firstParty={firstParty}
+          secondParty={secondParty}
+          founderName={founderName}
+          candidateName={candidateName}
+          phone={phone}
+          website={website}
+          email={email}
+        />
       </div>
 
       {/* ── SOLID VIBRANT ORANGE ACCENT FOOTER BAR ────────────────────────── */}

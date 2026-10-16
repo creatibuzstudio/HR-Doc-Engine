@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const validEmails = [
     envFounderEmail,
     "info@creatibuzstudio.com",
-    "founder@jevxo.com",
+    "founder@creatibuzstudio.com",
     "admin@creatibuzstudio.com",
   ].filter(Boolean);
 

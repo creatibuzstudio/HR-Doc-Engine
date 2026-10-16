@@ -1,18 +1,15 @@
 "use client";
 
 import React from "react";
-import DocumentPreview from "@/features/document-preview/components/DocumentPreview";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
 import InternCertificatePreview from "@/features/document-preview/components/InternCertificatePreview";
 import HRHiringNoticeDocument from "@/features/document-preview/templates/document/HRHiringNoticeDocument";
 import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
-import { TOTAL_DOCUMENT_PAGES } from "@/lib/documentConstants";
 import {
   FirstParty,
   SecondParty,
   DocSettings,
-  SalesAgreementType,
 } from "@/types";
 
 interface WorkspaceCanvasProps {
@@ -24,7 +21,6 @@ interface WorkspaceCanvasProps {
   onExport: () => void;
   isDemo: boolean;
   agreementTemplate?: string;
-  salesAgreementType?: SalesAgreementType;
 }
 
 export default function WorkspaceCanvas({
@@ -33,41 +29,19 @@ export default function WorkspaceCanvas({
   settings,
   previewRefs,
   isExporting,
-  onExport,
   isDemo,
   agreementTemplate,
-  salesAgreementType,
 }: WorkspaceCanvasProps) {
-  const template = agreementTemplate ?? settings.agreementTemplate ?? "partner";
+  const template = agreementTemplate ?? settings.agreementTemplate ?? "contractual";
   const isInternship = template === "internship";
   const isHrHiring = template === "hrHiringNotice";
   const isCertificate = template === "internCertificate";
-  const isContractual = template === "contractual";
-
-  const salesType = salesAgreementType ?? settings.salesAgreementType;
-  const isSalesAgreement =
-    salesType === "countrySales" || salesType === "salesAgent";
-
-  // Page count depends on document type
-  const pageCount = isInternship || isHrHiring || isCertificate || isContractual
-    ? 1
-    : isSalesAgreement
-      ? salesType === "countrySales" ? 5 : 3
-      : TOTAL_DOCUMENT_PAGES;
 
   return (
     <div className="flex-1 bg-background flex flex-col items-center justify-start p-6 overflow-y-auto scroll-smooth">
       <div className={`w-full transition-all duration-300 ${isCertificate ? "max-w-[1180px]" : "max-w-[860px]"}`}>
-        <A4DocumentScaler pageCount={pageCount} orientation={isCertificate ? "landscape" : "portrait"}>
-          {isContractual ? (
-            <ContractualOfferDocument
-              firstParty={firstParty}
-              secondParty={secondParty}
-              settings={settings}
-              innerRef={previewRefs[0]}
-              isExporting={isExporting}
-            />
-          ) : isCertificate ? (
+        <A4DocumentScaler pageCount={1} orientation={isCertificate ? "landscape" : "portrait"}>
+          {isCertificate ? (
             <InternCertificatePreview
               firstParty={firstParty}
               secondParty={secondParty}
@@ -88,12 +62,12 @@ export default function WorkspaceCanvas({
               previewRefs={previewRefs}
             />
           ) : (
-            <DocumentPreview
+            <ContractualOfferDocument
               firstParty={firstParty}
               secondParty={secondParty}
               settings={settings}
-              previewRefs={previewRefs}
-              isDemo={isDemo}
+              innerRef={previewRefs[0]}
+              isExporting={isExporting}
             />
           )}
         </A4DocumentScaler>

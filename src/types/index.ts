@@ -2,10 +2,10 @@ export interface FirstParty {
   companyName: string;
   representedBy: string;
   role: string;
-  ceoName?: string;
-  ceoMobile?: string;
-  cooName?: string;
-  cooMobile?: string;
+  ceoName: string;
+  ceoMobile: string;
+  cooName: string;
+  cooMobile: string;
   hrName?: string;
   hrMobile?: string;
   currentAddress: string;
@@ -18,10 +18,9 @@ export interface FirstParty {
 }
 
 export interface SecondParty {
-  fullName: string;
-  partnerId?: string; // e.g. "JVX-PT-26-001"
+  partnerId: string;
   partnerIdSerial?: string;
-  salesPartnerId?: string; // e.g. "JVX-CSP-26-001" or "JVX-SAG-26-001"
+  fullName: string;
   email: string;
   guardianName: string;
   guardianRelation: string;
@@ -40,92 +39,56 @@ export interface SecondParty {
 }
 
 export type AgreementTemplate =
-  | "partner"
+  | "contractual"
   | "internship"
-  | "sales_agent"
-  | "country_sales_partner"
   | "hrHiringNotice"
-  | "internCertificate"
-  | "contractual";
-
-export type SalesAgreementType = "countrySales" | "salesAgent";
-
-export interface SalesPartnerInfo {
-  fullName: string;
-  email: string;
-  phone: string;
-  address: string;
-  partnerId: string;
-  signatureImg?: string;
-}
+  | "internCertificate";
 
 export interface DocSettings {
   date: string;
-
-  minimumServicePeriod: number;
-  equityShare: number;
-  noticePeriod: number;
+  minimumServicePeriod?: number;
+  equityShare?: number;
+  noticePeriod?: number;
   refId?: string;
   refIdSerial?: string;
   agreementTemplate?: AgreementTemplate;
   // ── Internship-specific ──────────────────────────────────────────────────
-  internId?: string; // e.g. "JVX-INT-26-001"
+  internId?: string;
   internIdSerial?: string;
-  internRefId?: string; // e.g. "JVX-INT-REF-26-001"
+  internRefId?: string;
   internRefIdSerial?: string;
-  internshipDuration?: string; // e.g. "3 months"
+  internshipDuration?: string;
   isPaid?: boolean;
-  internExpiryDate?: string; // expiry date shown on the internee ID card
+  internExpiryDate?: string;
   // ── HR Hiring Notice-specific ────────────────────────────────────────────
-  hrNoticeId?: string; // e.g. "JVX-HR-26-001"
+  hrNoticeId?: string;
   hrNoticeIdSerial?: string;
-  hrNoticeRefId?: string; // e.g. "JVX-HR-REF-26-001"
+  hrNoticeRefId?: string;
   hrNoticeRefIdSerial?: string;
-  hrRecipientRole?: string; // e.g. "CEO", "CTO", "Founder"
-  hrRecipientRoleCustom?: string; // set when hrRecipientRole === "Other"
-  hrRecipientName?: string; // e.g. "Imtiaz Ahmed Tuhin"
-  hrRecipientEmail?: string; // e.g. "ceo@jevxo.com"
-  hrNoticeTitle?: string; // e.g. "UI/UX Designer Recruitment"
-  hrSubject?: string; // full subject line
-  hrPositionName?: string; // e.g. "UI/UX Designer"
-  hrVacancies?: number; // e.g. 4
-  hrDepartment?: string; // e.g. "Design Department"
-  hrEmploymentType?: string; // e.g. "Internship" | "Full-Time"
-  hrWorkMode?: string; // e.g. "Onsite" | "Remote" | "Hybrid"
-  hrLocation?: string; // e.g. "Rajshahi"
+  hrRecipientRole?: string;
+  hrRecipientRoleCustom?: string;
+  hrRecipientName?: string;
+  hrRecipientEmail?: string;
+  hrNoticeTitle?: string;
+  hrSubject?: string;
+  hrPositionName?: string;
+  hrVacancies?: number;
+  hrDepartment?: string;
+  hrEmploymentType?: string;
+  hrWorkMode?: string;
+  hrLocation?: string;
   hrRecruitmentStartDate?: string;
   hrRecruitmentEndDate?: string;
-  hrRequiredSkills?: string[]; // dynamic skill tags
-  hrExperienceRequired?: string; // e.g. "2+ years", "Fresher / No Experience"
-  hrExperienceNote?: string; // optional elaboration, e.g. "in UI/UX or product design"
-  hrPreparedByName?: string; // e.g. "Juwel Khan Shanto"
-  hrPreparedByDesignation?: string; // e.g. "Head of HR Department"
-  hrOrganization?: string; // default: "JEVXO"
-  // ── Sales Agreement-specific ─────────────────────────────────────────────
-  salesAgreementType?: SalesAgreementType;
-  salesRefId?: string; // e.g. "JVX-CSP-REF-26-001" or "JVX-SAG-REF-26-001"
-  salesRefIdSerial?: string;
-  salesPartnerId?: string; // e.g. "JVX-CSP-26-001" or "JVX-SAG-26-001"
-  salesPartnerIdSerial?: string;
-  territory?: string;
-  isExclusive?: boolean; // countrySales only
-  partnerAgreementRef?: string; // salesAgent only — which Partner they report to
-  initialTerm?: number; // e.g. 1 (years) — countrySales initial term
-  noticePeriodSales?: string; // e.g. "7/14" or "30/60"
-  governingJurisdiction?: string;
-  salesExpiryDate?: string; // ID card expiry for sales types
-  salesPartner?: SalesPartnerInfo; // contracting Country Sales Partner for Sales Agent agreements
-  partnerSignedDate?: string; // date the partner/CSP confirmed their signature
-  commissionConfiguration?: string;
-  baseCommissionRate?: number;
-  recurringCommissionRate?: number;
-  overrideCommissionRate?: number;
-  paymentCurrency?: string;
-  reportingStructure?: string;
+  hrRequiredSkills?: string[];
+  hrExperienceRequired?: string;
+  hrExperienceNote?: string;
+  hrPreparedByName?: string;
+  hrPreparedByDesignation?: string;
+  hrOrganization?: string;
   // ── Certificate-specific ─────────────────────────────────────────────────
-  certId?: string; // e.g. "JVX-CRT-26-001"
+  certId?: string;
   certIdSerial?: string;
-  certRefId?: string; // e.g. "JVX-CRT-REF-26-001"
+  certRefId?: string;
   certRefIdSerial?: string;
   certStartDate?: string;
   certEndDate?: string;
@@ -134,40 +97,26 @@ export interface DocSettings {
   certInternId?: string;
   certificateGenerated?: boolean;
   // ── Contractual-specific ─────────────────────────────────────────────────
-  contractId?: string; // e.g. "CRB-CON-26-001"
+  contractId?: string;
   contractIdSerial?: string;
-  contractRefId?: string; // e.g. "CRB-CON-REF-26-001"
+  contractRefId?: string;
   contractRefIdSerial?: string;
   employmentType?: "Project-Based Contract" | "Full-Time Contract";
-  contractSubject?: string; // e.g. "Web Developer For A Project-Based Contract"
+  contractSubject?: string;
   scopeOfWork?: string;
   compensationDetails?: string;
   confidentialityTerms?: string;
   ipOwnershipTerms?: string;
-}
-
-export interface EmployeeCard {
-  fullName: string;
-  position: string;
-  employeeId: string;
-  bloodGroup: string;
-  department: string;
-  photoUrl: string;
-  issueDate: string;
-  expiryDate: string;
+  partnerSignedDate?: string;
 }
 
 /** Which document types the HR is generating in this session */
 export type DocType =
-  | "Partner Agreement & ID Card"
-  | "Intern Offerletter & ID Card"
-  | "Country Sales Partner Agreement & ID Card"
-  | "Sales Agent Agreement & ID Card"
-  | "Joining Offer Letter & Work Agreement"
+  | "Contractual Offer Letter & Work Agreement (Featured)"
+  | "Internship"
   | "HR Hiring Notice"
   | "Intern Certificate"
   | string;
-
 
 export type AppState =
   | "home"
@@ -176,20 +125,17 @@ export type AppState =
   | "form"
   | "workspace"
   | "candidatePortal"
-  | "idCard"
   | "adminDashboard";
 
 export type AgreementStatus =
-  | "PENDING_CSP_SIGNATURE"
   | "PENDING_PARTNER_SIGNATURE"
   | "FULLY_EXECUTED";
 
 export interface AgreementSummary {
   agreementId: string;
   partnerId: string;
-  docType: string; // string for backward compat (old records may have "both" / "appointment")
+  docType: string;
   agreementTemplate?: AgreementTemplate;
-  salesAgreementType?: SalesAgreementType;
   status: AgreementStatus;
   founderSigned: boolean;
   partnerSigned: boolean;
@@ -199,7 +145,6 @@ export interface AgreementSummary {
   partnerEmail: string;
   companyName: string;
   position: string;
-  // HR Hiring Notice — recipient info (separate from partnerName/Email for display purposes)
   hrRecipientName?: string;
   hrRecipientEmail?: string;
 }

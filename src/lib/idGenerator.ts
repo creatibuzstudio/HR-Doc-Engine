@@ -1,5 +1,5 @@
 import dbConnect from "./mongodb";
-import Agreement from "../models/Agreement";
+import Agreement from "./models/Agreement";
 
 /**
  * Generates sequential IDs.

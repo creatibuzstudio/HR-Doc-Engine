@@ -1,43 +1,32 @@
 import { NextResponse } from "next/server";
 import {
-  generateAgreementIds,
+  generateContractualIds,
   generateInternIds,
-  generateCountrySalesPartnerIds,
-  generateSalesAgentIds,
   generateHrHiringIds,
   generateCertificateIds,
-  generateContractualIds,
   listAgreements,
-} from "../../../lib/agreementStore";
+} from "@/lib/agreementStore";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
 
-    if (action === "next") {
-      const { agreementId, partnerId, storage } = await generateAgreementIds();
-      return NextResponse.json({ agreementId, partnerId, storage });
-    }
-
-    if (action === "nextContract") {
-      const { contractualId, contractualRefId, storage } = await generateContractualIds();
-      return NextResponse.json({ contractualId, contractualRefId, storage });
+    if (action === "next" || action === "nextContract") {
+      const { contractualId, contractualRefId, storage } =
+        await generateContractualIds();
+      return NextResponse.json({
+        agreementId: contractualRefId,
+        partnerId: contractualId,
+        contractualId,
+        contractualRefId,
+        storage,
+      });
     }
 
     if (action === "nextIntern") {
       const { internId, internRefId, storage } = await generateInternIds();
       return NextResponse.json({ internId, internRefId, storage });
-    }
-
-    if (action === "nextCountrySales") {
-      const { salesRefId, salesPartnerId, storage } = await generateCountrySalesPartnerIds();
-      return NextResponse.json({ salesRefId, salesPartnerId, storage });
-    }
-
-    if (action === "nextSalesAgent") {
-      const { salesRefId, salesPartnerId, storage } = await generateSalesAgentIds();
-      return NextResponse.json({ salesRefId, salesPartnerId, storage });
     }
 
     if (action === "nextHrHiring") {

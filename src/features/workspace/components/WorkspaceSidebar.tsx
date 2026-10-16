@@ -2,9 +2,9 @@
 
 import React from "react";
 import { Settings, User, BookOpen, Mail, RefreshCw, Download } from "lucide-react";
-import { FirstParty, SecondParty, DocSettings, AgreementTemplate, SalesAgreementType } from "@/types";
-import { SettingsTab, InternshipSettingsTab, SalesSettingsTab, HRSettingsTab, InternCertificateSettingsTab, ContractualSettingsTab } from "./sidebar/SettingsTab";
-import { FirstPartyTab, SecondPartyTab, SalesPartyTab } from "./sidebar/PartiesTab";
+import { FirstParty, SecondParty, DocSettings, AgreementTemplate } from "@/types";
+import { InternshipSettingsTab, HRSettingsTab, InternCertificateSettingsTab, ContractualSettingsTab } from "./sidebar/SettingsTab";
+import { FirstPartyTab, SecondPartyTab } from "./sidebar/PartiesTab";
 
 // ─── Main sidebar tabs configuration ─────────────────────────────────────────
 const CONTRACT_TABS = [
@@ -13,22 +13,10 @@ const CONTRACT_TABS = [
   { id: "firstParty", label: "Issuer (Creatibuz)", icon: BookOpen },
 ];
 
-const PARTNER_TABS = [
-  { id: "settings", label: "Agreement Cl.", icon: Settings },
-  { id: "secondParty", label: "2nd Party (You)", icon: User },
-  { id: "firstParty", label: "1st Party (Creatibuz)", icon: BookOpen },
-];
-
 const INTERN_TABS = [
   { id: "settings", label: "Offer Terms", icon: Settings },
   { id: "secondParty", label: "Intern Details", icon: User },
   { id: "firstParty", label: "Company Info", icon: BookOpen },
-];
-
-const SALES_TABS = [
-  { id: "settings", label: "Sales Terms", icon: Settings },
-  { id: "secondParty", label: "Parties", icon: User },
-  { id: "firstParty", label: "Creatibuz Approval", icon: BookOpen },
 ];
 
 const HR_TABS = [
@@ -58,7 +46,6 @@ interface WorkspaceSidebarProps {
   onSendOffer: () => void;
   isOpeningModal?: boolean;
   agreementTemplate?: AgreementTemplate;
-  salesAgreementType?: SalesAgreementType;
 }
 
 export default function WorkspaceSidebar({
@@ -77,15 +64,11 @@ export default function WorkspaceSidebar({
   onSendOffer,
   isOpeningModal = false,
   agreementTemplate,
-  salesAgreementType,
 }: WorkspaceSidebarProps) {
   const isContractual = agreementTemplate === "contractual";
   const isInternship = agreementTemplate === "internship";
   const isHrHiring = agreementTemplate === "hrHiringNotice";
   const isCertificate = agreementTemplate === "internCertificate";
-  const isCSPAgreement = salesAgreementType === "countrySales";
-  const isSAGAgreement = salesAgreementType === "salesAgent";
-  const isSalesAgreement = salesAgreementType === "countrySales" || salesAgreementType === "salesAgent";
 
   return (
     <div className="w-full xl:w-[500px] bg-card border-b xl:border-b-0 xl:border-r border-border flex flex-col xl:h-full overflow-hidden shrink-0">
@@ -103,7 +86,7 @@ export default function WorkspaceSidebar({
               ? "bg-violet-950/40 border-violet-500/30 text-violet-400"
               : "bg-primary/10 border-primary/20 text-primary"
           }`}>
-            {isContractual ? "Contractual Offer Ready!" : isCertificate ? "Intern Certificate Ready!" : isInternship ? "Internship Offer Ready!" : isHrHiring ? "HR Hiring Notice Ready!" : isSalesAgreement ? `${salesAgreementType === "countrySales" ? "Country Sales Partner" : "Sales Agent"} Agreement Ready!` : "Agreement ready!"}
+            {isContractual ? "Contractual Offer Ready!" : isCertificate ? "Intern Certificate Ready!" : isInternship ? "Internship Offer Ready!" : "HR Hiring Notice Ready!"}
           </span>
           <h2 className="text-xl font-bold text-foreground">
             Document Workspace
@@ -115,17 +98,13 @@ export default function WorkspaceSidebar({
               ? "Adjust certificate details with live landscape preview."
               : isInternship
               ? "Adjust internship offer details with live preview."
-              : isHrHiring
-              ? "Adjust hiring notice details with live document preview."
-              : isSalesAgreement
-              ? "Adjust sales agreement details with a live document preview."
-              : "Fine-tune standard clause parameters with real-time browser preview compilation."}
+              : "Adjust hiring notice details with live document preview."}
           </p>
         </div>
 
         {/* Tab headers */}
         <div className="flex border-b border-border">
-          {(isContractual ? CONTRACT_TABS : isCertificate ? CERT_TABS : isInternship ? INTERN_TABS : isHrHiring ? HR_TABS : isSalesAgreement ? SALES_TABS : PARTNER_TABS).map(({ id, label, icon: Icon }) => (
+          {(isCertificate ? CERT_TABS : isInternship ? INTERN_TABS : isHrHiring ? HR_TABS : CONTRACT_TABS).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
@@ -143,26 +122,18 @@ export default function WorkspaceSidebar({
         {/* Tab content */}
         <div className="space-y-5">
           {activeTab === "settings" && (
-            isContractual ? (
-              <ContractualSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
-            ) : isCertificate ? (
+            isCertificate ? (
               <InternCertificateSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
             ) : isInternship ? (
               <InternshipSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
             ) : isHrHiring ? (
               <HRSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
-            ) : isSalesAgreement ? (
-              <SalesSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} salesAgreementType={salesAgreementType!} />
             ) : (
-              <SettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
+              <ContractualSettingsTab docSettings={docSettings} setDocSettings={setDocSettings} />
             )
           )}
           {activeTab === "secondParty" && (
-            isSalesAgreement ? (
-              <SalesPartyTab secondParty={secondParty} setSecondParty={setSecondParty} docSettings={docSettings} setDocSettings={setDocSettings} salesAgreementType={salesAgreementType!} />
-            ) : (
-              <SecondPartyTab secondParty={secondParty} setSecondParty={setSecondParty} />
-            )
+            <SecondPartyTab secondParty={secondParty} setSecondParty={setSecondParty} />
           )}
           {activeTab === "firstParty" && (
             <FirstPartyTab firstParty={firstParty} setFirstParty={setFirstParty} />
@@ -206,7 +177,7 @@ export default function WorkspaceSidebar({
                 )}
               </button>
             </div>
-          ) : isContractual ? (
+          ) : (
             <div className="space-y-2.5">
               <button
                 onClick={onSendOffer}
@@ -233,24 +204,10 @@ export default function WorkspaceSidebar({
                 )}
               </button>
             </div>
-          ) : (
-            <button
-              onClick={onSendOffer}
-              disabled={isOfferSent || isOpeningModal}
-              className="w-full py-3.5 px-6 bg-primary hover:opacity-90 disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-primary-foreground text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-primary/20 cursor-pointer"
-            >
-              {isOpeningModal ? (
-                <><RefreshCw className="w-4 h-4 animate-spin" /> Opening Offer Letter Modal…</>
-              ) : isOfferSent ? (
-                <><Mail className="w-4 h-4" /> Sent Offer Letter Successfully</>
-              ) : (
-                <><Mail className="w-4 h-4" /> Send Offer to Candidate</>
-              )}
-            </button>
           )}
           <div className="flex justify-between text-[11px] text-muted-foreground px-1 font-semibold">
             <span>A4 dimensions output</span>
-            <span>{isDemo ? "1 page" : isInternship ? "1 page" : isContractual ? "1 page" : isHrHiring ? "1 page" : isCertificate ? "1 page" : isCSPAgreement ? "5 pages" : isSAGAgreement ? "3 pages" : "2 pages"} automatic layout</span>
+            <span>1 page automatic layout</span>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Lock, Mail, ArrowRight, ShieldAlert } from "lucide-react";
-import JevxoLogo from "@/shared/layout/JevxoLogo";
+import Logo from "@/components/layout/Logo";
 
 interface LoginProps {
   onLoginSuccess: () => void;
@@ -56,7 +56,7 @@ onLoginSuccess();
         {/* Logo Header */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="cursor-pointer" onClick={onBackToHome}>
-            <JevxoLogo />
+            <Logo />
           </div>
           <h2 className="text-xl font-bold text-foreground mt-4">CEO &amp; Founder Login</h2>
           <p className="text-xs text-muted-foreground">

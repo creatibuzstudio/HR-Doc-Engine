@@ -23,12 +23,10 @@ const STATUS_OPTS: { value: StatusFilter; label: string }[] = [
 
 const DOCTYPE_OPTS: { value: DocTypeFilter; label: string }[] = [
   { value: "all", label: "All Types" },
-  { value: "partner", label: "Partner" },
+  { value: "contractual", label: "Joining Offer Letter (Contractual)" },
   { value: "internship", label: "Internship Offer Letter" },
-  { value: "internCertificate", label: "Internship Certificate" },
-  { value: "countrySales", label: "Country Sales Partner" },
-  { value: "salesAgent", label: "Sales Agent" },
   { value: "hrHiringNotice", label: "HR Hiring Notice" },
+  { value: "internCertificate", label: "Internship Certificate" },
 ];
 
 const SORT_FIELDS: { value: SortField; label: string }[] = [

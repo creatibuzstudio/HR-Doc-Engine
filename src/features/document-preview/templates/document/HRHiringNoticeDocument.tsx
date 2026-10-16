@@ -9,7 +9,7 @@ import DocumentMetadata from "./DocumentMetadata";
 import DocumentFooter from "./DocumentFooter";
 import Image from "next/image";
 
-import { toDisplayDate } from "@/shared/utils/dateUtils";
+import { toDisplayDate } from "@/lib/utils/dateUtils";
 
 interface HRHiringNoticeDocumentProps {
     firstParty: FirstParty;

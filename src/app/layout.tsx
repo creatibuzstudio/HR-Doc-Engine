@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
-import ToastProvider from "@/shared/ui/ToastProvider";
+import ToastProvider from "@/components/ui/ToastProvider";
 // Font variables defined as CSS variables with Google Fonts CDN in <head>
 const fontVariables = "--font-cinzel: 'Cinzel', serif; --font-montserrat: 'Montserrat', sans-serif; --font-opensans: 'Open Sans', sans-serif; --font-playfair: 'Playfair Display', serif; --font-ebgaramond: 'EB Garamond', serif;";
 

@@ -117,29 +117,17 @@ export default function DetailsModal({ agreementId, onClose }: Props) {
                 <Row label="Agreement ID" value={data.agreementId} />
                 <Row label="Partner ID" value={data.partnerId} />
                 <Row label="Doc Type" value={data.docType} />
-                <Row label="Sales Agreement Type" value={data.salesAgreementType} />
                 <Row label="Status" value={data.status} />
                 <Row label="Founder Signed" value={data.founderSigned ? "Yes" : "No"} />
                 <Row label="Partner Signed" value={data.partnerSigned ? "Yes" : "No"} />
                 <Row label="Signed At" value={data.signedAt ? new Date(data.signedAt).toLocaleString() : null} />
                 <Row label="Created At" value={data.createdAt ? new Date(data.createdAt).toLocaleString() : null} />
                 <Row label="Letter Sent To Both" value={data.letterSentToBoth ? "Yes" : "No"} />
-                <Row label="ID Card Generated" value={data.idCardGenerated ? "Yes" : "No"} />
               </Section>
 
               {renderSection("First Party (Company)", data.firstParty, ["signatureImg", "photoUrl"])}
-              {renderSection("Second Party (Partner / Agent)", data.secondParty, ["signatureImg", "photoUrl"])}
-              {renderSection("Document Settings", data.docSettings, ["salesPartner"])}
-
-              {data.docSettings?.salesPartner && (
-                <Section title="Country Sales Partner (for Sales Agent)">
-                  {Object.entries(data.docSettings.salesPartner as Record<string, unknown>)
-                    .filter(([k, v]) => k !== "signatureImg" && v !== undefined && v !== null && v !== "")
-                    .map(([k, v]) => (
-                      <Row key={k} label={k.replace(/([A-Z])/g, " $1").trim()} value={String(v)} />
-                    ))}
-                </Section>
-              )}
+              {renderSection("Second Party (Candidate / Recipient)", data.secondParty, ["signatureImg", "photoUrl"])}
+              {renderSection("Document Settings", data.docSettings)}
             </>
           )}
         </div>

@@ -2,18 +2,16 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { AgreementSummary } from "@/types";
-import { useDataCache } from "@/context/DataCacheContext";
+import { useDataCache } from "@/lib/context/DataCacheContext";
 
 export type SortField = "createdAt" | "agreementId";
 export type SortDir = "asc" | "desc";
 export type StatusFilter = "all" | "pending" | "executed";
 export type DocTypeFilter =
   | "all"
-  | "partner"
+  | "contractual"
   | "internship"
   | "internCertificate"
-  | "countrySales"
-  | "salesAgent"
   | "hrHiringNotice";
 
 export interface RegistryFilters {
@@ -29,20 +27,22 @@ const PAGE_SIZE = 25;
 
 function matchesDocType(a: AgreementSummary, docType: DocTypeFilter): boolean {
   if (docType === "all") return true;
-  if (docType === "countrySales")
+  if (docType === "contractual")
     return (
-      a.salesAgreementType === "countrySales" ||
-      a.docType === "Country Sales Partner Agreement & ID Card"
-    );
-  if (docType === "salesAgent")
-    return (
-      a.salesAgreementType === "salesAgent" ||
-      a.docType === "Sales Agent Agreement & ID Card"
+      a.agreementTemplate === "contractual" ||
+      a.docType === "Joining Offer Letter & Work Agreement" ||
+      Boolean(a.docType?.toLowerCase().includes("contractual")) ||
+      (!a.docType?.toLowerCase().includes("intern") &&
+        !a.docType?.toLowerCase().includes("hiring") &&
+        a.agreementTemplate !== "internCertificate" &&
+        a.agreementTemplate !== "hrHiringNotice" &&
+        a.agreementTemplate !== "internship")
     );
   if (docType === "internship")
     return (
       (a.docType?.includes("Intern") ||
-        a.docType === "Intern Offerletter & ID Card") &&
+        a.docType === "Intern Offer Letter" ||
+        a.agreementTemplate === "internship") &&
       a.agreementTemplate !== "internCertificate" &&
       a.docType !== "Intern Certificate"
     );
@@ -55,18 +55,7 @@ function matchesDocType(a: AgreementSummary, docType: DocTypeFilter): boolean {
     return (
       a.agreementTemplate === "hrHiringNotice" ||
       a.docType === "HR Hiring Notice" ||
-      a.docType?.includes("Hiring Notice")
-    );
-  if (docType === "partner")
-    return (
-      !a.salesAgreementType &&
-      !a.docType?.includes("Intern") &&
-      !a.docType?.includes("Hiring Notice") &&
-      a.agreementTemplate !== "hrHiringNotice" &&
-      (a.docType === "Partner Agreement & ID Card" ||
-        a.agreementTemplate === "partner" ||
-        a.docType === "appointment" ||
-        a.docType === "both")
+      Boolean(a.docType?.includes("Hiring Notice"))
     );
   return true;
 }
