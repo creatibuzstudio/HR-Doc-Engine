@@ -92,10 +92,7 @@ export function DataCacheProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const fetchCspList = useCallback(async (): Promise<CspOption[]> => {
-        const res = await fetch("/api/offers/csp-list");
-        if (!res.ok) throw new Error("Failed to fetch CSP list.");
-        const data = await res.json();
-        return (data.cspList as CspOption[]) || [];
+        return [];
     }, []);
 
     const fetchInternsList = useCallback(async (): Promise<InternOption[]> => {

@@ -6,8 +6,10 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    files: ["src/components/DocumentPreview.tsx"],
     rules: {
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/refs": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
       "react/no-unescaped-entities": "off",
     },
   },

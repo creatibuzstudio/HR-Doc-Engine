@@ -12,7 +12,6 @@ import Hero from "@/shared/layout/Hero";
 import Login from "@/features/auth/components/Login";
 import DocTypeSelector from "@/features/doc-select/components/DocTypeSelector";
 import FormWizard from "@/features/wizard/components/FormWizard";
-import SalesFormWizard from "@/features/wizard/components/SalesFormWizard";
 import InternshipFormWizard from "@/features/wizard/components/InternshipFormWizard";
 import HRHiringNoticeWizard from "@/features/wizard/components/HRHiringNoticeWizard";
 import InternCertificateWizard from "@/features/wizard/components/InternCertificateWizard";
@@ -20,7 +19,6 @@ import ContractualFormWizard from "@/features/wizard/components/ContractualFormW
 import CeoWorkspace from "@/features/workspace/components/CeoWorkspace";
 import CandidatePortal from "@/features/candidate-portal/components/CandidatePortal";
 import EmailPortalModal from "@/features/email/components/EmailPortalModal";
-import SalesAgentEmailModal from "@/features/email/components/SalesAgentEmailModal";
 import IdCardWorkspace from "@/features/id-card/components/IdCardWorkspace";
 import AdminDashboard from "@/features/admin/components/AdminDashboard";
 
@@ -333,22 +331,6 @@ function HomeInner() {
                 docSettings={docSettings}
                 setDocSettings={setDocSettings}
               />
-            ) : salesAgreementType ? (
-              <SalesFormWizard
-                key={`sales-${salesAgreementType}`}
-                activeStep={activeStep}
-                secondParty={secondParty}
-                setSecondParty={setSecondParty}
-                firstParty={firstParty}
-                setFirstParty={setFirstParty}
-                validationError={validationError}
-                onClearError={() => setValidationError("")}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                docSettings={docSettings}
-                setDocSettings={setDocSettings}
-                agreementType={salesAgreementType}
-              />
             ) : (
               <FormWizard
                 key="form"
@@ -436,19 +418,6 @@ function HomeInner() {
           )}
         </AnimatePresence>
       </main>
-
-      <SalesAgentEmailModal
-        isOpen={salesAgentModalOpen}
-        onClose={() => setSalesAgentModalOpen(false)}
-        onSentSuccess={() => setIsOfferSent(true)}
-        secondParty={secondParty}
-        firstParty={firstParty}
-        candidateLink={candidateLink}
-        offerId={offerId}
-        agreementTemplate={agreementTemplate}
-        salesAgreementType={salesAgreementType}
-        docSettings={docSettings}
-      />
 
       <EmailPortalModal
         isOpen={emailModalOpen}

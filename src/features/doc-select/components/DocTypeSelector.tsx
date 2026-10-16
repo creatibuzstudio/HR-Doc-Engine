@@ -6,7 +6,7 @@ import { ArrowRight, LayoutDashboard, FileText, CreditCard, BriefcaseIcon, Award
 
 // Local union — covers all selectable doc types including the new sales types.
 // Not exported from types/index.ts intentionally (only used at the selector layer).
-type SelectableDocType = "contractual" | "partner" | "internship" | "countrySales" | "salesAgent" | "hrHiringNotice" | "internCertificate";
+export type SelectableDocType = "contractual" | "internship" | "hrHiringNotice" | "internCertificate";
 
 interface DocTypeSelectorProps {
   onSelect: (type: SelectableDocType) => void;
@@ -38,7 +38,7 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
         </div>
 
         <div className="grid gap-4">
-          {/* Contractual Offer Letter & Work Agreement (Featured) */}
+          {/* 1. Contractual Offer Letter & Work Agreement (Featured) */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
@@ -73,40 +73,7 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
             </div>
           </motion.button>
 
-          {/* Partner */}
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={() => onSelect("partner")}
-            className="w-full text-left p-6 rounded-2xl border border-border bg-card shadow-sm cursor-pointer group transition-all hover:border-primary/50 hover:bg-secondary"
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex flex-col gap-1.5 shrink-0">
-                <div className="p-2.5 rounded-xl bg-secondary text-primary border border-border">
-                  <FileText className="w-5 h-5 text-primary" />
-                </div>
-                <div className="p-2.5 rounded-xl bg-secondary text-foreground border border-border">
-                  <CreditCard className="w-5 h-5 text-foreground" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-foreground text-base leading-snug">
-                  Partner Agreement &amp; ID Card
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                  Standard partner onboarding — appointment letter with equity, NDA, and ID card.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Equity Clause", "NDA", "PDF Export", "Digital Signature", "ID Card"].map((tag) => (
-                    <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
-                  ))}
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 shrink-0 mt-1 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition" />
-            </div>
-          </motion.button>
-
-          {/* Internship */}
+          {/* 2. Internship */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
@@ -126,62 +93,6 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {["Internship Duration", "NDA", "PDF Export", "ID Card"].map((tag) => (
-                    <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
-                  ))}
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 shrink-0 mt-1 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition" />
-            </div>
-          </motion.button>
-
-          {/* Country Sales Partner */}
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={() => onSelect("countrySales")}
-            className="w-full text-left p-6 rounded-2xl border border-border bg-card shadow-sm cursor-pointer group transition-all hover:border-primary/50 hover:bg-secondary"
-          >
-            <div className="flex items-start gap-4">
-              <div className="p-2.5 rounded-xl bg-secondary text-primary border border-border shrink-0">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-foreground text-base leading-snug">
-                  Country Sales Partner Agreement
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                  Sales partner agreement with commission structure, territory, and ID card.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Commission Terms", "Territory", "NDA", "PDF Export", "ID Card"].map((tag) => (
-                    <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
-                  ))}
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 shrink-0 mt-1 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition" />
-            </div>
-          </motion.button>
-
-          {/* Sales Agent */}
-          <motion.button
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={() => onSelect("salesAgent")}
-            className="w-full text-left p-6 rounded-2xl border border-border bg-card shadow-sm cursor-pointer group transition-all hover:border-primary/50 hover:bg-secondary"
-          >
-            <div className="flex items-start gap-4">
-              <div className="p-2.5 rounded-xl bg-secondary text-primary border border-border shrink-0">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-foreground text-base leading-snug">
-                  Sales Agent Agreement
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                  Agent agreement under a Country Sales Partner, with commission and ID card.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Agent Commission", "Reporting Structure", "NDA", "PDF Export", "ID Card"].map((tag) => (
                     <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
                   ))}
                 </div>

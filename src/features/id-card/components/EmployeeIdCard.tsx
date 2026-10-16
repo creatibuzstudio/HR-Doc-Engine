@@ -5,7 +5,6 @@ import QRCode from "react-qr-code";
 import { buildVerifyUrl } from "@/lib/verifyUrl";
 import { EmployeeCard } from "@/types";
 import Image from "next/image";
-import logo from "../../../../assets/logo0bg.png";
 
 // ─── Card dimensions — CR80 portrait ratio (54×85.6mm) at screen scale ───────
 const CARD_W = 360;
@@ -169,10 +168,10 @@ export function IdCardFront({ data, cardRef, idLabel = "ID No" }: FrontProps) {
         fontFamily: "'Orbitron', 'Rajdhani', sans-serif",
       }}
     >
-      {/* X-logo watermark — Partner card only */}
+      {/* Logo watermark */}
       {showQR && (
         <img
-          src="/x-logo0bg.png"
+          src="/creatibuz-symbol.png"
           alt=""
           style={{
             position: "absolute",
@@ -181,11 +180,11 @@ export function IdCardFront({ data, cardRef, idLabel = "ID No" }: FrontProps) {
             height: "auto",
             top: "390px",
             left: "390px",
-          transform: "scale(1.85) translate(-50%, -50%)",
-          opacity: 0.78,
-          pointerEvents: "none",
-          userSelect: "none",
-          filter: "blur(0.8px)",
+            transform: "scale(1.85) translate(-50%, -50%)",
+            opacity: 0.78,
+            pointerEvents: "none",
+            userSelect: "none",
+            filter: "blur(0.8px)",
           }}
         />
       )}
@@ -217,14 +216,14 @@ export function IdCardFront({ data, cardRef, idLabel = "ID No" }: FrontProps) {
         </div>
       )}
 
-      {/* JEVXO Logo */}
+      {/* Creatibuz Studio Logo */}
       <div className="absolute top-2 right-2 z-10 bg-[#0A0B10]/80 backdrop-blur-sm px-2 py-1 rounded-xl">
         <Image
-          src={logo}
+          src="/creatibuz-logo.png"
           width={140}
           height={95}
-          alt="JEVXO Logo"
-          className="drop-shadow-md"
+          alt="Creatibuz Studio Logo"
+          className="drop-shadow-md w-32 h-auto object-contain"
         />
       </div>
 

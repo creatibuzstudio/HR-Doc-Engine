@@ -12,7 +12,6 @@ import {
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
 import DocumentPreview from "@/features/document-preview/components/DocumentPreview";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
-import SalesAgreementDocument from "@/features/document-preview/templates/document/SalesAgreementDocument";
 import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
 import IdCardWorkspace from "@/features/id-card/components/IdCardWorkspace";
 
@@ -167,14 +166,6 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
                       secondParty={secondParty}
                       settings={docSettings}
                       innerRef={dummyRefs[0]}
-                    />
-                  ) : isSales ? (
-                    <SalesAgreementDocument
-                      docType={salesAgreementType!}
-                      firstParty={firstParty}
-                      secondParty={secondParty}
-                      settings={docSettings}
-                      previewRefs={dummyRefs}
                     />
                   ) : isInternship ? (
                     <InternshipDocumentPreview

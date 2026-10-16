@@ -73,7 +73,8 @@ function buildEmailSignature({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    let { offerId, candidateEmail, candidateName, agreementTemplate, hrNoticePdfBase64 } = body;
+    const { offerId, agreementTemplate, hrNoticePdfBase64 } = body;
+    let { candidateEmail, candidateName } = body;
 
     if (!offerId || !candidateEmail || !candidateName) {
       return NextResponse.json(

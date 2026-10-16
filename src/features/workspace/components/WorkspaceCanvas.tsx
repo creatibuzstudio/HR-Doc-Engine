@@ -4,7 +4,6 @@ import React from "react";
 import DocumentPreview from "@/features/document-preview/components/DocumentPreview";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
 import InternCertificatePreview from "@/features/document-preview/components/InternCertificatePreview";
-import SalesAgreementDocument from "@/features/document-preview/templates/document/SalesAgreementDocument";
 import HRHiringNoticeDocument from "@/features/document-preview/templates/document/HRHiringNoticeDocument";
 import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
@@ -83,14 +82,6 @@ export default function WorkspaceCanvas({
             />
           ) : isInternship ? (
             <InternshipDocumentPreview
-              firstParty={firstParty}
-              secondParty={secondParty}
-              settings={settings}
-              previewRefs={previewRefs}
-            />
-          ) : isSalesAgreement ? (
-            <SalesAgreementDocument
-              docType={salesType!}
               firstParty={firstParty}
               secondParty={secondParty}
               settings={settings}

@@ -63,13 +63,13 @@ export default function HRHiringNoticeDocument({ firstParty, settings, previewRe
         skills: (settings.hrRequiredSkills?.length) ? settings.hrRequiredSkills : ["Communication", "Teamwork", "Problem Solving"],
         experienceRequired: settings.hrExperienceRequired || "",
         experienceNote: settings.hrExperienceNote || "",
-        preparedByName: settings.hrPreparedByName || firstParty.hrName || "Juwel Khan Shanto",
+        preparedByName: settings.hrPreparedByName || firstParty.hrName || "Ashikur Rahman Ovi",
         preparedByDesignation: settings.hrPreparedByDesignation || "Head of HR Department",
-        organization: settings.hrOrganization || firstParty.companyName || "JEVXO",
+        organization: settings.hrOrganization || firstParty.companyName || "Creatibuz Studio",
         hrSig: firstParty.signatureImg || "",
-        companyEmail: firstParty.email || "info@jevxo.com",
-        companyWebsite: firstParty.website || "www.jevxo.com",
-        companyAddress: firstParty.currentAddress || "9th floor, Silicon Tower, Hi-tech park, Rajshahi, Bangladesh",
+        companyEmail: firstParty.email || "info@creatibuzstudio.com",
+        companyWebsite: firstParty.website || "www.creatibuzstudio.com",
+        companyAddress: firstParty.currentAddress || "Delduar Road, Tangail Shadar, Dhaka",
     };
 
     const verifyUrl = buildVerifyUrl(d.refId);
