@@ -124,40 +124,40 @@ export default function CandidateSidebar({
   };
 
   return (
-    <div className="w-full xl:w-[420px] bg-[#F8FAFC] border-r border-[#DBEAFE] flex flex-col h-screen sticky top-0 overflow-hidden shrink-0">
+    <div className="w-full xl:w-[420px] bg-card border-r border-border flex flex-col h-screen sticky top-0 overflow-hidden shrink-0">
       {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
         {/* Header */}
         <div className="space-y-2">
-          <span className="text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
+          <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
             Offer Awaiting Acceptance
           </span>
-          <h2 className="text-xl font-bold text-[#0F172A]">Candidate Portal</h2>
-          <p className="text-[#64748B] text-xs">
+          <h2 className="text-xl font-bold text-foreground">Candidate Portal</h2>
+          <p className="text-muted-foreground text-xs">
             Review the terms, draw your signature, and generate your
             counter-signed partnership contract.
           </p>
         </div>
 
         {/* Info card */}
-        <div className="p-4 bg-white border border-[#DBEAFE] rounded-2xl space-y-2 text-xs">
+        <div className="p-4 bg-secondary border border-border rounded-2xl space-y-2 text-xs">
           <div className="flex justify-between">
-            <span className="text-slate-400 font-semibold">Candidate:</span>
-            <span className="font-bold text-slate-800">
+            <span className="text-muted-foreground font-semibold">Candidate:</span>
+            <span className="font-bold text-foreground">
               {secondParty.fullName}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400 font-semibold">
+            <span className="text-muted-foreground font-semibold">
               Position Offered:
             </span>
-            <span className="font-bold text-[#2563EB]">
+            <span className="font-bold text-primary">
               {secondParty.position}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400 font-semibold">Company:</span>
-            <span className="font-bold text-slate-800">
+            <span className="text-muted-foreground font-semibold">Company:</span>
+            <span className="font-bold text-foreground">
               {firstParty.companyName}
             </span>
           </div>
@@ -165,17 +165,17 @@ export default function CandidateSidebar({
 
         {/* Signature Pad Section */}
         <div className="space-y-4">
-          <div className="border-b border-[#DBEAFE] pb-1">
-            <h3 className="text-xs font-bold text-[#0F172A] uppercase tracking-wide">
+          <div className="border-b border-border pb-1">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">
               Draw Your Signature *
             </h3>
-            <p className="text-[10px] text-[#64748B]">
+            <p className="text-[10px] text-muted-foreground">
               Draw inside the pad below to accept the partnership terms.
             </p>
           </div>
 
           {sigError && (
-            <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-semibold rounded-xl">
+            <div className="p-2.5 bg-rose-950/40 border border-rose-500/30 text-rose-300 text-[11px] font-semibold rounded-xl">
               {sigError}
             </div>
           )}
@@ -187,38 +187,38 @@ export default function CandidateSidebar({
           />
 
           {/* Or divider */}
-          <div className="flex items-center gap-4 my-2 text-[#64748B] text-xs font-bold uppercase tracking-wider">
-            <div className="flex-1 h-[1px] bg-[#DBEAFE]" />
+          <div className="flex items-center gap-4 my-2 text-muted-foreground text-xs font-bold uppercase tracking-wider">
+            <div className="flex-1 h-[1px] bg-border" />
             <span>Or</span>
-            <div className="flex-1 h-[1px] bg-[#DBEAFE]" />
+            <div className="flex-1 h-[1px] bg-border" />
           </div>
 
           {/* Upload option */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Option B: Upload Signature Photo File
             </label>
-            <div className="relative border-2 border-dashed border-[#DBEAFE] hover:border-[#2563EB]/50 rounded-2xl p-6 bg-[#F8FAFC]/50 hover:bg-[#F8FAFC] transition-all flex flex-col items-center justify-center text-center gap-2 cursor-pointer group">
+            <div className="relative border-2 border-dashed border-border hover:border-primary rounded-2xl p-6 bg-secondary/50 hover:bg-secondary transition-all flex flex-col items-center justify-center text-center gap-2 cursor-pointer group">
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleUpload}
                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
               />
-              <Upload className="w-8 h-8 text-[#64748B] group-hover:text-[#2563EB] transition transform group-hover:scale-105" />
-              <p className="text-xs text-[#334155] font-semibold uppercase tracking-wider">
+              <Upload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition transform group-hover:scale-105" />
+              <p className="text-xs text-foreground font-semibold uppercase tracking-wider">
                 Drag & drop image file or select
               </p>
-              <p className="text-[10px] text-[#64748B] leading-relaxed max-w-[280px]">
+              <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[280px]">
                 Accepts PNG, JPG, or SVG formats containing clear black or blue
                 ink signatures with high contrast backgrounds.
               </p>
             </div>
 
             {secondParty.signatureImg && (
-              <div className="mt-4 p-4 bg-[#F8FAFC] border border-[#DBEAFE] rounded-2xl flex items-center justify-between gap-4">
+              <div className="mt-4 p-4 bg-secondary border border-border rounded-2xl flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white border border-[#DBEAFE] rounded-xl shrink-0">
+                  <div className="p-2 bg-card border border-border rounded-xl shrink-0">
                     <img
                       src={secondParty.signatureImg}
                       alt="Signature Preview"
@@ -226,10 +226,10 @@ export default function CandidateSidebar({
                     />
                   </div>
                   <div>
-                    <p className="text-xs text-[#2563EB] font-bold flex items-center gap-1">
+                    <p className="text-xs text-primary font-bold flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" /> Signature Active
                     </p>
-                    <p className="text-[10px] text-[#64748B]">
+                    <p className="text-[10px] text-muted-foreground">
                       Export-ready image base64 synced
                     </p>
                   </div>
@@ -237,7 +237,7 @@ export default function CandidateSidebar({
                 <button
                   type="button"
                   onClick={handleClearSignature}
-                  className="text-xs text-rose-600 hover:text-rose-500 font-semibold px-2 py-1 cursor-pointer"
+                  className="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2 py-1 cursor-pointer"
                 >
                   Remove
                 </button>
@@ -248,11 +248,11 @@ export default function CandidateSidebar({
       </div>
 
       {/* Fixed Action Footer */}
-      <div className="p-6 bg-[#F8FAFC] border-t border-[#DBEAFE] space-y-3 shrink-0">
+      <div className="p-6 bg-card border-t border-border space-y-3 shrink-0">
         <button
           onClick={handleActionClick}
           disabled={isExporting || isCompleted}
-          className="w-full py-4 px-6 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#64748B]/40 disabled:cursor-not-allowed font-bold text-white text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-[#2563EB]/10 hover:shadow-[#2563EB]/25 cursor-pointer animate-pulse-subtle"
+          className="w-full py-4 px-6 bg-primary hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed font-bold text-primary-foreground text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-primary/20 cursor-pointer"
         >
           {isCompleted ? (
             <>
@@ -269,7 +269,7 @@ export default function CandidateSidebar({
             </>
           )}
         </button>
-        <div className="flex justify-between text-[11px] text-[#64748B] px-1 font-semibold">
+        <div className="flex justify-between text-[11px] text-muted-foreground px-1 font-semibold">
           <span>Official A4 formatting</span>
           <span>Dual signatures included</span>
         </div>

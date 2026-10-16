@@ -320,22 +320,22 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
             {onBack && (
               <button
                 onClick={onBack}
-                className="text-xs font-semibold text-[#64748B] hover:text-[#2563EB] flex items-center gap-1.5 mb-3 cursor-pointer"
+                className="text-xs font-semibold text-muted-foreground hover:text-primary flex items-center gap-1.5 mb-3 cursor-pointer"
               >
                 ← Back to Doc Select
               </button>
             )}
-            <h1 className="text-2xl font-bold text-[#0F172A]">
+            <h1 className="text-2xl font-bold text-foreground">
               Agreement Registry
             </h1>
-            <p className="text-sm text-[#64748B] mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               View all generated documents, track status, and resend signing links.
             </p>
           </div>
           <button
             onClick={reload}
             disabled={loading}
-            className="group self-start flex items-center gap-2 px-4 py-2.5 bg-white border border-[#DBEAFE] hover:border-[#2563EB] rounded-xl text-xs font-bold text-[#2563EB] cursor-pointer"
+            className="group self-start flex items-center gap-2 px-4 py-2.5 bg-card border border-border hover:border-primary rounded-xl text-xs font-bold text-primary cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 transition-transform duration-500 ${loading ? "animate-spin" : "group-hover:rotate-180"}`} />
             Refresh
@@ -345,18 +345,18 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[
-            { label: "Total Agreements", value: stats.total, color: "#2563EB" },
+            { label: "Total Agreements", value: stats.total, color: "var(--primary)" },
             { label: "Pending Signature", value: stats.pending, color: "#D97706" },
             { label: "Fully Executed", value: stats.executed, color: "#059669" },
           ].map(({ label, value, color }) => (
             <div
               key={label}
-              className="bg-white border border-[#DBEAFE] rounded-2xl p-4 text-center"
+              className="bg-card border border-border rounded-2xl p-4 text-center"
             >
               <div className="text-2xl font-black" style={{ color }}>
                 {value}
               </div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mt-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">
                 {label}
               </div>
             </div>
@@ -367,39 +367,39 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
         <RegistryToolbar filters={filters} onChange={patchFilter} />
 
         {error && (
-          <div className="mb-4 p-4 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-800">
+          <div className="mb-4 p-4 bg-rose-950/40 border border-rose-500/30 rounded-xl text-sm text-rose-300">
             {error}
           </div>
         )}
 
         {/* Table */}
-        <div className="bg-white border border-[#DBEAFE] rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-12 flex justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-[#2563EB]" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : processed.list.length === 0 ? (
-            <div className="p-12 text-center text-sm text-[#64748B]">
+            <div className="p-12 text-center text-sm text-muted-foreground">
               No agreements match your filters.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#DBEAFE] bg-[#F8FAFC] text-center">
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                  <tr className="border-b border-border bg-secondary/70 text-center">
+                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Agreement
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Partner
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Created
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Actions
                     </th>
                   </tr>
@@ -408,10 +408,10 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                   {processed.list.map((a) => (
                     <tr
                       key={a.agreementId}
-                      className="border-b border-[#DBEAFE]/60 hover:bg-[#F8FAFC] text-center"
+                      className="border-b border-border/50 hover:bg-secondary/40 text-center transition-colors"
                     >
                       <td className="px-4 py-3 text-left">
-                        <div className="font-mono font-bold text-[#0F172A] text-xs">
+                        <div className="font-mono font-bold text-foreground text-xs">
                           {a.agreementId}
                         </div>
                         <div className="mt-0.5">
@@ -423,10 +423,10 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-[#0F172A]">
+                        <div className="font-semibold text-foreground">
                           {a.hrRecipientName || a.partnerName}
                         </div>
-                        <div className="text-[11px] text-[#64748B]">
+                        <div className="text-[11px] text-muted-foreground">
                           {a.hrRecipientEmail || a.partnerEmail}
                         </div>
                       </td>
@@ -437,7 +437,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                           docType={a.docType}
                         />
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#64748B]">
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
                         {a.createdAt
                           ? new Date(a.createdAt).toLocaleDateString("en-US", {
                             month: "short",

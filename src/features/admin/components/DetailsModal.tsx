@@ -11,11 +11,11 @@ interface Props {
 function Row({ label, value }: { label: string; value?: string | number | boolean | null }) {
   if (value === undefined || value === null || value === "") return null;
   return (
-    <div className="grid grid-cols-5 gap-2 py-1.5 border-b border-[#F1F5F9] last:border-0">
-      <span className="col-span-2 text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+    <div className="grid grid-cols-5 gap-2 py-1.5 border-b border-border/40 last:border-0">
+      <span className="col-span-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
         {label}
       </span>
-      <span className="col-span-3 text-xs text-[#0F172A] font-medium break-all">
+      <span className="col-span-3 text-xs text-foreground font-medium break-all">
         {String(value)}
       </span>
     </div>
@@ -25,7 +25,7 @@ function Row({ label, value }: { label: string; value?: string | number | boolea
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-5">
-      <h4 className="text-[10px] font-black uppercase tracking-widest text-[#2563EB] mb-2 pb-1 border-b border-[#DBEAFE]">
+      <h4 className="text-[10px] font-black uppercase tracking-widest text-primary mb-2 pb-1 border-b border-border/60">
         {title}
       </h4>
       {children}
@@ -79,19 +79,19 @@ export default function DetailsModal({ agreementId, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#DBEAFE] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <div>
-            <h2 className="font-bold text-[#0F172A] text-base">Agreement Details</h2>
-            <p className="text-[11px] text-[#64748B] font-mono mt-0.5">{agreementId}</p>
+            <h2 className="font-bold text-foreground text-base">Agreement Details</h2>
+            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{agreementId}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
+            className="p-2 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>

@@ -131,7 +131,7 @@ export default function CeoWorkspace({
         </div>
 
         {/* Tab bar */}
-        <div className="sticky top-15 z-20 w-full flex border-b border-[#DBEAFE] bg-[#F8FAFC] px-3 sm:px-6 overflow-x-auto">
+        <div className="sticky top-15 z-20 w-full flex border-b border-border bg-card px-3 sm:px-6 overflow-x-auto">
           {[
             { id: "settings", label: salesAgreementType === "countrySales" ? "📄 Country Sales Partner Agreement" : salesAgreementType === "salesAgent" ? "📄 Sales Agent Agreement" : agreementTemplate === "internship" ? "📄 Internship Offer" : agreementTemplate === "hrHiringNotice" ? "📋 HR Hiring Notice" : agreementTemplate === "internCertificate" ? "📄 Intern Certificate" : "📄 Appointment Docs" },
             ...(agreementTemplate === "hrHiringNotice" || agreementTemplate === "internCertificate" ? [] : [
@@ -143,8 +143,8 @@ export default function CeoWorkspace({
               onClick={() => setActiveWorkspaceTab(id)}
               className={`px-3 sm:px-6 py-3.5 text-xs font-bold uppercase tracking-wide border-b-2 transition cursor-pointer whitespace-nowrap ${
                 activeWorkspaceTab === id
-                  ? "border-[#2563EB] text-[#2563EB]"
-                  : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {label}

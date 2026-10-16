@@ -135,39 +135,39 @@ export default function EmailPortalModal({
   const hrContact = firstParty.email || firstParty.mobileNumber;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center shrink-0">
+        <div className="px-6 py-4 bg-card border-b border-border flex justify-between items-center shrink-0">
           <div className="flex items-center gap-2">
             <div
-              className={`w-2.5 h-2.5 rounded-full animate-pulse ${isHrHiring ? "bg-violet-600" : isCertificate ? "bg-indigo-600" : "bg-blue-600"
+              className={`w-2.5 h-2.5 rounded-full animate-pulse ${isHrHiring ? "bg-violet-500" : isCertificate ? "bg-indigo-500" : "bg-primary"
                 }`}
             />
-            <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">
+            <h3 className="font-extrabold text-sm text-foreground uppercase tracking-wider">
               {isHrHiring
-                ? "JEVXO HR Hiring Notice Dispatch"
+                ? "HR Hiring Notice Dispatch"
                 : isCertificate
-                  ? "JEVXO Intern Certificate Dispatch"
+                  ? "Intern Certificate Dispatch"
                   : isInternship
-                    ? "JEVXO Internship Offer Portal"
+                    ? "Internship Offer Portal"
                     : isCSP
-                      ? "JEVXO Country Sales Partner Portal"
+                      ? "Country Sales Partner Portal"
                       : isSalesAgent
-                        ? "JEVXO Sales Agent Agreement Portal"
-                        : "JEVXO Offer Dispatch Portal"}
+                        ? "Sales Agent Agreement Portal"
+                        : "Offer Dispatch Portal"}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-200/60 text-slate-400 hover:text-slate-600 rounded-lg transition"
+            className="p-1.5 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-lg transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Email header fields */}
-        <div className="p-6 border-b border-slate-100 space-y-3 shrink-0 text-xs font-semibold text-slate-500 bg-slate-50/50">
+        <div className="p-6 border-b border-border space-y-3 shrink-0 text-xs font-semibold text-muted-foreground bg-secondary/40">
           <div className="flex flex-col gap-1.5 w-full">
             <div className="flex items-center gap-3">
               <span className="w-14 text-right shrink-0">From:</span>
@@ -175,22 +175,22 @@ export default function EmailPortalModal({
                 type="text"
                 value={fromAddress}
                 readOnly
-                className="bg-white border border-slate-200 px-3.5 py-1.5 rounded-lg text-slate-800 flex-1 font-bold outline-none"
+                className="bg-card border border-border px-3.5 py-1.5 rounded-lg text-foreground flex-1 font-bold outline-none"
               />
             </div>
-            <p className="text-[10px] text-slate-400 font-normal pl-[68px] leading-relaxed">
-              * Emails use the verified JEVXO sender configuration from the server.
+            <p className="text-[10px] text-muted-foreground/80 font-normal pl-[68px] leading-relaxed">
+              * Emails use the verified sender configuration from the server.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="w-14 text-right">To:</span>
-            <span className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-slate-800 flex-1 font-bold">
+            <span className="bg-card border border-border px-3 py-1.5 rounded-lg text-foreground flex-1 font-bold">
               {displayName} ({displayEmail})
             </span>
           </div>
           <div className="flex items-center gap-3">
             <span className="w-14 text-right">Subject:</span>
-            <span className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-slate-800 flex-1 font-extrabold">
+            <span className="bg-card border border-border px-3 py-1.5 rounded-lg text-foreground flex-1 font-extrabold">
               {emailSubject}
             </span>
           </div>
@@ -401,11 +401,11 @@ export default function EmailPortalModal({
         </div>
 
         {/* Footer actions */}
-        <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end items-center gap-3 shrink-0">
+        <div className="p-6 bg-card border-t border-border flex justify-end items-center gap-3 shrink-0">
           <button
             onClick={onClose}
             disabled={sending || sent}
-            className="h-11 px-5 border border-slate-200 hover:border-slate-300 hover:bg-white rounded-xl text-slate-600 text-xs font-bold transition cursor-pointer disabled:opacity-40"
+            className="h-11 px-5 border border-border hover:border-primary hover:bg-secondary rounded-xl text-muted-foreground hover:text-foreground text-xs font-bold transition cursor-pointer disabled:opacity-40"
           >
             Cancel
           </button>
@@ -418,7 +418,7 @@ export default function EmailPortalModal({
                   ? "bg-violet-600 hover:bg-violet-700"
                   : isCertificate
                     ? "bg-indigo-600 hover:bg-indigo-700"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    : "bg-primary hover:opacity-90"
               }`}
           >
             {sending ? (

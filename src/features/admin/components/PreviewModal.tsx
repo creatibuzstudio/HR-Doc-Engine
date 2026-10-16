@@ -92,17 +92,17 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#DBEAFE] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <div>
-            <h2 className="font-bold text-[#0F172A] text-base">
+            <h2 className="font-bold text-foreground text-base">
               Document Preview
             </h2>
-            <p className="text-[11px] text-[#64748B] font-mono mt-0.5">
+            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
               {agreementId}
             </p>
           </div>
@@ -114,8 +114,8 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
                   onClick={() => setTab("agreement")}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
                     tab === "agreement"
-                      ? "bg-[#2563EB] text-white border-[#2563EB]"
-                      : "bg-white border-[#DBEAFE] text-[#64748B] hover:border-[#2563EB]"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-secondary border-border text-muted-foreground hover:border-primary hover:text-foreground"
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" /> Agreement
@@ -125,8 +125,8 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
                     onClick={() => setTab("idCard")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
                       tab === "idCard"
-                        ? "bg-[#2563EB] text-white border-[#2563EB]"
-                        : "bg-white border-[#DBEAFE] text-[#64748B] hover:border-[#2563EB]"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-secondary border-border text-muted-foreground hover:border-primary hover:text-foreground"
                     }`}
                   >
                     <CreditCard className="w-3.5 h-3.5" /> ID Card
@@ -136,7 +136,7 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-xl hover:bg-[#F1F5F9] text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
+              className="p-2 rounded-xl hover:bg-secondary text-muted-foreground hover:text-foreground transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -144,7 +144,7 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto flex-1 px-4 py-4">
+        <div className="overflow-y-auto flex-1 px-4 py-4 bg-background">
           {loading && (
             <div className="flex justify-center py-16">
               <Loader2 className="w-7 h-7 animate-spin text-[#2563EB]" />

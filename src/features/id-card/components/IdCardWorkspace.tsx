@@ -44,8 +44,8 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[10px] font-bold text-[#334155] uppercase tracking-wider flex items-center gap-1.5">
-        <Icon className="w-3 h-3 text-[#2563EB]" />
+      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+        <Icon className="w-3 h-3 text-primary" />
         {label}
       </label>
       {children}
@@ -66,11 +66,11 @@ function ReadOnlyField({
 }) {
   return (
     <Field label={label} icon={Icon}>
-      <div className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-xl py-2.5 px-3 text-sm text-[#0F172A] font-medium select-text flex items-center gap-2">
-        <span className={value ? "text-[#0F172A]" : "text-[#94A3B8]"}>
+      <div className="w-full bg-secondary border border-border rounded-xl py-2.5 px-3 text-sm text-foreground font-medium select-text flex items-center gap-2">
+        <span className={value ? "text-foreground" : "text-muted-foreground"}>
           {value || placeholder || "—"}
         </span>
-        <span className="ml-auto text-[9px] font-bold text-[#CBD5E1] uppercase tracking-wider shrink-0">
+        <span className="ml-auto text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider shrink-0">
           Read only
         </span>
       </div>
@@ -100,10 +100,10 @@ function EditableField({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-sm text-[#0F172A] font-medium focus:outline-none transition"
+        className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-2.5 px-3 text-sm text-foreground font-medium focus:outline-none transition"
       />
       {hint && (
-        <p className="text-[10px] text-[#64748B] italic mt-0.5">{hint}</p>
+        <p className="text-[10px] text-muted-foreground italic mt-0.5">{hint}</p>
       )}
     </Field>
   );
@@ -514,17 +514,17 @@ export default function IdCardWorkspace({
       className="flex-1 flex flex-col md:flex-row w-full min-h-0 overflow-hidden"
     >
       {/* ── LEFT: Form Panel ────────────────────────────────────────────────── */}
-      <div className="w-full md:w-[360px] bg-[#F8FAFC] border-b md:border-b-0 md:border-r border-[#DBEAFE] flex flex-col overflow-y-auto shrink-0 max-h-[55vh] sm:max-h-[60vh] md:max-h-none md:h-full">
+      <div className="w-full md:w-[360px] bg-card border-b md:border-b-0 md:border-r border-border flex flex-col overflow-y-auto shrink-0 max-h-[55vh] sm:max-h-[60vh] md:max-h-none md:h-full">
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Header */}
           <div className="space-y-1">
-            <span className="text-[10px] bg-[#EFF6FF] border border-[#DBEAFE]/50 text-[#1E3A8A] font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
+            <span className="text-[10px] bg-primary/10 border border-primary/20 text-primary font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block">
               ID Card Preview
             </span>
-            <h2 className="text-lg sm:text-xl font-bold text-[#0F172A]">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
               {idLabel === "Internee ID" ? "Internee ID Card" : "Partner ID Card"}
             </h2>
-            <p className="text-[#64748B] text-xs">
+            <p className="text-muted-foreground text-xs">
               {hidePhotoUpload
                 ? `Card details are pulled from the appointment form. The ${idLabel === "Internee ID" ? "intern" : "candidate"} uploads their own photo in the candidate portal.`
                 : "Card details are pulled from the appointment form. Upload the employee photo below."}
@@ -534,12 +534,12 @@ export default function IdCardWorkspace({
           {/* Photo Upload */}
           {!hidePhotoUpload && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-[#334155] uppercase tracking-wider flex items-center gap-1.5">
-                <ImageIcon className="w-3 h-3 text-[#2563EB]" />
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <ImageIcon className="w-3 h-3 text-primary" />
                 {idLabel === "Internee ID" ? "Intern Photo" : "Partner Photo"}{" "}
                 <span className="text-rose-500 font-extrabold">* Required</span>
               </label>
-              <label className="flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-[#DBEAFE] hover:border-[#2563EB] rounded-xl cursor-pointer bg-white transition-all group">
+              <label className="flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-border hover:border-primary rounded-xl cursor-pointer bg-secondary transition-all group">
                 {card.photoUrl ? (
                   <img
                     src={card.photoUrl}
@@ -548,11 +548,11 @@ export default function IdCardWorkspace({
                   />
                 ) : (
                   <>
-                    <Upload className="w-5 h-5 text-[#94A3B8] group-hover:text-[#2563EB] transition" />
-                    <span className="text-xs font-medium text-[#94A3B8] group-hover:text-[#2563EB] transition">
+                    <Upload className="w-5 h-5 text-muted-foreground group-hover:text-primary transition" />
+                    <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition">
                       Click to upload photo
                     </span>
-                    <span className="text-[10px] text-[#CBD5E1]">
+                    <span className="text-[10px] text-muted-foreground/70">
                       PNG, JPG — recommended 400×600px
                     </span>
                   </>
@@ -570,7 +570,7 @@ export default function IdCardWorkspace({
                     if (isControlled && onPhotoChange) onPhotoChange("");
                     else setUncontrolledPhotoUrl("");
                   }}
-                  className="text-[10px] font-semibold text-red-400 hover:text-red-600 text-right transition cursor-pointer"
+                  className="text-[10px] font-semibold text-rose-400 hover:text-rose-300 text-right transition cursor-pointer"
                 >
                   Remove photo
                 </button>
@@ -649,7 +649,7 @@ export default function IdCardWorkspace({
       {/* ── RIGHT: Card Preview — scales to fit any screen ──────────────────── */}
       <div
         ref={previewAreaRef}
-        className="flex-1 flex justify-center items-center bg-[#1a1a2e] overflow-auto p-4 min-h-[400px] sm:min-h-[500px]"
+        className="flex-1 flex justify-center items-center bg-background overflow-auto p-4 min-h-[400px] sm:min-h-[500px]"
       >
         {/* Scaler wrapper — sizes the outer box to match the scaled content exactly,
             so the parent can center it without overflow. On xl+ both cards sit

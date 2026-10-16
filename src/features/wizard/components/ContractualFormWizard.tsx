@@ -144,25 +144,25 @@ export default function ContractualFormWizard({
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl md:text-2xl font-bold text-[#0F172A] flex items-center gap-2">
-            <div className="p-2 bg-[#FF5722]/15 text-[#FF5722] rounded-xl">
-              <FileText className="w-5 h-5 text-[#FF5722]" />
+          <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
+            <div className="p-2 bg-primary/20 text-primary rounded-xl">
+              <FileText className="w-5 h-5 text-primary" />
             </div>
             Joining Offer Letter &amp; Work Agreement
           </h2>
-          <span className="text-xs bg-[#FFF3EE] border border-[#FF5722]/30 px-3 py-1 rounded-full text-[#EA580C] font-bold">
+          <span className="text-xs bg-secondary border border-border px-3 py-1 rounded-full text-primary font-bold">
             Step {activeStep} of {TOTAL_STEPS}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div className="w-full bg-[#FFEDD5] h-2 rounded-full overflow-hidden flex">
+        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden flex border border-border">
           {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
             <div
               key={idx}
               className={`h-full flex-1 transition-all duration-300 ${
-                idx + 1 <= activeStep ? "bg-[#FF5722]" : "bg-[#FFEDD5]"
-              } ${idx < TOTAL_STEPS - 1 ? "border-r border-white" : ""}`}
+                idx + 1 <= activeStep ? "bg-primary" : "bg-transparent"
+              } ${idx < TOTAL_STEPS - 1 ? "border-r border-border" : ""}`}
             />
           ))}
         </div>
@@ -174,10 +174,10 @@ export default function ContractualFormWizard({
               key={idx}
               className={`text-[10px] font-bold px-3 py-1 rounded-full border transition ${
                 idx + 1 === activeStep
-                  ? "bg-[#FF5722] border-[#FF5722] text-white"
+                  ? "bg-primary border-primary text-primary-foreground"
                   : idx + 1 < activeStep
-                  ? "bg-[#FFF3EE] border-[#FF5722] text-[#EA580C]"
-                  : "bg-white border-[#E2E8F0] text-[#94A3B8]"
+                  ? "bg-secondary border-border text-primary"
+                  : "bg-secondary/40 border-border text-muted-foreground"
               }`}
             >
               {idx + 1 < activeStep ? (
@@ -194,13 +194,13 @@ export default function ContractualFormWizard({
       </div>
 
       {/* Step content container */}
-      <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 md:p-8 shadow-sm min-h-[380px]">
+      <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm min-h-[380px]">
         {validationError && (
-          <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-center justify-between">
+          <div className="mb-5 p-3.5 bg-destructive/15 border border-destructive/30 text-destructive text-xs font-semibold rounded-xl flex items-center justify-between">
             <span>{validationError}</span>
             <button
               onClick={onClearError}
-              className="text-rose-500 hover:text-rose-700 text-xs font-bold"
+              className="text-destructive hover:opacity-80 text-xs font-bold"
             >
               Dismiss
             </button>
@@ -614,13 +614,13 @@ export default function ContractualFormWizard({
         <button
           onClick={onPrev}
           disabled={activeStep === 1}
-          className="flex items-center gap-2 px-5 py-3 border border-[#E2E8F0] hover:border-[#FF5722] text-[#334155] font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className="flex items-center gap-2 px-5 py-3 border border-border hover:border-primary text-foreground bg-secondary hover:bg-accent font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
           onClick={onNext}
-          className="flex items-center gap-2 px-7 py-3 bg-[#FF5722] hover:bg-[#EA580C] text-white font-bold text-sm rounded-2xl transition shadow-md shadow-[#FF5722]/20 cursor-pointer"
+          className="flex items-center gap-2 px-7 py-3 bg-primary hover:opacity-95 text-primary-foreground font-bold text-sm rounded-2xl transition shadow-lg shadow-primary/25 cursor-pointer"
         >
           {activeStep === TOTAL_STEPS ? (
             <>

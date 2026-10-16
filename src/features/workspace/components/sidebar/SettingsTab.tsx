@@ -15,19 +15,19 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">Offer Date</label>
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Offer Date</label>
         <input
           type="date"
           max={getTodayISO()}
           value={toISODate(docSettings.date)}
           onChange={(e) => setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))}
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition cursor-pointer"
+          className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-2.5 px-3 text-xs md:text-sm text-foreground focus:outline-none transition cursor-pointer"
         />
       </div>
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between items-center">
-          <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">Internship Duration</label>
-          <span className="text-xs text-[#2563EB] font-extrabold">{Number(docSettings.internshipDuration) || 1} Months</span>
+          <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Internship Duration</label>
+          <span className="text-xs text-primary font-extrabold">{Number(docSettings.internshipDuration) || 1} Months</span>
         </div>
         <div className="flex items-center gap-3">
           <input
@@ -42,7 +42,7 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
               const expiryStr = expiry.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
               setDocSettings((p) => ({ ...p, internshipDuration: String(months), internExpiryDate: expiryStr }));
             }}
-            className="flex-1 accent-[#2563EB] cursor-pointer"
+            className="flex-1 accent-primary cursor-pointer"
           />
           <input
             type="number"
@@ -56,15 +56,15 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
               const expiryStr = expiry.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
               setDocSettings((p) => ({ ...p, internshipDuration: String(months), internExpiryDate: expiryStr }));
             }}
-            className="w-[60px] text-center bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-1 text-[#0F172A] text-xs font-bold"
+            className="w-[60px] text-center bg-secondary border border-border rounded-lg py-1 text-foreground text-xs font-bold"
           />
         </div>
-        <p className="text-[10px] text-[#64748B] italic">
-          ID card expiry: <strong className="text-[#2563EB]">{docSettings.internExpiryDate || "—"}</strong>
+        <p className="text-[10px] text-muted-foreground italic">
+          ID card expiry: <strong className="text-primary">{docSettings.internExpiryDate || "—"}</strong>
         </p>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">Compensation Type</label>
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Compensation Type</label>
         <div className="grid grid-cols-2 gap-2">
           {[true, false].map((paid) => (
             <button
@@ -72,8 +72,8 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
               type="button"
               onClick={() => setDocSettings((p) => ({ ...p, isPaid: paid }))}
               className={`py-2.5 text-xs font-bold rounded-xl border transition cursor-pointer ${docSettings.isPaid === paid
-                ? "bg-[#2563EB]/10 border-[#2563EB] text-[#2563EB]"
-                : "bg-white border-[#DBEAFE] text-[#334155] hover:border-[#2563EB]"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-secondary border-border text-foreground hover:border-primary"
                 }`}
             >
               {paid ? "Paid" : "Unpaid"}
@@ -82,21 +82,21 @@ export function InternshipSettingsTab({ docSettings, setDocSettings }: Internshi
         </div>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">Intern ID</label>
+        <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Intern ID</label>
         <input
           type="text"
           value={docSettings.internId || ""}
           readOnly
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-mono font-bold"
+          className="w-full bg-secondary border border-border rounded-lg py-2 px-3 text-xs text-muted-foreground font-mono font-bold"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">Reference ID</label>
+        <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Reference ID</label>
         <input
           type="text"
           value={docSettings.internRefId || ""}
           readOnly
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-mono font-bold"
+          className="w-full bg-secondary border border-border rounded-lg py-2 px-3 text-xs text-muted-foreground font-mono font-bold"
         />
       </div>
     </div>
@@ -121,7 +121,7 @@ export function SettingsTab({ docSettings, setDocSettings }: SettingsTabProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
           Signing Date
         </label>
         <input
@@ -131,7 +131,7 @@ export function SettingsTab({ docSettings, setDocSettings }: SettingsTabProps) {
           onChange={(e) =>
             setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))
           }
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-2.5 px-3 text-xs md:text-sm text-[#0F172A] focus:outline-none transition cursor-pointer"
+          className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-2.5 px-3 text-xs md:text-sm text-foreground focus:outline-none transition cursor-pointer"
         />
       </div>
 
@@ -333,7 +333,7 @@ export function ContractualSettingsTab({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
           Employment Type
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -352,8 +352,8 @@ export function ContractualSettingsTab({
               }
               className={`py-2 text-[11px] font-bold rounded-xl border transition cursor-pointer ${
                 docSettings.employmentType === type
-                  ? "bg-[#FF5722]/10 border-[#FF5722] text-[#EA580C]"
-                  : "bg-white border-[#CBD5E1] text-[#334155] hover:border-[#FF5722]"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-secondary border-border text-foreground hover:border-primary"
               }`}
             >
               {type === "Project-Based Contract" ? "Project-Based" : "Full-Time"}
@@ -377,7 +377,7 @@ export function ContractualSettingsTab({
       />
 
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+        <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
           Term 01 — Scope Of Work
         </label>
         <textarea
@@ -386,12 +386,12 @@ export function ContractualSettingsTab({
           onChange={(e) =>
             setDocSettings((p) => ({ ...p, scopeOfWork: e.target.value }))
           }
-          className="w-full bg-[#F1F5F9] border border-[#CBD5E1] rounded-lg p-2 text-xs text-[#0F172A] focus:border-[#FF5722] focus:outline-none"
+          className="w-full bg-secondary border border-border rounded-lg p-2 text-xs text-foreground focus:border-primary focus:outline-none"
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+        <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
           Term 02 — Compensation
         </label>
         <textarea
@@ -400,7 +400,7 @@ export function ContractualSettingsTab({
           onChange={(e) =>
             setDocSettings((p) => ({ ...p, compensationDetails: e.target.value }))
           }
-          className="w-full bg-[#F1F5F9] border border-[#CBD5E1] rounded-lg p-2 text-xs text-[#0F172A] focus:border-[#FF5722] focus:outline-none"
+          className="w-full bg-secondary border border-border rounded-lg p-2 text-xs text-foreground focus:border-primary focus:outline-none"
         />
       </div>
     </div>

@@ -112,21 +112,21 @@ export default function SignaturePad({
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex justify-between items-center">
-        <label className="block text-xs font-semibold text-[#8C8479] tracking-wider uppercase">
+        <label className="block text-xs font-semibold text-muted-foreground tracking-wider uppercase">
           Option A: Draw Signature Directly
         </label>
         {(hasDrawn || savedImage) && (
           <button
             type="button"
             onClick={clearCanvas}
-            className="text-xs text-rose-600 hover:text-rose-500 transition font-medium flex items-center gap-1 cursor-pointer"
+            className="text-xs text-rose-400 hover:text-rose-300 transition font-medium flex items-center gap-1 cursor-pointer"
             id="clear_signature_btn"
           >
             Clear Signature Pad
           </button>
         )}
       </div>
-      <div className="relative border border-[#EBE5DE] rounded-xl bg-[#FAF9F7] overflow-hidden cursor-crosshair">
+      <div className="relative border border-border rounded-xl bg-secondary overflow-hidden cursor-crosshair">
         <canvas
           id="signature_canvas"
           ref={canvasRef}
@@ -140,7 +140,7 @@ export default function SignaturePad({
           onPointerCancel={stopDrawing}
         />
         {!hasDrawn && !savedImage && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-xs text-[#8C8479] text-center px-4">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-xs text-slate-500 text-center px-4">
             Draw your signature here using mouse or touch pad
           </div>
         )}

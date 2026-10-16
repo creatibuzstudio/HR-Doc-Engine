@@ -43,12 +43,12 @@ export default function RegistryPagination({
   const btnCls = (active: boolean, disabled = false) =>
     `h-8 min-w-[32px] px-2 rounded-lg text-xs font-bold border transition flex items-center justify-center
     ${disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
-    ${active ? "bg-[#2563EB] text-white border-[#2563EB]" : "bg-white border-[#DBEAFE] text-[#64748B] hover:border-[#2563EB] hover:text-[#2563EB]"}`;
+    ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border text-muted-foreground hover:border-primary hover:text-foreground"}`;
 
   return (
-    <div className="bg-white p-4 rounded-xl my-6 shadow-lg">
+    <div className="bg-card p-4 rounded-xl my-6 border border-border shadow-md">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-[#64748B] font-medium">
+        <span className="text-[11px] text-muted-foreground font-medium">
           Showing {from}–{to} of {total}
         </span>
         <div className="flex items-center gap-1">
@@ -61,7 +61,7 @@ export default function RegistryPagination({
           </button>
           {pages.map((p, i) =>
             p === "…" ? (
-              <span key={`ellipsis-${i}`} className="text-xs text-[#94A3B8] px-1">
+              <span key={`ellipsis-${i}`} className="text-xs text-muted-foreground px-1">
                 …
               </span>
             ) : (

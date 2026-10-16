@@ -47,21 +47,20 @@ onLoginSuccess();
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.3 }}
-      className="relative min-h-[calc(100vh-77px)] flex items-center justify-center px-4 overflow-hidden"
+      className="relative min-h-[calc(100vh-77px)] flex items-center justify-center px-4 overflow-hidden hero-radial-glow"
     >
       {/* Background patterns */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#DBEAFE_1px,transparent_1px),linear-gradient(to_bottom,#DBEAFE_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
-      <div className="absolute top-1/3 left-1/3 w-[250px] h-[250px] bg-[#2563EB]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
 
-      <div className="w-full max-w-md bg-white border border-[#DBEAFE] shadow-xl rounded-3xl p-8 space-y-6 relative z-10">
+      <div className="w-full max-w-md bg-card border border-border shadow-2xl rounded-3xl p-8 space-y-6 relative z-10">
         {/* Logo Header */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="cursor-pointer" onClick={onBackToHome}>
             <JevxoLogo />
           </div>
-          <h2 className="text-xl font-bold text-[#0F172A] mt-4">CEO & Founder Login</h2>
-          <p className="text-xs text-[#64748B]">
-            Authenticate to generate and manage official partnership documents.
+          <h2 className="text-xl font-bold text-foreground mt-4">CEO &amp; Founder Login</h2>
+          <p className="text-xs text-muted-foreground">
+            Authenticate to generate and manage official Creatibuz Studio agreements.
           </p>
         </div>
 
@@ -69,45 +68,45 @@ onLoginSuccess();
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-800 flex items-center gap-2"
+            className="p-3 bg-destructive/15 border border-destructive/30 rounded-xl text-xs font-medium text-destructive flex items-center gap-2"
           >
-            <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+            <ShieldAlert className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </motion.div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-[#334155] uppercase tracking-wide">
+            <label className="text-[10px] font-bold text-header-text uppercase tracking-wide">
               Founder Email
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="email"
-                placeholder="e.g. something@nothing.com"
+                placeholder="info@creatibuzstudio.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full bg-[#F8FAFC] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-3 pl-10 pr-4 text-sm text-[#0F172A] focus:outline-none transition font-medium"
+                className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-3 pl-10 pr-4 text-sm text-foreground focus:outline-none transition font-medium placeholder:text-muted-foreground/60"
                 required
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-bold text-[#334155] uppercase tracking-wide">
+            <label className="text-[10px] font-bold text-header-text uppercase tracking-wide">
               Security Token / Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
-                className="w-full bg-[#F8FAFC] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-3 pl-10 pr-4 text-sm text-[#0F172A] focus:outline-none transition font-medium"
+                className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-3 pl-10 pr-4 text-sm text-foreground focus:outline-none transition font-medium placeholder:text-muted-foreground/60"
                 required
               />
             </div>
@@ -116,18 +115,36 @@ onLoginSuccess();
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#2563EB]/70 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-6"
+            className="w-full py-3.5 bg-primary hover:opacity-95 disabled:opacity-50 text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 transition flex items-center justify-center gap-2 cursor-pointer mt-6"
           >
             {isSubmitting ? "Authenticating..." : "Login Portal"}
             {!isSubmitting && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
 
+        {/* Credentials shortcut helper */}
+        <div className="border-t border-border pt-4 text-center space-y-2">
+          <p className="text-[11px] text-muted-foreground">
+            Password: <code className="text-primary font-bold">Shahid@2026</code>
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setEmail("info@creatibuzstudio.com");
+              setPassword("Shahid@2026");
+              setError("");
+            }}
+            className="text-xs font-bold text-primary hover:underline transition cursor-pointer"
+          >
+            Auto-fill Credentials (info@creatibuzstudio.com)
+          </button>
+        </div>
+
         <div className="text-center">
           <button
             type="button"
             onClick={onBackToHome}
-            className="text-xs text-[#64748B] hover:text-[#0F172A] font-semibold transition cursor-pointer"
+            className="text-xs text-muted-foreground hover:text-foreground font-semibold transition cursor-pointer"
           >
             Cancel and Return
           </button>

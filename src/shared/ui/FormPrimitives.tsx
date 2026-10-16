@@ -11,7 +11,7 @@ export interface FieldProps {
 export function Field({ label, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold text-[#334155] uppercase tracking-wide">
+      <label className="text-xs font-semibold text-header-text uppercase tracking-wide">
         {label}
       </label>
       {children}
@@ -28,9 +28,9 @@ export interface IconInputProps
 export function IconInput({ icon: Icon, ...props }: IconInputProps) {
   return (
     <div className="relative">
-      <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+      <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <input
-        className="w-full bg-[#F8FAFC] border border-[#DBEAFE] focus:border-[#2563EB] rounded-xl py-3 pl-10 pr-4 text-sm text-[#0F172A] focus:outline-none transition"
+        className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none transition"
         {...props}
       />
     </div>
@@ -46,14 +46,14 @@ export interface TextInputProps
 export function TextInput({ label, value, onChange, type = "text", ...rest }: TextInputProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+      <label className="text-[10px] font-semibold text-header-text uppercase tracking-wide">
         {label}
       </label>
       <input
         type={type}
         value={value}
         onChange={onChange}
-        className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-medium focus:outline-none focus:border-[#2563EB] cursor-pointer"
+        className="w-full bg-secondary border border-border rounded-lg py-2 px-3 text-xs text-foreground font-medium focus:outline-none focus:border-primary"
         {...rest}
       />
     </div>
@@ -75,14 +75,14 @@ export function TextArea({
 }: TextAreaProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+      <label className="text-[10px] font-semibold text-header-text uppercase tracking-wide">
         {label}
       </label>
       <textarea
         rows={rows}
         value={value}
         onChange={onChange}
-        className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-3 text-xs text-[#0F172A] font-medium focus:outline-none focus:border-[#2563EB]"
+        className="w-full bg-secondary border border-border rounded-lg py-2 px-3 text-xs text-foreground font-medium focus:outline-none focus:border-primary"
         {...rest}
       />
     </div>
@@ -97,9 +97,9 @@ export interface StepHeaderProps {
 
 export function StepHeader({ title, desc }: StepHeaderProps) {
   return (
-    <div className="border-b border-[#DBEAFE] pb-2 mb-4">
-      <h3 className="text-[#0F172A] font-bold text-base">{title}</h3>
-      <p className="text-[#64748B] text-xs">{desc}</p>
+    <div className="border-b border-border pb-2 mb-4">
+      <h3 className="text-foreground font-bold text-base">{title}</h3>
+      <p className="text-muted-foreground text-xs">{desc}</p>
     </div>
   );
 }
@@ -128,10 +128,10 @@ export function SliderField({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-between items-center">
-        <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">
+        <label className="text-[11px] font-bold text-header-text uppercase tracking-wider">
           {label}
         </label>
-        <span className="text-xs text-[#2563EB] font-extrabold">
+        <span className="text-xs text-primary font-extrabold">
           {numVal}
           {suffix}
         </span>
@@ -143,7 +143,7 @@ export function SliderField({
           max={max}
           value={numVal}
           onChange={onChange}
-          className="flex-1 accent-[#2563EB] cursor-pointer"
+          className="flex-1 accent-primary cursor-pointer"
         />
         <input
           type="number"
@@ -151,10 +151,10 @@ export function SliderField({
           max={max}
           value={numVal}
           onChange={onChange}
-          className="w-[60px] text-center bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-1 text-[#0F172A] text-xs font-bold"
+          className="w-[60px] text-center bg-secondary border border-border rounded-lg py-1 text-foreground text-xs font-bold"
         />
       </div>
-      {hint && <p className="text-[10px] text-[#64748B] italic">{hint}</p>}
+      {hint && <p className="text-[10px] text-muted-foreground italic">{hint}</p>}
     </div>
   );
 }

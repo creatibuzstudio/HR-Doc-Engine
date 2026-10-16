@@ -57,7 +57,7 @@ export default function WorkspaceCanvas({
       : TOTAL_DOCUMENT_PAGES;
 
   return (
-    <div className="flex-1 bg-[#F1F5F9] flex flex-col items-center justify-start p-6 overflow-y-auto scroll-smooth">
+    <div className="flex-1 bg-background flex flex-col items-center justify-start p-6 overflow-y-auto scroll-smooth">
       <div className={`w-full transition-all duration-300 ${isCertificate ? "max-w-[1180px]" : "max-w-[860px]"}`}>
         <A4DocumentScaler pageCount={pageCount} orientation={isCertificate ? "landscape" : "portrait"}>
           {isContractual ? (

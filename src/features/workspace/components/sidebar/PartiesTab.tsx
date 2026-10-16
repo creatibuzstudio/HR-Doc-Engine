@@ -91,16 +91,16 @@ export function SecondPartyTab({ secondParty, setSecondParty }: SecondPartyTabPr
           onChange={set("guardianName")}
         />
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+          <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
             Relation
           </label>
           <select
             value={secondParty.guardianRelation}
             onChange={set("guardianRelation")}
-            className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-2 text-xs text-[#0F172A] font-semibold focus:outline-none focus:border-[#2563EB]"
+            className="w-full bg-secondary border border-border rounded-lg py-2 px-2 text-xs text-foreground font-semibold focus:outline-none focus:border-primary"
           >
             {["Father", "Mother", "Husband", "Guardian"].map((r) => (
-              <option key={r}>{r}</option>
+              <option key={r} value={r} className="bg-card text-foreground">{r}</option>
             ))}
           </select>
         </div>
@@ -118,16 +118,16 @@ export function SecondPartyTab({ secondParty, setSecondParty }: SecondPartyTabPr
       />
 
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] font-semibold text-[#334155] uppercase tracking-wide">
+        <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
           Blood Group
         </label>
         <select
           value={secondParty.bloodGroup || "Select"}
           onChange={set("bloodGroup")}
-          className="w-full bg-[#F1F5F9] border border-[#DBEAFE] rounded-lg py-2 px-2 text-xs text-[#0F172A] font-semibold focus:outline-none focus:border-[#2563EB]"
+          className="w-full bg-secondary border border-border rounded-lg py-2 px-2 text-xs text-foreground font-semibold focus:outline-none focus:border-primary"
         >
           {["Select", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-            <option key={bg} value={bg}>
+            <option key={bg} value={bg} className="bg-card text-foreground">
               {bg}
             </option>
           ))}

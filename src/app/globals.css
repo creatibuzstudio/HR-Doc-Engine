@@ -1,25 +1,78 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-@theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
-  
-  --font-cinzel: var(--font-cinzel), serif;
-  --font-montserrat: var(--font-montserrat), sans-serif;
-  --font-opensans: var(--font-opensans), sans-serif;
-  --font-playfair: var(--font-playfair), serif;
-  --font-ebgaramond: var(--font-ebgaramond), serif;
-  
-  /* JEVXO Centered Corporate Blue Palette */
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-dark: #1E3A8A;
-  --color-primary-light: #EFF6FF;
-  --color-primary-border: #DBEAFE;
-  --color-brand-accent: #06B6D4;
-  --color-brand-bg: #F8FAFC;
-  --color-brand-card: #FFFFFF;
-  --color-brand-text: #0F172A;
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0C0E12;
+  --foreground: #ffffff;
+  --primary: #FE5A00;
+  --primary-foreground: #ffffff;
+  --color-text: #767676;
+  --color-header: #BCBCBC;
+  --primary-gradient: linear-gradient(to right, #FE5A00, #1B0900);
+  --color-nav: #191919;
+  --color-card: #181A1E;
+  --card: #181A1E;
+  --card-foreground: #ffffff;
+  --popover: #181A1E;
+  --popover-foreground: #ffffff;
+  --secondary: #1F2228;
+  --secondary-foreground: #ffffff;
+  --muted: #1F2228;
+  --muted-foreground: #767676;
+  --accent: #262930;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #FE5A00;
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--color-text);
+  --color-header-text: var(--color-header);
+  --primary-gradient: var(--primary-gradient);
+  --color-nav: var(--color-nav);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--card-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-bricolage), "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-dm-serif), "DM Serif Display", Georgia, serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+.hero-radial-glow {
+  background: radial-gradient(circle at 50% 45%, rgba(248, 88, 0, 0.15) 0%, rgba(248, 88, 0, 0.05) 50%, transparent 80%);
+}
+
+.serif-italic {
+  font-family: var(--font-dm-serif), "DM Serif Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* Beautiful custom transitions and styling for modern web aesthetic */
@@ -45,7 +98,10 @@ html.a4-exporting .a4-scaler-inner {
 
 #document-preview-container,
 #document-page-1,
-#document-page-2 {
+#document-page-2,
+.a4-document-page {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
   --color-slate-950: #020617;
   --color-slate-900: #0f172a;
   --color-slate-800: #1e293b;

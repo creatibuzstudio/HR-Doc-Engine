@@ -369,7 +369,7 @@ export default function CandidatePortal({
       </div>
 
       {/* ── Tab bar ── */}
-      <div className="sticky top-15 z-20 w-full flex border-b border-[#DBEAFE] bg-[#F8FAFC] px-6 shrink-0">
+      <div className="sticky top-15 z-20 w-full flex border-b border-border bg-card px-6 shrink-0">
         {[
           {
             id: "letter" as const,
@@ -398,8 +398,8 @@ export default function CandidatePortal({
             key={id}
             onClick={() => setActiveTab(id)}
             className={`px-6 py-3.5 text-xs font-bold uppercase tracking-wide border-b-2 transition cursor-pointer ${activeTab === id
-              ? "border-[#2563EB] text-[#2563EB]"
-              : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
           >
             {label}
@@ -443,24 +443,24 @@ export default function CandidatePortal({
             />
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center bg-[#1a1a2e] overflow-auto p-6 sm:p-8 gap-6">
+          <div className="h-full flex flex-col items-center bg-background overflow-auto p-6 sm:p-8 gap-6">
             {/* Photo upload */}
             {!isCompleted && (
-              <div className="w-full max-w-md bg-[#F8FAFC] rounded-2xl p-5 space-y-3">
+              <div className="w-full max-w-md bg-card border border-border rounded-2xl p-5 space-y-3">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-[#334155] uppercase tracking-wider flex items-center gap-1.5">
-                    <Upload className="w-3 h-3 text-[#2563EB]" />
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                    <Upload className="w-3 h-3 text-primary" />
                     Your Photo{" "}
                     <span className="text-rose-500 font-extrabold">
                       * Required before signing
                     </span>
                   </span>
-                  <p className="text-[10px] text-[#64748B]">
+                  <p className="text-[10px] text-muted-foreground">
                     Upload a professional photo without background. This will
                     appear on your ID card.
                   </p>
                 </div>
-                <label className="flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-[#DBEAFE] hover:border-[#2563EB] rounded-xl cursor-pointer bg-white transition-all group">
+                <label className="flex flex-col items-center justify-center gap-2 h-28 border-2 border-dashed border-border hover:border-primary rounded-xl cursor-pointer bg-secondary transition-all group">
                   {candidatePhotoUrl ? (
                     <img
                       src={candidatePhotoUrl}
@@ -469,11 +469,11 @@ export default function CandidatePortal({
                     />
                   ) : (
                     <>
-                      <Upload className="w-5 h-5 text-[#94A3B8] group-hover:text-[#2563EB] transition" />
-                      <span className="text-xs font-medium text-[#94A3B8] group-hover:text-[#2563EB] transition">
+                      <Upload className="w-5 h-5 text-muted-foreground group-hover:text-primary transition" />
+                      <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition">
                         Click to upload your photo
                       </span>
-                      <span className="text-[10px] text-[#CBD5E1]">
+                      <span className="text-[10px] text-muted-foreground/70">
                         PNG, JPG — transparent or plain background recommended
                       </span>
                     </>

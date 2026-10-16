@@ -88,27 +88,27 @@ export default function WorkspaceSidebar({
   const isSalesAgreement = salesAgreementType === "countrySales" || salesAgreementType === "salesAgent";
 
   return (
-    <div className="w-full xl:w-[500px] bg-[#F8FAFC] border-b xl:border-b-0 xl:border-r border-[#DBEAFE] flex flex-col xl:h-full overflow-hidden shrink-0">
+    <div className="w-full xl:w-[500px] bg-card border-b xl:border-b-0 xl:border-r border-border flex flex-col xl:h-full overflow-hidden shrink-0">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Header */}
         <div className="space-y-2">
           <span className={`text-[10px] border font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-block ${
             isContractual
-              ? "bg-[#FFF3EE] border-[#FF5722]/30 text-[#EA580C]"
+              ? "bg-primary/10 border-primary/30 text-primary"
               : isCertificate
-              ? "bg-indigo-50 border-indigo-200 text-indigo-700"
+              ? "bg-indigo-950/40 border-indigo-500/30 text-indigo-400"
               : isInternship
-              ? "bg-[#F0F9FF] border-[#BAE6FD] text-[#0EA5E9]"
+              ? "bg-sky-950/40 border-sky-500/30 text-sky-400"
               : isHrHiring
-              ? "bg-violet-50 border-violet-200 text-violet-700"
-              : "bg-[#EFF6FF] border-[#DBEAFE]/50 text-[#1E3A8A]"
+              ? "bg-violet-950/40 border-violet-500/30 text-violet-400"
+              : "bg-primary/10 border-primary/20 text-primary"
           }`}>
             {isContractual ? "Contractual Offer Ready!" : isCertificate ? "Intern Certificate Ready!" : isInternship ? "Internship Offer Ready!" : isHrHiring ? "HR Hiring Notice Ready!" : isSalesAgreement ? `${salesAgreementType === "countrySales" ? "Country Sales Partner" : "Sales Agent"} Agreement Ready!` : "Agreement ready!"}
           </span>
-          <h2 className="text-xl font-bold text-[#0F172A]">
+          <h2 className="text-xl font-bold text-foreground">
             Document Workspace
           </h2>
-          <p className="text-[#64748B] text-xs">
+          <p className="text-muted-foreground text-xs">
             {isContractual
               ? "Fine-tune scope of work, compensation, and contract terms with live document preview."
               : isCertificate
@@ -124,14 +124,14 @@ export default function WorkspaceSidebar({
         </div>
 
         {/* Tab headers */}
-        <div className="flex border-b border-[#DBEAFE]">
+        <div className="flex border-b border-border">
           {(isContractual ? CONTRACT_TABS : isCertificate ? CERT_TABS : isInternship ? INTERN_TABS : isHrHiring ? HR_TABS : isSalesAgreement ? SALES_TABS : PARTNER_TABS).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
               className={`flex-1 pb-3 text-xs font-bold tracking-wide border-b-2 transition flex flex-col md:flex-row items-center justify-center gap-1.5 cursor-pointer ${activeTab === id
-                ? "border-[#FF5722] text-[#EA580C]"
-                : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -169,9 +169,9 @@ export default function WorkspaceSidebar({
           )}
         </div>
         {/* Export footer */}
-        <div className="p-6 bg-[#F8FAFC] border-t border-[#DBEAFE] space-y-3 shrink-0">
+        <div className="p-6 bg-card border-t border-border space-y-3 shrink-0">
           {isDemo ? (
-            <div className="w-full py-4 px-6 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-2xl text-center">
+            <div className="w-full py-4 px-6 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold rounded-2xl text-center">
               PDF Export Disabled in Demo Mode
             </div>
           ) : (isHrHiring || isCertificate) ? (
@@ -197,11 +197,7 @@ export default function WorkspaceSidebar({
               <button
                 onClick={onExport}
                 disabled={isExporting}
-                className={`w-full py-3 px-6 bg-white border-2 font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50 ${
-                  isCertificate
-                    ? "hover:bg-indigo-50 border-[#6366F1]/40 hover:border-[#6366F1] text-[#6366F1]"
-                    : "hover:bg-violet-50 border-[#7C3AED]/40 hover:border-[#7C3AED] text-[#7C3AED]"
-                }`}
+                className="w-full py-3 px-6 bg-secondary border border-border hover:border-primary text-foreground font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
               >
                 {isExporting ? (
                   <><RefreshCw className="w-4 h-4 animate-spin" /> Generating PDF…</>
@@ -215,7 +211,7 @@ export default function WorkspaceSidebar({
               <button
                 onClick={onSendOffer}
                 disabled={isOfferSent || isOpeningModal}
-                className="w-full py-3.5 px-6 bg-[#FF5722] hover:bg-[#EA580C] disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-white text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-[#FF5722]/15 hover:shadow-[#FF5722]/30 cursor-pointer"
+                className="w-full py-3.5 px-6 bg-primary hover:opacity-90 disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-primary-foreground text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-primary/20 cursor-pointer"
               >
                 {isOpeningModal ? (
                   <><RefreshCw className="w-4 h-4 animate-spin" /> Preparing Offer Link…</>
@@ -228,7 +224,7 @@ export default function WorkspaceSidebar({
               <button
                 onClick={onExport}
                 disabled={isExporting}
-                className="w-full py-3 px-6 bg-white border-2 border-[#FF5722]/30 hover:border-[#FF5722] hover:bg-[#FFF8F5] text-[#EA580C] font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full py-3 px-6 bg-secondary border border-border hover:border-primary text-foreground font-bold text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
               >
                 {isExporting ? (
                   <><RefreshCw className="w-4 h-4 animate-spin" /> Generating PDF…</>
@@ -241,7 +237,7 @@ export default function WorkspaceSidebar({
             <button
               onClick={onSendOffer}
               disabled={isOfferSent || isOpeningModal}
-              className="w-full py-3.5 px-6 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-white text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-[#2563EB]/10 hover:shadow-[#2563EB]/25 cursor-pointer"
+              className="w-full py-3.5 px-6 bg-primary hover:opacity-90 disabled:bg-emerald-600 disabled:hover:bg-emerald-600 disabled:cursor-not-allowed font-bold text-primary-foreground text-sm rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md shadow-primary/20 cursor-pointer"
             >
               {isOpeningModal ? (
                 <><RefreshCw className="w-4 h-4 animate-spin" /> Opening Offer Letter Modal…</>
@@ -252,7 +248,7 @@ export default function WorkspaceSidebar({
               )}
             </button>
           )}
-          <div className="flex justify-between text-[11px] text-[#64748B] px-1 font-semibold">
+          <div className="flex justify-between text-[11px] text-muted-foreground px-1 font-semibold">
             <span>A4 dimensions output</span>
             <span>{isDemo ? "1 page" : isInternship ? "1 page" : isContractual ? "1 page" : isHrHiring ? "1 page" : isCertificate ? "1 page" : isCSPAgreement ? "5 pages" : isSAGAgreement ? "3 pages" : "2 pages"} automatic layout</span>
           </div>
