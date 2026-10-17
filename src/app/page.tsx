@@ -72,6 +72,21 @@ function MainApp() {
     handleHeaderBack,
   } = useAppOrchestrator();
 
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("candidateView")) return;
+
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.authenticated) {
+          void prefetch();
+          setAppState("docTypeSelect");
+        }
+      })
+      .catch(() => {});
+  }, [prefetch, setAppState]);
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
       <AppHeader

@@ -32,7 +32,7 @@ export default function CandidateSidebar({
   const handleSaveSignature = (dataUrl: string) => {
     setSigError("");
     setSecondParty((p) => {
-      const updated = { ...p, signatureImg: dataUrl };
+      const updated = { ...p, signatureImg: dataUrl, signatureDate: new Date() };
       const stored = localStorage.getItem("creatibuz_offer_" + offerId);
       if (stored) {
         try {
@@ -63,7 +63,7 @@ export default function CandidateSidebar({
 
   const handleClearSignature = () => {
     setSecondParty((p) => {
-      const updated = { ...p, signatureImg: "" };
+      const updated = { ...p, signatureImg: "", signatureDate: null };
       const stored = localStorage.getItem("creatibuz_offer_" + offerId);
       if (stored) {
         try {

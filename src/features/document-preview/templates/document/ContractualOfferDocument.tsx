@@ -149,6 +149,7 @@ export default function ContractualOfferDocument({
           email={email}
           idNo={secondParty.partnerId || ""}
           refNo={settings.contractRef || settings.refId || ""}
+          signatureDate={secondParty.signatureDate || settings.partnerSignedDate || null}
         />
       </div>
 

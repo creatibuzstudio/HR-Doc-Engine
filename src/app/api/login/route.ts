@@ -1,38 +1,62 @@
 import { NextResponse } from "next/server";
+import {
+  authenticateAdmin,
+  createSessionToken,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth";
+
+export const maxDuration = 10;
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  const { email, password } = await req.json();
+  try {
+    const { email, password } = await req.json();
 
-  const envFounderEmail = process.env.FOUNDER_EMAIL?.trim().toLowerCase();
-  const envFounderPassword = process.env.FOUNDER_PASSWORD;
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Email and password are required." },
+        { status: 400 },
+      );
+    }
 
-  const inputEmail = email?.trim().toLowerCase();
-  const validEmails = [
-    envFounderEmail,
-    "info@creatibuzstudio.com",
-    "founder@creatibuzstudio.com",
-    "admin@creatibuzstudio.com",
-  ].filter(Boolean);
+    const user = await authenticateAdmin(email, password);
 
-  const isPasswordValid =
-    (envFounderPassword && password === envFounderPassword) ||
-    password === "Shahid@2026" ||
-    password === "founder123";
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "Invalid email or security token." },
+        { status: 401 },
+      );
+    }
 
-  if (validEmails.includes(inputEmail) && isPasswordValid) {
-    return NextResponse.json({
+    const sessionToken = await createSessionToken(user);
+
+    const response = NextResponse.json({
       success: true,
       message: "Authenticated successfully.",
+      user: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     });
-  }
 
-  return NextResponse.json(
-    {
-      success: false,
-      message: "Invalid email or password.",
-    },
-    {
-      status: 401,
-    },
-  );
+    // Set HttpOnly, Secure, SameSite=Strict cookie
+    response.cookies.set({
+      name: SESSION_COOKIE_NAME,
+      value: sessionToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
+  } catch (error) {
+    console.error("[Login API] Authentication error:", error);
+    return NextResponse.json(
+      { success: false, message: "Authentication service error." },
+      { status: 500 },
+    );
+  }
 }

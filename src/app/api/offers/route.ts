@@ -8,6 +8,7 @@ import {
   findAgreementById,
   toAgreementSummary,
 } from "@/lib/agreementStore";
+import { getSession } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
@@ -22,6 +23,15 @@ export async function GET(request: Request) {
         );
       }
       return NextResponse.json(agreement);
+    }
+
+    // Listing all agreements is restricted to authenticated founders
+    const session = await getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized access. Please login." },
+        { status: 401 },
+      );
     }
 
     const agreements = await listAgreements();
@@ -40,6 +50,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Only authenticated founders/admins can generate and save agreements
+    const session = await getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized access. Please login." },
+        { status: 401 },
+      );
+    }
+
     const body = await request.json();
     const {
       firstParty,

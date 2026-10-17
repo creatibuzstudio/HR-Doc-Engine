@@ -34,6 +34,7 @@ export interface SecondParty {
   bloodGroup: string;
   photoUrl?: string;
   signatureImg: string;
+  signatureDate?: Date | string | null;
   department?: string;
   performanceGrade?: string;
 }

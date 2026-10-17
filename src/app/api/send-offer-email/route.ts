@@ -7,12 +7,22 @@ import {
   getResendClient,
 } from "@/lib/emailConfig";
 import { buildEmailHtml } from "@/lib/emailTemplates";
+import { getSession } from "@/lib/auth";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
+    // Only authenticated founders/admins can dispatch offer emails
+    const session = await getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized access. Please login." },
+        { status: 401 },
+      );
+    }
+
     const { offerId, pdfBase64 } = await request.json();
     if (!offerId) {
       return NextResponse.json(

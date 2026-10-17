@@ -16,30 +16,37 @@ export default function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-const response = await fetch("/api/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    email,
-    password,
-  }),
-});
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-const data = await response.json();
+      const data = await response.json();
 
-if (!response.ok) {
-  setError(data.message);
-  return;
-}
+      if (!response.ok) {
+        setError(data.message || "Invalid email or security token.");
+        return;
+      }
 
-onLoginSuccess();
-};
+      onLoginSuccess();
+    } catch {
+      setError("Network error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <motion.section
@@ -122,25 +129,7 @@ onLoginSuccess();
           </button>
         </form>
 
-        {/* Credentials shortcut helper */}
-        <div className="border-t border-border pt-4 text-center space-y-2">
-          <p className="text-[11px] text-muted-foreground">
-            Password: <code className="text-primary font-bold">Shahid@2026</code>
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setEmail("info@creatibuzstudio.com");
-              setPassword("Shahid@2026");
-              setError("");
-            }}
-            className="text-xs font-bold text-primary hover:underline transition cursor-pointer"
-          >
-            Auto-fill Credentials (info@creatibuzstudio.com)
-          </button>
-        </div>
-
-        <div className="text-center">
+        <div className="text-center pt-2">
           <button
             type="button"
             onClick={onBackToHome}

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Mail, RefreshCw, CreditCard, FileText, LayoutDashboard } from "lucide-react";
+import { Mail, RefreshCw, CreditCard, FileText, LayoutDashboard, LogOut } from "lucide-react";
 import Logo from "./Logo";
 import { AppState, AgreementTemplate } from "@/types";
 
@@ -153,6 +153,22 @@ export default function AppHeader({
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Registry</span>
+            </button>
+          )}
+
+          {/* Logout button */}
+          {appState !== "candidatePortal" && appState !== "home" && appState !== "login" && (
+            <button
+              onClick={() => {
+                fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+                  setAppState("home");
+                });
+              }}
+              title="Logout session"
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-destructive/30 text-destructive bg-destructive/10 hover:bg-destructive/20 transition cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
             </button>
           )}
         </div>

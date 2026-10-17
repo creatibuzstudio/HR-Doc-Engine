@@ -14,6 +14,18 @@ interface ContractualOfferSignaturesProps {
   phone?: string;
   website?: string;
   email?: string;
+  signatureDate?: string | Date | null;
+}
+
+function formatSignatureDate(rawDate?: string | Date | null): string {
+  const d = rawDate ? new Date(rawDate) : new Date();
+  if (isNaN(d.getTime())) {
+    return String(rawDate);
+  }
+  const day = d.getDate();
+  const month = d.toLocaleString("en-US", { month: "long" });
+  const year = d.getFullYear();
+  return `${day} ${month}, ${year}`;
 }
 
 export default function ContractualOfferSignatures({
@@ -23,6 +35,7 @@ export default function ContractualOfferSignatures({
   candidateName,
   idNo,
   refNo,
+  signatureDate,
 }: ContractualOfferSignaturesProps) {
   const currentYearStr = new Date().getFullYear().toString().slice(-2);
   const displayIdNo = idNo || secondParty.partnerId || "CBS-EMP-001";
@@ -84,9 +97,17 @@ export default function ContractualOfferSignatures({
             <span className="text-[9.5px] font-bold text-[#0F172A]">
               {candidateName}
             </span>
-            <span className="text-[8px] text-[#64748B] uppercase tracking-wider">
-              Contractor
-            </span>
+            {secondParty.signatureImg ? (
+              <span className="text-[8px] text-[#64748B] font-medium tracking-tight">
+                {formatSignatureDate(
+                  signatureDate || secondParty.signatureDate,
+                )}
+              </span>
+            ) : (
+              <span className="text-[8px] text-[#94A3B8] italic">
+                Awaiting Signature
+              </span>
+            )}
           </div>
         </div>
 
