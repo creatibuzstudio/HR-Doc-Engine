@@ -42,7 +42,7 @@ export const DEFAULT_SECOND_PARTY: SecondParty = {
 
 // ─── Pre-filled demo second party ─────────────────────────────────────────────
 export const SAMPLE_SECOND_PARTY: SecondParty = {
-  partnerId: "CRB-CON-26-001",
+  partnerId: "CBS-EMP-001",
   partnerIdSerial: "001",
   fullName: "Ashikur Rahman Ovi",
   email: "ovi@creatibuzstudio.com",

@@ -123,7 +123,7 @@ export function EmailBodyPreview({
             position of <strong>{secondParty.position}</strong>.
           </p>
           <p>Your offer details have been finalized. To complete the process:</p>
-          <ol className="list-decimal pl-5 space-y-2 font-medium text-slate-600">
+          <ol className="list-decimal pl-5 space-y-2 font-medium text-white/80">
             <li>Review the full internship offer letter terms.</li>
             <li>Apply your digital signature to the signature block.</li>
             <li>Press the Confirm button once everything looks correct.</li>
@@ -143,7 +143,7 @@ export function EmailBodyPreview({
             Please review the terms of this offer and apply your digital
             signature to complete the agreement:
           </p>
-          <ol className="list-decimal pl-5 space-y-2 font-medium text-slate-600">
+          <ol className="list-decimal pl-5 space-y-2 font-medium text-white/80">
             <li>Review the contract scope and compensation terms.</li>
             <li>Apply your digital signature to the signature block.</li>
             <li>Press Confirm once everything looks correct.</li>
@@ -152,8 +152,8 @@ export function EmailBodyPreview({
       )}
 
       {/* Portal link card */}
-      <div className="p-4 bg-blue-50/70 border border-blue-100 rounded-2xl space-y-3">
-        <p className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+      <div className="p-4 bg-nav border border-gray-300/20 rounded-2xl space-y-3">
+        <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">
           {isInternship
             ? "Intern Signature Portal Link"
             : "Candidate Signature Portal Link"}

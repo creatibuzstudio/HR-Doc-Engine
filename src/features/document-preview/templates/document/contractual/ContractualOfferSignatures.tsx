@@ -12,6 +12,8 @@ interface ContractualOfferSignaturesProps {
   phone: string;
   website: string;
   email: string;
+  idNo?: string;
+  refNo?: string;
 }
 
 export default function ContractualOfferSignatures({
@@ -22,7 +24,13 @@ export default function ContractualOfferSignatures({
   phone,
   website,
   email,
+  idNo,
+  refNo,
 }: ContractualOfferSignaturesProps) {
+  const currentYearStr = new Date().getFullYear().toString().slice(-2);
+  const displayIdNo = idNo || secondParty.partnerId || "CBS-EMP-001";
+  const displayRefNo = refNo || `CBS/REF-${currentYearStr}/001`;
+
   return (
     <div className="relative z-10 pt-4 border-t border-[#E2E8F0] mt-3">
       <div className="flex items-end justify-between gap-6">
@@ -85,8 +93,20 @@ export default function ContractualOfferSignatures({
           </div>
         </div>
 
-        {/* Contact Details Card on the right */}
-        <div className="flex flex-col items-start gap-2 bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-xl shadow-xs">
+        {/* Contact & Identification Details Card on the right */}
+        <div className="flex flex-col items-start gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-xl shadow-xs min-w-[165px]">
+          {/* ID & Ref Section */}
+          <div className="w-full pb-1.5 border-b border-[#E2E8F0] flex flex-col gap-0.5">
+            <div className="flex items-center justify-between gap-3 text-[10px]">
+              <span className="font-semibold text-[#64748B]">ID No:</span>
+              <span className="font-mono font-bold text-[#0F172A]">{displayIdNo}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3 text-[10px]">
+              <span className="font-semibold text-[#64748B]">Ref No:</span>
+              <span className="font-mono font-bold text-[#0F172A]">{displayRefNo}</span>
+            </div>
+          </div>
+
           {/* Phone */}
           <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
             <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">

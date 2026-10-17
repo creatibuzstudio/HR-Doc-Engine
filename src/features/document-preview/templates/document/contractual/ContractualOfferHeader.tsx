@@ -17,7 +17,7 @@ export default function ContractualOfferHeader({
   dateOfIssue,
 }: ContractualOfferHeaderProps) {
   return (
-    <div className="bg-[#1F0A0A] text-white px-16 pt-16 pb-12 relative shrink-0">
+    <div className="bg-[#1F0A0A] text-white px-12.5 pt-12.5 pb-10 relative shrink-0">
       {/* Top bar: Brand + Employment Type */}
       <div className="flex items-start justify-between">
         {/* Logo & Brand text */}
@@ -32,43 +32,19 @@ export default function ContractualOfferHeader({
           </span>
           <div className="flex flex-col gap-1 items-start">
             <div className="flex items-center gap-1.5">
-              <span
-                className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] ${
-                  employmentType === "Project-Based Contract"
-                    ? "bg-[#22C55E] text-white"
-                    : "bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]"
-                }`}
-              >
+              <span className="w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]">
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
-              <span
-                className={`text-[11px] ${
-                  employmentType === "Project-Based Contract"
-                    ? "text-white font-medium"
-                    : "text-white/70"
-                }`}
-              >
+              <span className="text-[11px] text-white/80 font-medium">
                 Project-Based Contract
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span
-                className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] ${
-                  employmentType === "Full-Time Contract"
-                    ? "bg-[#22C55E] text-white"
-                    : "bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]"
-                }`}
-              >
+              <span className="w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]">
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
-              <span
-                className={`text-[11px] ${
-                  employmentType === "Full-Time Contract"
-                    ? "text-white font-medium"
-                    : "text-white/70"
-                }`}
-              >
-                Full-Time Contract
+              <span className="text-[11px] text-white/80">
+                Full-Time - Remote
               </span>
             </div>
           </div>

@@ -47,8 +47,8 @@ export default function ContractualFormWizard({
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        const conSerial = data.contractualId?.split("-").pop() || "001";
-        const refSerial = data.contractualRefId?.split("-").pop() || "001";
+        const conSerial = data.contractualId?.split(/[-/]/).pop() || "001";
+        const refSerial = data.contractualRefId?.split(/[-/]/).pop() || "001";
         setSecondParty((p) => ({
           ...p,
           partnerId: data.contractualId,
@@ -65,10 +65,10 @@ export default function ContractualFormWizard({
             }`,
           scopeOfWork:
             p.scopeOfWork ||
-            "Assigned deliverables will be completed per the approved project scope. Substantial scope, timeline, or deliverable changes require prior mutual approval.",
+            "All deliverables must be completed strictly in accordance with the approved project scope. Any substantial modifications to the scope, timeline, or deliverables require prior mutual written approval from both parties.",
           compensationDetails:
             p.compensationDetails ||
-            "The Agency will issue payments per the agreed schedule, milestones, and written acceptance criteria. Approved out-of-scope work will be compensated separately.",
+            "The Agency will issue payments strictly in accordance with the mutually agreed schedule, milestones, and written acceptance criteria. Furthermore, any approved out-of-scope work will be evaluated and compensated separately.",
           confidentialityTerms:
             p.confidentialityTerms ||
             "All confidential information, client data, credentials, and project assets must remain strictly protected and non-disclosed to unauthorized parties during and after the engagement, per applicable law.",

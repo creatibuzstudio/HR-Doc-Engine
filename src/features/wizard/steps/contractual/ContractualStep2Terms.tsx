@@ -28,7 +28,7 @@ export function ContractualStep2Terms({
     setDocSettings((p) => ({
       ...p,
       refIdSerial: digits,
-      refId: digits ? `CRB-CON-REF-${currentYearStr}-${digits.padStart(3, "0")}` : "",
+      refId: digits ? `CBS/REF-${currentYearStr}/${digits.padStart(3, "0")}` : "",
     }));
   };
 
@@ -37,94 +37,16 @@ export function ContractualStep2Terms({
     setSecondParty((p) => ({
       ...p,
       partnerIdSerial: digits,
-      partnerId: digits ? `CRB-CON-${currentYearStr}-${digits.padStart(3, "0")}` : "",
+      partnerId: digits ? `CBS-EMP-${digits.padStart(3, "0")}` : "",
     }));
   };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <StepHeader
-        title="Section 2: Contract Specifications & Terms"
-        desc="Set employment type, subject line, issue date, and customized terms."
+        title="Section 2: Contract Specifications"
+        desc="Set subject line, issue date, and document reference numbers."
       />
-
-      {/* Employment Type Selector */}
-      <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl space-y-3">
-        <label className="text-xs font-bold uppercase tracking-wider text-[#334155]">
-          Employment Type *
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              onClearError();
-              setDocSettings((p) => ({
-                ...p,
-                employmentType: "Project-Based Contract",
-                contractSubject: `Subject: ${
-                  secondParty.position || "Full Stack Developer"
-                } For A Project-Based Contract`,
-              }));
-            }}
-            className={`p-3.5 rounded-xl border-2 text-left transition flex items-center justify-between cursor-pointer ${
-              docSettings.employmentType === "Project-Based Contract"
-                ? "border-[#22C55E] bg-[#F0FDF4] text-[#166534]"
-                : "border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${
-                  docSettings.employmentType === "Project-Based Contract"
-                    ? "bg-[#22C55E] text-white"
-                    : "border border-slate-300"
-                }`}
-              >
-                {docSettings.employmentType === "Project-Based Contract" && "✓"}
-              </div>
-              <span className="text-sm font-bold">Project-Based Contract</span>
-            </div>
-            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-              Milestone
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              onClearError();
-              setDocSettings((p) => ({
-                ...p,
-                employmentType: "Full-Time Contract",
-                contractSubject: `Subject: ${
-                  secondParty.position || "Full Stack Developer"
-                } For A Full-Time Contract`,
-              }));
-            }}
-            className={`p-3.5 rounded-xl border-2 text-left transition flex items-center justify-between cursor-pointer ${
-              docSettings.employmentType === "Full-Time Contract"
-                ? "border-[#22C55E] bg-[#F0FDF4] text-[#166534]"
-                : "border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-4 h-4 rounded-full flex items-center justify-center text-xs ${
-                  docSettings.employmentType === "Full-Time Contract"
-                    ? "bg-[#22C55E] text-white"
-                    : "border border-slate-300"
-                }`}
-              >
-                {docSettings.employmentType === "Full-Time Contract" && "✓"}
-              </div>
-              <span className="text-sm font-bold">Full-Time Contract</span>
-            </div>
-            <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-              Monthly
-            </span>
-          </button>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="Date Of Issue *">
@@ -155,14 +77,14 @@ export function ContractualStep2Terms({
       </div>
 
       {/* Contract Serials */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 bg-nav border border-gray-300/20 rounded-2xl">
         <div>
           <label className="text-xs font-semibold text-[#475569] block mb-1">
-            Agreement Reference ID (Unique) *
+            Agreement Reference ID (Ref No) *
           </label>
-          <div className="flex items-stretch bg-white border border-[#CBD5E1] rounded-xl overflow-hidden h-11">
-            <div className="flex items-center px-3 bg-[#F1F5F9] border-r border-[#CBD5E1] text-[#64748B] font-mono text-xs font-bold">
-              CRB-CON-REF-{currentYearStr}-
+          <div className="flex items-stretch bg-card border border-gray-300/25 rounded-xl overflow-hidden h-11">
+            <div className="flex items-center px-3 bg-card border-r border-gray-300/50 text-[#64748B] font-mono text-xs font-bold">
+              CBS/REF-{currentYearStr}/
             </div>
             <input
               type="text"
@@ -173,18 +95,18 @@ export function ContractualStep2Terms({
               placeholder="001"
             />
           </div>
-          <p className="text-[11px] font-mono text-emerald-600 font-bold mt-1">
-            {docSettings.refId || `CRB-CON-REF-${currentYearStr}-001`}
+          <p className="text-xs font-mono text-emerald-600 font-bold mt-1 ml-27">
+            {docSettings.refId || `CBS/REF-${currentYearStr}/001`}
           </p>
         </div>
 
         <div>
           <label className="text-xs font-semibold text-[#475569] block mb-1">
-            Contractor ID *
+            Employee / Contractor ID (ID No) *
           </label>
-          <div className="flex items-stretch bg-white border border-[#CBD5E1] rounded-xl overflow-hidden h-11">
-            <div className="flex items-center px-3 bg-[#F1F5F9] border-r border-[#CBD5E1] text-[#64748B] font-mono text-xs font-bold">
-              CRB-CON-{currentYearStr}-
+          <div className="flex items-stretch bg-card border border-gray-300/25 rounded-xl overflow-hidden h-11">
+            <div className="flex items-center px-3 bg-card border-r border-gray-300/50 text-[#64748B] font-mono text-xs font-bold">
+              CBS-EMP-
             </div>
             <input
               type="text"
@@ -195,68 +117,9 @@ export function ContractualStep2Terms({
               placeholder="001"
             />
           </div>
-          <p className="text-[11px] font-mono text-emerald-600 font-bold mt-1">
-            {secondParty.partnerId || `CRB-CON-${currentYearStr}-001`}
+          <p className="text-xs font-mono text-emerald-600 font-bold mt-1 ml-21">
+            {secondParty.partnerId || "CBS-EMP-001"}
           </p>
-        </div>
-      </div>
-
-      {/* Terms Customization */}
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs font-bold text-[#0F172A] block mb-1">
-            Term 01 — Scope Of Work And Deliverables
-          </label>
-          <textarea
-            rows={3}
-            value={docSettings.scopeOfWork || ""}
-            onChange={(e) =>
-              setDocSettings((p) => ({ ...p, scopeOfWork: e.target.value }))
-            }
-            className="w-full text-xs p-3 border border-[#CBD5E1] rounded-xl focus:border-[#FF5722] focus:outline-none bg-[#FAFAFA]"
-          />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-[#0F172A] block mb-1">
-            Term 02 — Compensation And Payment
-          </label>
-          <textarea
-            rows={3}
-            value={docSettings.compensationDetails || ""}
-            onChange={(e) =>
-              setDocSettings((p) => ({ ...p, compensationDetails: e.target.value }))
-            }
-            className="w-full text-xs p-3 border border-[#CBD5E1] rounded-xl focus:border-[#FF5722] focus:outline-none bg-[#FAFAFA]"
-          />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-[#0F172A] block mb-1">
-            Term 03 — Confidentiality And Data Protection
-          </label>
-          <textarea
-            rows={2}
-            value={docSettings.confidentialityTerms || ""}
-            onChange={(e) =>
-              setDocSettings((p) => ({ ...p, confidentialityTerms: e.target.value }))
-            }
-            className="w-full text-xs p-3 border border-[#CBD5E1] rounded-xl focus:border-[#FF5722] focus:outline-none bg-[#FAFAFA]"
-          />
-        </div>
-
-        <div>
-          <label className="text-xs font-bold text-[#0F172A] block mb-1">
-            Term 04 — Intellectual Property And Work Ownership
-          </label>
-          <textarea
-            rows={3}
-            value={docSettings.ipOwnershipTerms || ""}
-            onChange={(e) =>
-              setDocSettings((p) => ({ ...p, ipOwnershipTerms: e.target.value }))
-            }
-            className="w-full text-xs p-3 border border-[#CBD5E1] rounded-xl focus:border-[#FF5722] focus:outline-none bg-[#FAFAFA]"
-          />
         </div>
       </div>
     </motion.div>

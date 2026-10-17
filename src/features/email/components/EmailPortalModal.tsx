@@ -188,7 +188,7 @@ export default function EmailPortalModal({
         </div>
 
         {/* Email body preview */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 text-slate-700 text-sm leading-relaxed font-sans">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 text-white/80 text-sm leading-relaxed font-sans">
           {apiError && (
             <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-2xl">
               Resend Error: {apiError}
@@ -214,7 +214,7 @@ export default function EmailPortalModal({
           <button
             onClick={onClose}
             disabled={sending || sent}
-            className="h-11 px-5 border border-border hover:border-primary hover:bg-secondary rounded-xl text-muted-foreground hover:text-foreground text-xs font-bold transition cursor-pointer disabled:opacity-40"
+            className="h-11 px-5 border border-border hover:border-primary hover:bg-secondary rounded-xl text-white/50 hover:text-foreground text-xs font-bold transition cursor-pointer disabled:opacity-40"
           >
             Cancel
           </button>

@@ -55,7 +55,7 @@ export default function ContractualOfferDocument({
       />
 
       {/* ── BODY CONTENT ──────────────────────────────────────────────────── */}
-      <div className="relative px-16 pt-12 pb-11 flex-1 flex flex-col justify-between">
+      <div className="relative px-12.5 pt-10 pb-7.5 flex-1 flex flex-col justify-between">
         {/* Subtle Watermark in background */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 w-[340px] h-[340px] pointer-events-none opacity-[0.045] select-none z-0">
           <Image
@@ -75,40 +75,40 @@ export default function ContractualOfferDocument({
           </p>
 
           {/* Paragraph 1 */}
-          <p className="leading-[1.6] text-[#334155]">
-            We Are Pleased To Offer You A {employmentType} At {companyName} - A Global UI/UX Design &amp; Development Agency As [{position}]. We Are Excited About The Possibility Of Having You Join Our Team And Contribute To Our Mission Of Creating Meaningful Digital Experiences Through UI/UX Design, Web Design, And Development.
+          <p className="leading-[1.6] text-[#334155] max-w-[98%]">
+            We are pleased to offer you a {employmentType} position at <strong> {companyName}</strong>, a global UI/UX design and development agency, as a [{position}]. We are excited for welcoming you to our team and having you contribute to our core mission of crafting meaningful digital experiences through innovative design and development.
           </p>
 
           {/* Paragraph 2 */}
-          <p className="leading-[1.6] text-[#334155]">
-            In This Role, We Appreciate Your Skills, Professional Potential, And Interest In Working With Our Agency. We Look Forward To Collaborating With You On Client Projects And Delivering High-Quality Design And Development Solutions. And Contribute To The Creative Direction Of Client And Internal Initiative.
+          <p className="leading-[1.6] text-[#334155] max-w-[93%]">
+            In this role, we deeply appreciate your skills, professional potential, and genuine interest in working with our agency. We look forward to collaborating closely with you on client projects, delivering high-quality design and development solutions, and actively contributing to the creative direction of client and internal initiatives.
           </p>
 
           {/* Terms Section */}
           <div className="space-y-4 pt-6">
             <h2 className="text-[18px] font-bold text-primary/75">Terms & Conditions</h2>
-            <div className="max-w-[80%]">
-              <h4 className="font-semibold text-[13px] text-[#0F172A] tracking-tight">
+            <div className="max-w-[90%]">
+              <h4 className="font-semibold text-[15px] text-[#0F172A] tracking-tight">
                 Term 01 — Scope Of Work And Deliverables
               </h4>
               <p className="text-[12px] leading-[1.5] text-[#475569] mt-0.5">
                 {settings.scopeOfWork ||
-                  "Assigned deliverables will be completed per the approved project scope. Substantial scope, timeline, or deliverable changes require prior mutual approval."}
+                  "All deliverables must be completed strictly in accordance with the approved project scope. Any substantial modifications to the scope, timeline, or deliverables require prior mutual written approval from both parties."}
               </p>
             </div>
 
-            <div className="max-w-[80%]">
-              <h4 className="font-semibold text-[13px] text-[#0F172A] tracking-tight">
+            <div className="max-w-[95%]">
+              <h4 className="font-semibold text-[15px] text-[#0F172A] tracking-tight">
                 Term 02 — Compensation And Payment
               </h4>
               <p className="text-[12px] leading-[1.5] text-[#475569] mt-0.5">
                 {settings.compensationDetails ||
-                  "The Agency will issue payments per the agreed schedule, milestones, and written acceptance criteria. Approved out-of-scope work will be compensated separately."}
+                  "The Agency will issue payments strictly in accordance with the mutually agreed schedule, milestones, and written acceptance criteria. Furthermore, any approved out-of-scope work will be evaluated and compensated separately."}
               </p>
             </div>
 
             <div className="max-w-[88%]">
-              <h4 className="font-semibold text-[13px] text-[#0F172A] tracking-tight">
+              <h4 className="font-semibold text-[15px] text-[#0F172A] tracking-tight">
                 Term 03 — Confidentiality And Data Protection
               </h4>
               <p className="text-[12px] leading-[1.5] text-[#475569] mt-0.5">
@@ -118,7 +118,7 @@ export default function ContractualOfferDocument({
             </div>
 
             <div className="max-w-[88%]">
-              <h4 className="font-semibold text-[13px] text-[#0F172A] tracking-tight">
+              <h4 className="font-semibold text-[15px] text-[#0F172A] tracking-tight">
                 Term 04 — Intellectual Property And Work Ownership
               </h4>
               <p className="text-[12px] leading-[1.5] text-[#475569] mt-0.5">
@@ -130,7 +130,7 @@ export default function ContractualOfferDocument({
 
           {/* Note block */}
           <div className="pt-4">
-            <p className="text-[11.5px] leading-[1.5] text-[#334155]">
+            <p className="text-[11.5px] leading-[1.5] text-[#334155] font-semibold">
               <strong className="text-[#0F172A] font-bold">Note:</strong> Please Review This Offer Carefully. By Signing Below, You Confirm That You Understand And <br /> Accept The Project Scope, Compensation, Timeline, And Terms Stated In This Offer.
             </p>
           </div>
@@ -144,6 +144,8 @@ export default function ContractualOfferDocument({
           phone={phone}
           website={website}
           email={email}
+          idNo={secondParty.partnerId}
+          refNo={settings.refId}
         />
       </div>
 

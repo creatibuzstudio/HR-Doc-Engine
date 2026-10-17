@@ -25,7 +25,7 @@ function extractMaxSeq(
       typeof item.agreementId === "string" &&
       item.agreementId.startsWith(prefix)
     ) {
-      const parts = item.agreementId.split("-");
+      const parts = item.agreementId.split(/[-/]/);
       const seq = parseInt(parts[parts.length - 1], 10);
       if (!isNaN(seq) && seq > max) max = seq;
     }
@@ -34,9 +34,10 @@ function extractMaxSeq(
 }
 
 async function generatePrefixedIdPair(refPrefix: string, entityPrefix: string) {
+  const escapedPrefix = refPrefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const mongoResult = await tryMongo(async () => {
     const docs = await Agreement.find(
-      { agreementId: new RegExp(`^${refPrefix}`) },
+      { agreementId: new RegExp(`^${escapedPrefix}`) },
       "agreementId",
     );
     const maxSeq = extractMaxSeq(docs, refPrefix);
@@ -64,8 +65,8 @@ async function generatePrefixedIdPair(refPrefix: string, entityPrefix: string) {
 export async function generateContractualIds() {
   const currentYearStr = new Date().getFullYear().toString().slice(-2);
   const pair = await generatePrefixedIdPair(
-    `CRB-CON-REF-${currentYearStr}-`,
-    `CRB-CON-${currentYearStr}-`,
+    `CBS/REF-${currentYearStr}/`,
+    `CBS-EMP-`,
   );
   return {
     contractualId: pair.id,
