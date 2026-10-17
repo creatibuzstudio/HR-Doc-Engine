@@ -121,22 +121,33 @@ export default function DetailsModal({ agreementId, onClose }: Props) {
 
           {data && !loading && (
             <>
-              <Section title="Agreement">
-                <Row label="Agreement ID" value={data.agreementId} />
-                <Row label="Partner ID" value={data.partnerId} />
-                <Row label="Doc Type" value={data.docType} />
+              <Section title="Document Details">
+                <Row label="Contract Reference ID" value={data.contractRef || data.agreementId} />
+                <Row label="Employee ID" value={data.candidateDetails?.employeeId || data.partnerId} />
+                <Row label="Document Type" value={data.docType} />
                 <Row label="Status" value={data.status} />
-                <Row label="Founder Signed" value={data.founderSigned ? "Yes" : "No"} />
-                <Row label="Partner Signed" value={data.partnerSigned ? "Yes" : "No"} />
-                <Row label="Signed At" value={data.signedAt ? new Date(data.signedAt).toLocaleString() : null} />
+                <Row label="Founder Signed" value={data.isFounderSigned ?? data.founderSigned ? "Yes" : "No"} />
+                <Row label="Candidate Signed" value={data.isCandidateSigned ?? data.partnerSigned ? "Yes" : "No"} />
+                <Row
+                  label="Signed At"
+                  value={
+                    data.candidateDetails?.signatureDate || data.signedAt
+                      ? new Date(data.candidateDetails?.signatureDate || data.signedAt).toLocaleString()
+                      : null
+                  }
+                />
                 <Row label="Created At" value={data.createdAt ? new Date(data.createdAt).toLocaleString() : null} />
-                <Row label="Letter Sent To Both" value={data.letterSentToBoth ? "Yes" : "No"} />
+                <Row label="Final PDF Sent" value={data.isFinalletterSentToBoth ?? data.letterSentToBoth ? "Yes" : "No"} />
                 <Row label="Stored PDF" value={data.letterPDFdata ? "Saved in MongoDB Atlas" : "Pending Signature"} />
               </Section>
 
-              {renderSection("First Party (Company)", data.firstParty, ["signatureImg", "photoUrl"])}
-              {renderSection("Second Party (Candidate / Recipient)", data.secondParty, ["signatureImg", "photoUrl"])}
-              {renderSection("Document Settings", data.docSettings)}
+              {data.candidateDetails &&
+                renderSection("Candidate Details", data.candidateDetails, ["signatureImg", "photoUrl"])}
+              {data.companyDetails &&
+                renderSection("Company Details", data.companyDetails, ["signatureImg", "photoUrl"])}
+              {data.firstParty && renderSection("First Party (Company)", data.firstParty, ["signatureImg", "photoUrl"])}
+              {data.secondParty && renderSection("Second Party (Candidate / Recipient)", data.secondParty, ["signatureImg", "photoUrl"])}
+              {data.docSettings && renderSection("Document Settings", data.docSettings)}
             </>
           )}
         </div>

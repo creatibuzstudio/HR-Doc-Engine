@@ -13,9 +13,11 @@ export async function GET(request: Request) {
     const action = searchParams.get("action");
 
     if (action === "next" || action === "nextContract") {
-      const { contractualId, contractualRefId, storage } =
+      const { contractRef, employeeId, contractualId, contractualRefId, storage } =
         await generateContractualIds();
       return NextResponse.json({
+        contractRef: contractRef || contractualRefId,
+        employeeId: employeeId || contractualId,
         agreementId: contractualRefId,
         partnerId: contractualId,
         contractualId,

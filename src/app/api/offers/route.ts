@@ -74,14 +74,12 @@ export async function POST(request: Request) {
       const generated = await generateContractualIds();
       agreementId =
         docSettings?.contractRef ||
-        docSettings?.contractRefId ||
-        docSettings?.contractualRefId ||
         docSettings?.refId ||
+        generated.contractRef ||
         generated.contractualRefId;
       partnerId =
-        docSettings?.contractualId ||
-        docSettings?.contractId ||
         secondParty?.partnerId ||
+        generated.employeeId ||
         generated.contractualId;
       storage = generated.storage;
     }
@@ -129,7 +127,7 @@ export async function POST(request: Request) {
         },
         isFounderSigned: true,
         isCandidateSigned: false,
-        status: "PENDING_PARTNER_SIGNATURE",
+        status: "PENDING_CANDIDATE_SIGNATURE",
         letterPDFdata: letterPDFdata || "",
         isFinalletterSentToBoth: false,
       };

@@ -78,6 +78,8 @@ export async function generateContractualIds() {
     `CBS-EMP-`,
   );
   return {
+    contractRef: pair.refId,
+    employeeId: pair.id,
     contractualId: pair.id,
     contractualRefId: pair.refId,
     agreementId: pair.refId,

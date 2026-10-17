@@ -97,11 +97,6 @@ export interface DocSettings {
   certInternId?: string;
   certificateGenerated?: boolean;
   // ── Contractual-specific ─────────────────────────────────────────────────
-  contractId?: string;
-  contractualId?: string;
-  contractIdSerial?: string;
-  contractRefId?: string;
-  contractualRefId?: string;
   contractRef?: string;
   contractRefIdSerial?: string;
   employmentType?: "Project-Based Contract" | "Full-Time Contract";
@@ -152,3 +147,47 @@ export interface AgreementSummary {
   hrRecipientEmail?: string;
   hasPdf?: boolean;
 }
+
+// ─── Strict Domain Types for Contractual Offers (Creatibuz Studio) ───────────
+export interface CompanyDetails {
+  companyName: string;
+  founderCEO: string;
+  ceoMobile: string;
+  coFounderCOO: string;
+  cooMobile: string;
+  officeAddress: string;
+  contactNumber: string;
+  email: string;
+  website: string;
+  signatureImg: string;
+}
+
+export interface CandidateDetails {
+  employeeId: string;
+  fullName: string;
+  email: string;
+  contactNumber: string;
+  livingAddress: string;
+  position: string;
+  signatureImg?: string;
+  signatureDate?: Date | string | null;
+}
+
+export interface ContractualOfferData {
+  _id?: string;
+  docType: "Contractual Offer";
+  issueDate: string;
+  contractRef: string;
+  employmentType: string;
+  contractSubject: string;
+  candidateDetails: CandidateDetails;
+  companyDetails?: CompanyDetails;
+  isFounderSigned: boolean;
+  isCandidateSigned: boolean;
+  status: "PENDING_CANDIDATE_SIGNATURE" | "FINALISED";
+  letterPDFdata?: string;
+  isFinalletterSentToBoth?: boolean;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+

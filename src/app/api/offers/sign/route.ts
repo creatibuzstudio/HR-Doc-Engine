@@ -3,6 +3,7 @@ import {
   findAgreementById,
   updateAgreement,
 } from "@/lib/agreementStore";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
 import {
   getFounderNotificationRecipients,
   getResendFromAddress,
@@ -117,11 +118,11 @@ export async function POST(request: Request) {
       try {
         const candidateDetails = (agreement.candidateDetails || {}) as Record<string, any>;
         const secondParty = (agreement.secondParty || {}) as Record<string, any>;
-        const firstParty = (agreement.firstParty || {}) as Record<string, any>;
+        const firstParty = (agreement.firstParty || DEFAULT_COMPANY_DETAILS) as Record<string, any>;
 
         const founderRecipients = getFounderNotificationRecipients(
           process.env.FOUNDER_EMAIL,
-          firstParty.email,
+          firstParty.email || DEFAULT_COMPANY_DETAILS.email,
         );
         const partnerEmail = (
           candidateDetails.email ||
@@ -131,13 +132,14 @@ export async function POST(request: Request) {
         const founderName =
           firstParty.representedBy ||
           firstParty.ceoName ||
+          DEFAULT_COMPANY_DETAILS.founderCEO ||
           "Md. Abdul Hakim";
         const partnerName =
           candidateDetails.fullName ||
           secondParty.fullName ||
           "Candidate";
         const company =
-          firstParty.companyName || "Creatibuz Studio";
+          firstParty.companyName || DEFAULT_COMPANY_DETAILS.companyName || "Creatibuz Studio";
         const position =
           candidateDetails.position ||
           secondParty.position ||
@@ -149,7 +151,6 @@ export async function POST(request: Request) {
         const employeeId =
           candidateDetails.employeeId ||
           secondParty.partnerId ||
-          secondParty.contractualId ||
           "";
 
         const safeFilenameRef = contractRef.replace(/[/\\?%*:|"<>]/g, "-");

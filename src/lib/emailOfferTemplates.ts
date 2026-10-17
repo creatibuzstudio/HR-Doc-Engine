@@ -154,7 +154,7 @@ export function renderContractualEmail({
   const contractType = docSettings.employmentType || "Project-Based Contract";
   const companyName = firstParty.companyName || "Creatibuz Studio";
   const referenceId =
-    docSettings.contractRefId || docSettings.refId || "CBS/REF-26/001";
+    docSettings.contractRef || docSettings.refId || "CBS/REF-26/001";
   const issueDate =
     docSettings.date ||
     new Date().toLocaleDateString("en-US", {

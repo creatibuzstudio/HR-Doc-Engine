@@ -3,6 +3,7 @@ import {
   findAgreementById,
   updateAgreement,
 } from "../../../../../lib/agreementStore";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
 import {
   getFounderNotificationRecipients,
   getResendFromAddress,
@@ -100,18 +101,22 @@ export async function POST(
 
     if (process.env.RESEND_API_KEY && normalizedLetterPdf) {
       try {
+        const fp = agreement.firstParty || DEFAULT_COMPANY_DETAILS;
+        const cd = agreement.candidateDetails || agreement.secondParty || {};
+
         const founderRecipients = getFounderNotificationRecipients(
           process.env.FOUNDER_EMAIL,
-          agreement.firstParty.email,
+          fp.email || DEFAULT_COMPANY_DETAILS.email,
         );
-        const partnerEmail = agreement.secondParty?.email?.trim();
+        const partnerEmail = (cd.email || "").trim();
         const founderName =
-          agreement.firstParty.representedBy ||
-          agreement.firstParty.ceoName ||
+          fp.representedBy ||
+          fp.ceoName ||
+          DEFAULT_COMPANY_DETAILS.founderCEO ||
           "Founder";
-        const partnerName = agreement.secondParty?.fullName || "Candidate";
+        const partnerName = cd.fullName || "Candidate";
         const company =
-          agreement.firstParty.companyName || "Creatibuz Studio";
+          fp.companyName || DEFAULT_COMPANY_DETAILS.companyName || "Creatibuz Studio";
 
         const attachments = [
           {
@@ -121,16 +126,15 @@ export async function POST(
         ];
 
         const position =
-          agreement.secondParty?.position ||
+          cd.position ||
           "Team Member";
         const contractRef =
           agreement.contractRef ||
           agreement.agreementId ||
           id;
         const employeeId =
-          agreement.candidateDetails?.employeeId ||
-          agreement.secondParty?.partnerId ||
-          agreement.secondParty?.contractualId ||
+          cd.employeeId ||
+          cd.partnerId ||
           "";
 
         const founderSubject = `Document Executed & Signed — ${partnerName} (${contractRef})`;

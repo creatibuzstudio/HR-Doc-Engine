@@ -1,7 +1,6 @@
 import dbConnect from "./mongodb";
 import { getAgreementModel, getAllAgreementModels } from "./models/Agreement";
 import * as fileStore from "./fileAgreementStore";
-import { DEFAULT_FIRST_PARTY, DEFAULT_SECOND_PARTY } from "@/data/defaults";
 
 export { TOTAL_DOCUMENT_PAGES } from "./documentConstants";
 export * from "./idGenerators";
@@ -26,40 +25,29 @@ function normalizeDoc(doc: Record<string, any> | null): Record<string, any> | nu
   if (doc.contractRef || doc.candidateDetails) {
     const candidate = doc.candidateDetails || {};
     return {
-      ...doc,
-      // Provide compatibility fields for UI/PDF rendering
-      agreementId: doc.contractRef,
-      partnerId: candidate.employeeId,
+      _id: doc._id,
       docType: doc.docType || "Contractual Offer",
-      status: doc.status || "PENDING_PARTNER_SIGNATURE",
-      founderSigned: doc.isFounderSigned ?? true,
-      partnerSigned: doc.isCandidateSigned ?? false,
-      signedAt: candidate.signatureDate,
-      firstParty: DEFAULT_FIRST_PARTY,
-      secondParty: {
-        ...DEFAULT_SECOND_PARTY,
-        partnerId: candidate.employeeId,
+      issueDate: doc.issueDate || "",
+      contractRef: doc.contractRef,
+      employmentType: doc.employmentType || "Project-Based Contract",
+      contractSubject: doc.contractSubject || "",
+      candidateDetails: {
+        employeeId: candidate.employeeId || "",
         fullName: candidate.fullName || "",
         email: candidate.email || "",
-        mobileNumber: candidate.contactNumber || "",
-        presentAddress: candidate.livingAddress || "",
+        contactNumber: candidate.contactNumber || "",
+        livingAddress: candidate.livingAddress || "",
         position: candidate.position || "",
         signatureImg: candidate.signatureImg || "",
+        signatureDate: candidate.signatureDate || null,
       },
-      docSettings: {
-        agreementTemplate: "contractual",
-        contractualRefId: doc.contractRef,
-        contractRefId: doc.contractRef,
-        refId: doc.contractRef,
-        contractRef: doc.contractRef,
-        contractualId: candidate.employeeId,
-        contractId: candidate.employeeId,
-        partnerId: candidate.employeeId,
-        employmentType: doc.employmentType || "Project-Based Contract",
-        contractSubject: doc.contractSubject || "",
-        date: doc.issueDate || "",
-      },
+      isFounderSigned: doc.isFounderSigned ?? true,
+      isCandidateSigned: doc.isCandidateSigned ?? false,
+      status: doc.status || (doc.isCandidateSigned ? "FINALISED" : "PENDING_CANDIDATE_SIGNATURE"),
       letterPDFdata: doc.letterPDFdata || "",
+      isFinalletterSentToBoth: doc.isFinalletterSentToBoth ?? false,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
     };
   }
 
@@ -302,10 +290,10 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
       partnerId: candidate.employeeId || candidate.partnerId || (agreement.partnerId as string),
       docType: "Contractual Offer",
       agreementTemplate: "contractual",
-      status: (agreement.status as string) || "PENDING_PARTNER_SIGNATURE",
-      founderSigned: (agreement.isFounderSigned ?? agreement.founderSigned ?? true) as boolean,
-      partnerSigned: (agreement.isCandidateSigned ?? agreement.partnerSigned ?? false) as boolean,
-      signedAt: candidate.signatureDate || agreement.signedAt,
+      status: (agreement.status as string) || (agreement.isCandidateSigned ? "FINALISED" : "PENDING_CANDIDATE_SIGNATURE"),
+      founderSigned: (agreement.isFounderSigned ?? true) as boolean,
+      partnerSigned: (agreement.isCandidateSigned ?? false) as boolean,
+      signedAt: candidate.signatureDate || (agreement.signedAt as Date | undefined),
       createdAt: agreement.createdAt,
       partnerName: candidate.fullName || "",
       partnerEmail: candidate.email || "",

@@ -3,7 +3,7 @@ import {
   AgreementTemplate,
   SecondParty,
 } from "@/types";
-import { DEFAULT_FIRST_PARTY } from "@/data/defaults";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
 
 export function getTemplateSelectionConfig(
   type:
@@ -54,13 +54,13 @@ export function getTemplateSelectionConfig(
         agreementTemplate: "hrHiringNotice",
         hrPreparedByName:
           prev.hrPreparedByName ||
-          DEFAULT_FIRST_PARTY.hrName ||
+          DEFAULT_COMPANY_DETAILS.coFounderCOO ||
           "Juwel Khan Shanto",
         hrPreparedByDesignation:
           prev.hrPreparedByDesignation || "Head of HR Department",
         hrOrganization:
           prev.hrOrganization ||
-          DEFAULT_FIRST_PARTY.companyName ||
+          DEFAULT_COMPANY_DETAILS.companyName ||
           "Creatibuz Studio",
         hrVacancies: prev.hrVacancies ?? 1,
         hrEmploymentType: prev.hrEmploymentType || "Full-Time",

@@ -2,8 +2,8 @@
 
 import { useState, useRef } from "react";
 import {
-  DEFAULT_FIRST_PARTY,
-  DEFAULT_SECOND_PARTY,
+  DEFAULT_COMPANY_DETAILS,
+  DEFAULT_CANDIDATE_DETAILS,
 } from "@/data/defaults";
 import {
   FirstParty,
@@ -36,9 +36,42 @@ export function useAppOrchestrator() {
   const [activeStep, setActiveStep] = useState(1);
   const [isDemo, setIsDemo] = useState(false);
 
-  const [firstParty, setFirstParty] = useState<FirstParty>(DEFAULT_FIRST_PARTY);
-  const [secondParty, setSecondParty] =
-    useState<SecondParty>(DEFAULT_SECOND_PARTY);
+  const [firstParty, setFirstParty] = useState<FirstParty>({
+    companyName: DEFAULT_COMPANY_DETAILS.companyName,
+    representedBy: DEFAULT_COMPANY_DETAILS.founderCEO,
+    role: "Founder & CEO",
+    ceoName: DEFAULT_COMPANY_DETAILS.founderCEO,
+    ceoMobile: DEFAULT_COMPANY_DETAILS.ceoMobile,
+    cooName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+    cooMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+    hrName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+    hrMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+    currentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+    permanentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+    mobileNumber: DEFAULT_COMPANY_DETAILS.contactNumber,
+    nidNumber: "2874935543",
+    email: DEFAULT_COMPANY_DETAILS.email,
+    website: DEFAULT_COMPANY_DETAILS.website,
+    signatureImg: DEFAULT_COMPANY_DETAILS.signatureImg,
+  });
+  const [secondParty, setSecondParty] = useState<SecondParty>({
+    partnerId: DEFAULT_CANDIDATE_DETAILS.employeeId,
+    partnerIdSerial: "",
+    fullName: DEFAULT_CANDIDATE_DETAILS.fullName,
+    email: DEFAULT_CANDIDATE_DETAILS.email,
+    guardianName: "",
+    guardianRelation: "Father",
+    mobileNumber: DEFAULT_CANDIDATE_DETAILS.contactNumber,
+    guardianMobile: "",
+    presentAddress: DEFAULT_CANDIDATE_DETAILS.livingAddress,
+    permanentAddress: DEFAULT_CANDIDATE_DETAILS.livingAddress,
+    dob: "",
+    nidNumber: "",
+    position: DEFAULT_CANDIDATE_DETAILS.position,
+    bloodGroup: "Select",
+    photoUrl: "",
+    signatureImg: DEFAULT_CANDIDATE_DETAILS.signatureImg,
+  });
   const [docSettings, setDocSettings] = useState<DocSettings>({
     date: getDefaultIssueDate(),
     minimumServicePeriod: 3,

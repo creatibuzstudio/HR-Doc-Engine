@@ -6,6 +6,26 @@ import {
   AppState,
   AgreementTemplate,
 } from "@/types";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
+
+const defaultCompanyFirstParty: FirstParty = {
+  companyName: DEFAULT_COMPANY_DETAILS.companyName,
+  representedBy: DEFAULT_COMPANY_DETAILS.founderCEO,
+  role: "Founder & CEO",
+  ceoName: DEFAULT_COMPANY_DETAILS.founderCEO,
+  ceoMobile: DEFAULT_COMPANY_DETAILS.ceoMobile,
+  cooName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+  cooMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+  hrName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+  hrMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+  currentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+  permanentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+  mobileNumber: DEFAULT_COMPANY_DETAILS.contactNumber,
+  nidNumber: "2874935543",
+  email: DEFAULT_COMPANY_DETAILS.email,
+  website: DEFAULT_COMPANY_DETAILS.website,
+  signatureImg: DEFAULT_COMPANY_DETAILS.signatureImg,
+};
 
 interface CandidateViewRestoreParams {
   setFirstParty: React.Dispatch<React.SetStateAction<FirstParty>>;
@@ -43,39 +63,54 @@ export function useCandidateViewRestore({
         return res.json();
       })
       .then((data) => {
-        setFirstParty(data.firstParty);
-        setSecondParty(data.secondParty);
-        const refNo = data.contractRef || data.agreementId || candidateViewId;
-        const empId =
-          data.candidateDetails?.employeeId ||
-          data.partnerId ||
-          data.secondParty?.partnerId;
+        const candidate = data.candidateDetails;
+        if (candidate) {
+          setFirstParty(defaultCompanyFirstParty);
+          setSecondParty((p) => ({
+            ...p,
+            partnerId: candidate.employeeId || "",
+            fullName: candidate.fullName || "",
+            email: candidate.email || "",
+            mobileNumber: candidate.contactNumber || "",
+            presentAddress: candidate.livingAddress || "",
+            position: candidate.position || "",
+            signatureImg: candidate.signatureImg || "",
+          }));
+        } else if (data.secondParty) {
+          setFirstParty(data.firstParty || defaultCompanyFirstParty);
+          setSecondParty(data.secondParty);
+        }
 
-        setDocSettings({
-          ...data.docSettings,
-          refId: refNo,
-          contractRefId: refNo,
-          contractualRefId: refNo,
+        const refNo = data.contractRef || data.agreementId || candidateViewId;
+
+        setDocSettings((p) => ({
+          ...p,
           contractRef: refNo,
-          contractualId: empId,
-          contractId: empId,
-          partnerId: empId,
-          ...(data.signedAt
+          refId: refNo,
+          date: data.issueDate || p.date,
+          employmentType: data.employmentType || p.employmentType,
+          contractSubject: data.contractSubject || p.contractSubject,
+          ...(candidate?.signatureDate || data.signedAt
             ? {
-                partnerSignedDate: new Date(data.signedAt).toLocaleDateString(
-                  "en-US",
-                  { year: "numeric", month: "long", day: "numeric" },
-                ),
+                partnerSignedDate: new Date(
+                  candidate?.signatureDate || data.signedAt,
+                ).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }),
               }
             : {}),
-        });
+        }));
         setAgreementTemplate(
-          (data.docSettings?.agreementTemplate as AgreementTemplate) || "contractual",
+          (data.agreementTemplate as AgreementTemplate) ||
+            (data.docSettings?.agreementTemplate as AgreementTemplate) ||
+            "contractual",
         );
         setIsCandidateSigned(
           Boolean(
-            data.partnerSigned ||
-              data.isCandidateSigned ||
+            data.isCandidateSigned ||
+              data.partnerSigned ||
               data.status === "FINALISED" ||
               data.status === "FULLY_EXECUTED",
           ),
@@ -93,29 +128,44 @@ export function useCandidateViewRestore({
         if (stored) {
           try {
             const data = JSON.parse(stored);
-            setFirstParty(data.firstParty);
+            const candidate = data.candidateDetails;
+            if (candidate) {
+              setFirstParty(defaultCompanyFirstParty);
+              setSecondParty((p) => ({
+                ...p,
+                partnerId: candidate.employeeId || "",
+                fullName: candidate.fullName || "",
+                email: candidate.email || "",
+                mobileNumber: candidate.contactNumber || "",
+                presentAddress: candidate.livingAddress || "",
+                position: candidate.position || "",
+                signatureImg: candidate.signatureImg || "",
+              }));
+            } else if (data.secondParty) {
+              setFirstParty(data.firstParty || defaultCompanyFirstParty);
+              setSecondParty(data.secondParty);
+            }
             const refNo = data.contractRef || data.agreementId || candidateViewId;
-            const empId =
-              data.candidateDetails?.employeeId ||
-              data.partnerId ||
-              data.secondParty?.partnerId;
-            setDocSettings({
-              ...data.docSettings,
-              refId: refNo,
-              contractRefId: refNo,
-              contractualRefId: refNo,
+            setDocSettings((p) => ({
+              ...p,
               contractRef: refNo,
-              contractualId: empId,
-              contractId: empId,
-              partnerId: empId,
-            });
+              refId: refNo,
+              date: data.issueDate || p.date,
+              employmentType: data.employmentType || p.employmentType,
+              contractSubject: data.contractSubject || p.contractSubject,
+            }));
             setAgreementTemplate(
               (data.agreementTemplate as AgreementTemplate) ||
                 data.docSettings?.agreementTemplate ||
                 "contractual",
             );
             setIsCandidateSigned(
-              Boolean(data.partnerSigned || data.status === "FULLY_EXECUTED"),
+              Boolean(
+                data.isCandidateSigned ||
+                  data.partnerSigned ||
+                  data.status === "FINALISED" ||
+                  data.status === "FULLY_EXECUTED",
+              ),
             );
             setOfferId(candidateViewId);
             setIsDemo(false);

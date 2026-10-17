@@ -3,7 +3,7 @@
 import React from "react";
 import { AnimatePresence } from "motion/react";
 import { useAppOrchestrator } from "@/lib/hooks/useAppOrchestrator";
-import { SAMPLE_SECOND_PARTY } from "@/data/defaults";
+import { SAMPLE_CANDIDATE_DETAILS } from "@/data/defaults";
 import { DataCacheProvider, useDataCache } from "@/lib/context/DataCacheContext";
 
 import Hero from "@/components/layout/Hero";
@@ -94,7 +94,17 @@ function MainApp() {
               key="home"
               onStart={() => setAppState("login")}
               onDemo={() => {
-                setSecondParty(SAMPLE_SECOND_PARTY);
+                setSecondParty((prev) => ({
+                  ...prev,
+                  partnerId: SAMPLE_CANDIDATE_DETAILS.employeeId,
+                  partnerIdSerial: "001",
+                  fullName: SAMPLE_CANDIDATE_DETAILS.fullName,
+                  email: SAMPLE_CANDIDATE_DETAILS.email,
+                  mobileNumber: SAMPLE_CANDIDATE_DETAILS.contactNumber,
+                  presentAddress: SAMPLE_CANDIDATE_DETAILS.livingAddress,
+                  permanentAddress: SAMPLE_CANDIDATE_DETAILS.livingAddress,
+                  position: SAMPLE_CANDIDATE_DETAILS.position,
+                }));
                 setSameAddress(false);
                 setAppState("form");
                 setDocType("Contractual Offer Letter & Work Agreement (Featured)");

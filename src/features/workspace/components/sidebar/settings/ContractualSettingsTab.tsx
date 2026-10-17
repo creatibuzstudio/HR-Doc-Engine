@@ -31,20 +31,12 @@ export function ContractualSettingsTab({
 
       <TextInput
         label="Agreement Reference ID (Ref No)"
-        value={
-          docSettings.contractRef ||
-          docSettings.contractRefId ||
-          docSettings.contractualRefId ||
-          docSettings.refId ||
-          ""
-        }
+        value={docSettings.contractRef || docSettings.refId || ""}
         onChange={(e) =>
           setDocSettings((p) => ({
             ...p,
-            refId: e.target.value,
-            contractRefId: e.target.value,
-            contractualRefId: e.target.value,
             contractRef: e.target.value,
+            refId: e.target.value,
           }))
         }
       />

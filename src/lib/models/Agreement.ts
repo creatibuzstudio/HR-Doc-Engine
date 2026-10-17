@@ -53,7 +53,7 @@ export const ContractualOfferSchema: Schema = new Schema(
     },
     isFounderSigned: { type: Boolean, default: true },
     isCandidateSigned: { type: Boolean, default: false },
-    status: { type: String, default: "PENDING_PARTNER_SIGNATURE" },
+    status: { type: String, default: "PENDING_CANDIDATE_SIGNATURE" },
     letterPDFdata: { type: String, default: "" },
     isFinalletterSentToBoth: { type: Boolean, default: false },
   },

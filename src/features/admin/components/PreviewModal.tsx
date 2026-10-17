@@ -8,6 +8,7 @@ import {
   DocSettings,
   AgreementTemplate,
 } from "@/types";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
 import A4DocumentScaler from "@/features/document-preview/components/A4DocumentScaler";
 import InternshipDocumentPreview from "@/features/document-preview/components/InternshipDocumentPreview";
 import ContractualOfferDocument from "@/features/document-preview/templates/document/ContractualOfferDocument";
@@ -66,9 +67,57 @@ export default function PreviewModal({ agreementId, onClose }: Props) {
         return r.json();
       })
       .then((data) => {
-        setFirstParty(data.firstParty);
-        setSecondParty(data.secondParty);
-        setDocSettings(data.docSettings);
+        const candidate = data.candidateDetails;
+        if (candidate) {
+          setFirstParty({
+            companyName: DEFAULT_COMPANY_DETAILS.companyName,
+            representedBy: DEFAULT_COMPANY_DETAILS.founderCEO,
+            role: "Founder & CEO",
+            ceoName: DEFAULT_COMPANY_DETAILS.founderCEO,
+            ceoMobile: DEFAULT_COMPANY_DETAILS.ceoMobile,
+            cooName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+            cooMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+            hrName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+            hrMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+            currentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+            permanentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+            mobileNumber: DEFAULT_COMPANY_DETAILS.contactNumber,
+            nidNumber: "2874935543",
+            email: DEFAULT_COMPANY_DETAILS.email,
+            website: DEFAULT_COMPANY_DETAILS.website,
+            signatureImg: DEFAULT_COMPANY_DETAILS.signatureImg,
+          });
+          setSecondParty({
+            partnerId: candidate.employeeId || "",
+            partnerIdSerial: "",
+            fullName: candidate.fullName || "",
+            email: candidate.email || "",
+            guardianName: "",
+            guardianRelation: "Father",
+            mobileNumber: candidate.contactNumber || "",
+            guardianMobile: "",
+            presentAddress: candidate.livingAddress || "",
+            permanentAddress: candidate.livingAddress || "",
+            dob: "",
+            nidNumber: "",
+            position: candidate.position || "",
+            bloodGroup: "Select",
+            photoUrl: "",
+            signatureImg: candidate.signatureImg || "",
+          });
+          setDocSettings({
+            agreementTemplate: "contractual",
+            contractRef: data.contractRef,
+            refId: data.contractRef,
+            employmentType: data.employmentType || "Project-Based Contract",
+            contractSubject: data.contractSubject || "",
+            date: data.issueDate || "",
+          });
+        } else {
+          setFirstParty(data.firstParty);
+          setSecondParty(data.secondParty);
+          setDocSettings(data.docSettings);
+        }
         if (data.letterPDFdata) {
           setLetterPDFdata(data.letterPDFdata);
           setViewMode("pdf");

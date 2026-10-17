@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { findAgreementById } from "@/lib/agreementStore";
+import { DEFAULT_COMPANY_DETAILS } from "@/data/defaults";
 import {
   getBaseUrl,
   getResendFromAddress,
@@ -25,14 +26,48 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
 
-    const firstParty = agreement.firstParty || {};
-    const secondParty = agreement.secondParty || {};
-    const docSettings = agreement.docSettings || {};
+    const candidate = agreement.candidateDetails || agreement.secondParty || {};
+    const firstParty = agreement.firstParty || {
+      companyName: DEFAULT_COMPANY_DETAILS.companyName,
+      representedBy: DEFAULT_COMPANY_DETAILS.founderCEO,
+      role: "Founder & CEO",
+      ceoName: DEFAULT_COMPANY_DETAILS.founderCEO,
+      ceoMobile: DEFAULT_COMPANY_DETAILS.ceoMobile,
+      cooName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+      cooMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+      hrName: DEFAULT_COMPANY_DETAILS.coFounderCOO,
+      hrMobile: DEFAULT_COMPANY_DETAILS.cooMobile,
+      currentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+      permanentAddress: DEFAULT_COMPANY_DETAILS.officeAddress,
+      mobileNumber: DEFAULT_COMPANY_DETAILS.contactNumber,
+      nidNumber: "2874935543",
+      email: DEFAULT_COMPANY_DETAILS.email,
+      website: DEFAULT_COMPANY_DETAILS.website,
+      signatureImg: DEFAULT_COMPANY_DETAILS.signatureImg,
+    };
+    const secondParty = {
+      partnerId: candidate.employeeId || candidate.partnerId || "",
+      fullName: candidate.fullName || "",
+      email: candidate.email || "",
+      mobileNumber: candidate.contactNumber || candidate.mobileNumber || "",
+      presentAddress: candidate.livingAddress || candidate.presentAddress || "",
+      permanentAddress: candidate.livingAddress || candidate.permanentAddress || "",
+      position: candidate.position || "",
+      ...candidate,
+    };
+    const docSettings = agreement.docSettings || {
+      contractRef: agreement.contractRef,
+      refId: agreement.contractRef,
+      date: agreement.issueDate,
+      employmentType: agreement.employmentType,
+      contractSubject: agreement.contractSubject,
+    };
     const agreementTemplate =
-      agreement.agreementTemplate || docSettings.agreementTemplate;
+      agreement.agreementTemplate ||
+      (agreement.contractRef ? "contractual" : docSettings.agreementTemplate);
 
-    let candidateEmail = secondParty.email;
-    let candidateName = secondParty.fullName || "Candidate";
+    let candidateEmail = candidate.email;
+    let candidateName = candidate.fullName || "Candidate";
 
     const isContractual = agreementTemplate === "contractual";
     const isInternship = agreementTemplate === "internship";

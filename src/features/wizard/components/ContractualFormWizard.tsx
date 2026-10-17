@@ -47,21 +47,19 @@ export default function ContractualFormWizard({
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        const conSerial = data.contractualId?.split(/[-/]/).pop() || "001";
-        const refSerial = data.contractualRefId?.split(/[-/]/).pop() || "001";
+        const empId = data.employeeId || data.partnerId || data.contractualId;
+        const refNo = data.contractRef || data.contractualRefId || data.agreementId;
+        const conSerial = empId?.split(/[-/]/).pop() || "001";
+        const refSerial = refNo?.split(/[-/]/).pop() || "001";
         setSecondParty((p) => ({
           ...p,
-          partnerId: data.contractualId,
+          partnerId: empId,
           partnerIdSerial: conSerial,
         }));
         setDocSettings((p) => ({
           ...p,
-          refId: data.contractualRefId,
-          contractRefId: data.contractualRefId,
-          contractualRefId: data.contractualRefId,
-          contractRef: data.contractualRefId,
-          contractualId: data.contractualId,
-          contractId: data.contractualId,
+          contractRef: refNo,
+          refId: refNo,
           refIdSerial: refSerial,
           employmentType: p.employmentType || "Project-Based Contract",
           contractSubject:
