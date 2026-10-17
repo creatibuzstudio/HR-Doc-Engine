@@ -47,10 +47,10 @@ export default function CandidateSidebar({
         }
       }
 
-      fetch(`/api/offers/${offerId}/sign`, {
+      fetch(`/api/offers/sign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signatureImg: dataUrl }),
+        body: JSON.stringify({ offerId, signatureImg: dataUrl }),
       }).catch((e) => console.error("Auto-sync signature failed:", e));
 
       return updated;
@@ -78,10 +78,10 @@ export default function CandidateSidebar({
         }
       }
 
-      fetch(`/api/offers/${offerId}/sign`, {
+      fetch(`/api/offers/sign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signatureImg: "" }),
+        body: JSON.stringify({ offerId, signatureImg: "" }),
       }).catch((e) => console.error("Auto-clear signature failed:", e));
 
       return updated;

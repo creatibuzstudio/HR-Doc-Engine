@@ -52,10 +52,13 @@ export default function ContractualOfferDocument({
         employmentType={employmentType}
         subjectLine={subjectLine}
         dateOfIssue={dateOfIssue}
+        phone={phone}
+        website={website}
+        email={email}
       />
 
       {/* ── BODY CONTENT ──────────────────────────────────────────────────── */}
-      <div className="relative px-12.5 pt-10 pb-7.5 flex-1 flex flex-col justify-between">
+      <div className="relative px-12.5 pt-8.5 pb-7.5 flex-1 flex flex-col justify-between">
         {/* Subtle Watermark in background */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 w-[340px] h-[340px] pointer-events-none opacity-[0.045] select-none z-0">
           <Image

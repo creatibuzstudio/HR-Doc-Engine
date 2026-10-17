@@ -147,4 +147,5 @@ export interface AgreementSummary {
   position: string;
   hrRecipientName?: string;
   hrRecipientEmail?: string;
+  hasPdf?: boolean;
 }

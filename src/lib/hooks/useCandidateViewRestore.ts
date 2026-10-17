@@ -36,7 +36,8 @@ export function useCandidateViewRestore({
     if (!candidateViewId) return;
 
     setIsLoadingOffer(true);
-    fetch(`/api/offers/${candidateViewId}`)
+    const targetUrl = `/api/offers?id=${encodeURIComponent(candidateViewId)}`;
+    fetch(targetUrl)
       .then((res) => {
         if (!res.ok) throw new Error("Offer not found on backend.");
         return res.json();
@@ -59,7 +60,12 @@ export function useCandidateViewRestore({
           (data.docSettings?.agreementTemplate as AgreementTemplate) || "contractual",
         );
         setIsCandidateSigned(
-          Boolean(data.partnerSigned || data.status === "FULLY_EXECUTED"),
+          Boolean(
+            data.partnerSigned ||
+              data.isCandidateSigned ||
+              data.status === "FINALISED" ||
+              data.status === "FULLY_EXECUTED",
+          ),
         );
         setOfferId(candidateViewId);
         setIsDemo(false);

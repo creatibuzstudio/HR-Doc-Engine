@@ -8,7 +8,7 @@ import {
   getResendFromAddress,
   getResendClient,
 } from "../../../../../lib/emailConfig";
-import { uploadPdfToStorage } from "@/services/storage.service";
+import { buildFinalExecutedEmailHtml } from "../../../../../lib/emailTemplates";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -79,21 +79,12 @@ export async function POST(
     // ── Finalizing: apply signature, mark executed, and send emails ─────────
     console.log(`[Next.js API] Finalizing offer: ${id}`);
 
-    let pdfUrl: string | undefined;
-    if (normalizedLetterPdf) {
-      const uploadRes = await uploadPdfToStorage(id, normalizedLetterPdf);
-      if (uploadRes.url) {
-        pdfUrl = uploadRes.url;
-      }
-    }
-
     const updated = await updateAgreement(id, {
       secondParty: updatedSecondParty,
       status: "FULLY_EXECUTED",
       partnerSigned: true,
       signedAt: new Date().toISOString(),
       letterPDFdata: normalizedLetterPdf,
-      ...(pdfUrl ? { pdfUrl } : {}),
     });
 
     if (!updated) {
@@ -129,11 +120,32 @@ export async function POST(
           },
         ];
 
-        const founderSubject = `Document Executed & Signed — ${partnerName} (${id})`;
-        const founderText = `Dear ${founderName},\n\nThe document for ${partnerName} (ID: ${id}) has been fully executed with both signatures. Please find the finalized PDF attached.\n\nBest regards,\n${company}`;
+        const position =
+          agreement.secondParty?.position ||
+          "Team Member";
+        const contractRef =
+          agreement.contractRef ||
+          agreement.agreementId ||
+          id;
+        const employeeId =
+          agreement.candidateDetails?.employeeId ||
+          agreement.secondParty?.partnerId ||
+          agreement.secondParty?.contractualId ||
+          "";
 
-        const partnerSubject = `Your Signed Document — ${company}`;
-        const partnerText = `Dear ${partnerName},\n\nCongratulations! Your document with ${company} has been fully executed. Please find your official signed copy attached.\n\nBest regards,\n${company}`;
+        const founderSubject = `Document Executed & Signed — ${partnerName} (${contractRef})`;
+        const founderText = `Dear ${founderName},\n\nThe document for ${partnerName} (Ref: ${contractRef}) has been fully executed with both signatures. Please find the finalized PDF attached.\n\nBest regards,\n${company}`;
+
+        const partnerSubject = `🎉 Document Finalized & Executed — ${company}`;
+        const partnerHtml = buildFinalExecutedEmailHtml({
+          candidateName: partnerName,
+          companyName: company,
+          position,
+          contractRef,
+          employeeId,
+          firstParty: agreement.firstParty,
+        });
+        const partnerText = `Dear ${partnerName},\n\nCongratulations! Your document with ${company} (Ref: ${contractRef}) has been fully executed with both signatures. Please find your official signed copy attached.\n\nBest regards,\n${company}`;
 
         if (founderRecipients.length > 0) {
           const fRes = await sendWithRetry({
@@ -151,6 +163,7 @@ export async function POST(
             from: getResendFromAddress(),
             to: [partnerEmail],
             subject: partnerSubject,
+            html: partnerHtml,
             text: partnerText,
             attachments,
           });
@@ -158,6 +171,7 @@ export async function POST(
         }
 
         await updateAgreement(id, {
+          isFinalletterSentToBoth: founderEmailSent && partnerEmailSent,
           letterSentToBoth: founderEmailSent && partnerEmailSent,
         });
       } catch (mailErr) {

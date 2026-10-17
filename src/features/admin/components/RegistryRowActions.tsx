@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Send, ShieldCheck, ExternalLink, Loader2, Eye, FileSearch, Trash2 } from "lucide-react";
+import { Send, ShieldCheck, ExternalLink, Loader2, Eye, FileSearch, Trash2, FileText } from "lucide-react";
 import { AgreementSummary } from "@/types";
 import { buildVerifyUrl } from "@/lib/verifyUrl";
 
@@ -25,7 +25,7 @@ export function RegistryRowActions({
   onDelete,
 }: RegistryRowActionsProps) {
   return (
-    <div className="flex items-center justify-start gap-3 flex-wrap">
+    <div className="flex items-center justify-start gap-2.5 flex-wrap">
       {a.status !== "FULLY_EXECUTED" && (
         <button
           onClick={() => onResend(a.agreementId)}
@@ -54,6 +54,18 @@ export function RegistryRowActions({
         <FileSearch className="w-3 h-3" />
         Preview
       </button>
+      {a.hasPdf && (
+        <a
+          href={`/api/offers/${encodeURIComponent(a.agreementId)}/pdf`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-[10px] font-bold text-emerald-600 transition"
+          title="Direct PDF Download"
+        >
+          <FileText className="w-3 h-3" />
+          PDF
+        </a>
+      )}
       <a
         href={buildVerifyUrl(a.agreementId)}
         target="_blank"

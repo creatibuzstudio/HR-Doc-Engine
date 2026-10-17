@@ -51,7 +51,7 @@ export default function EmailPortalModal({
     ? hrRecipientName || "Recipient"
     : secondParty.fullName;
 
-  const fromAddress = "Creatibuz Studio <info@creatibuzstudio.com>";
+  const fromAddress = "Creatibuz Studio <hr@creatibuzstudio.com>";
 
   const emailSubject = isHrHiring
     ? `HR Hiring Notice: ${docSettings?.hrPositionName || "Open Position"}`
@@ -93,9 +93,11 @@ export default function EmailPortalModal({
           onClose();
         }, 1500);
       } else {
-        setApiError(
-          data.error || "Failed to send email. Please check your domain configuration.",
-        );
+        const errorMsg =
+          data.details?.message ||
+          data.error ||
+          "Failed to send email. Please check your domain configuration.";
+        setApiError(errorMsg);
       }
     } catch (err) {
       console.error(err);

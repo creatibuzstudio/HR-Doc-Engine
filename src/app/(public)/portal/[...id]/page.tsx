@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 
 interface PortalPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string | string[] }>;
 }
 
 export default async function PortalPage({ params }: PortalPageProps) {
-  const { id } = await params;
+  const resolved = await params;
+  const rawId = resolved.id;
+  const id = Array.isArray(rawId) ? rawId.join("/") : rawId;
   redirect(`/?candidateView=${encodeURIComponent(id)}`);
 }

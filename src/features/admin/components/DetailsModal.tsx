@@ -61,6 +61,14 @@ export default function DetailsModal({ agreementId, onClose }: Props) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
     if (!agreementId) return;
     setData(null);
     setError("");
@@ -123,6 +131,7 @@ export default function DetailsModal({ agreementId, onClose }: Props) {
                 <Row label="Signed At" value={data.signedAt ? new Date(data.signedAt).toLocaleString() : null} />
                 <Row label="Created At" value={data.createdAt ? new Date(data.createdAt).toLocaleString() : null} />
                 <Row label="Letter Sent To Both" value={data.letterSentToBoth ? "Yes" : "No"} />
+                <Row label="Stored PDF" value={data.letterPDFdata ? "Saved in MongoDB Atlas" : "Pending Signature"} />
               </Section>
 
               {renderSection("First Party (Company)", data.firstParty, ["signatureImg", "photoUrl"])}

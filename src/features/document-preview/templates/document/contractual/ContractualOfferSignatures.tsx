@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Phone, Globe, Mail } from "lucide-react";
+import { Check } from "lucide-react";
 import { FirstParty, SecondParty } from "@/types";
 
 interface ContractualOfferSignaturesProps {
@@ -9,11 +9,11 @@ interface ContractualOfferSignaturesProps {
   secondParty: SecondParty;
   founderName: string;
   candidateName: string;
-  phone: string;
-  website: string;
-  email: string;
   idNo?: string;
   refNo?: string;
+  phone?: string;
+  website?: string;
+  email?: string;
 }
 
 export default function ContractualOfferSignatures({
@@ -21,9 +21,6 @@ export default function ContractualOfferSignatures({
   secondParty,
   founderName,
   candidateName,
-  phone,
-  website,
-  email,
   idNo,
   refNo,
 }: ContractualOfferSignaturesProps) {
@@ -93,8 +90,8 @@ export default function ContractualOfferSignatures({
           </div>
         </div>
 
-        {/* Contact & Identification Details Card on the right */}
-        <div className="flex flex-col items-start gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-xl shadow-xs min-w-[165px]">
+        {/* Contract ID & Employment Type Card on the right */}
+        <div className="flex flex-col items-start gap-1.5 bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-xl shadow-xs min-w-[175px]">
           {/* ID & Ref Section */}
           <div className="w-full pb-1.5 border-b border-[#E2E8F0] flex flex-col gap-0.5">
             <div className="flex items-center justify-between gap-3 text-[10px]">
@@ -107,28 +104,27 @@ export default function ContractualOfferSignatures({
             </div>
           </div>
 
-          {/* Phone */}
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-            <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-              <Phone className="w-2.5 h-2.5 fill-white text-white" />
+          {/* Employment Type Badges */}
+          <div className="flex flex-col gap-1 items-start w-full pt-0.5">
+            <span className="text-[10px] font-extrabold text-[#475569] uppercase tracking-wide">
+              Employment Type:
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] bg-[#22C55E] border border-[#22C55E] text-white">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </span>
+              <span className="text-[10px] text-[#1E293B] font-medium">
+                Project-Based Contract
+              </span>
             </div>
-            <span>{phone}</span>
-          </div>
-
-          {/* Website */}
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-            <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-              <Globe className="w-2.5 h-2.5 text-white" />
+            <div className="flex items-center gap-1.5">
+              <span className="w-3.5 h-3.5 rounded flex items-center justify-center text-[10px] bg-[#22C55E]/20 border border-[#22C55E]/50 text-[#22C55E]">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </span>
+              <span className="text-[10px] text-[#1E293B] font-medium">
+                Full-Time - Remote
+              </span>
             </div>
-            <span>{website}</span>
-          </div>
-
-          {/* Email */}
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-[#1E293B]">
-            <div className="w-4 h-4 rounded bg-[#FF5722] flex items-center justify-center text-white shrink-0">
-              <Mail className="w-2.5 h-2.5 text-white" />
-            </div>
-            <span>{email}</span>
           </div>
         </div>
       </div>

@@ -117,6 +117,7 @@ export function useOfferSubmission({
             docSettings,
             docType: isCertificate ? "Intern Certificate" : docType,
             agreementTemplate,
+            ...(hrNoticePdfBase64 ? { letterPDFdata: hrNoticePdfBase64 } : {}),
           }),
         });
 
@@ -139,7 +140,7 @@ export function useOfferSubmission({
       return;
     }
 
-    const link = `${window.location.origin}${window.location.pathname}?candidateView=${dbAgreementId}`;
+    const link = `${window.location.origin}${window.location.pathname}?candidateView=${encodeURIComponent(dbAgreementId)}`;
     setCandidateLink(link);
     setOfferId(dbAgreementId);
     if ((isHrHiring || isCertificate) && hrNoticePdfBase64) {

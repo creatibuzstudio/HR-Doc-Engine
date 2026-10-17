@@ -8,7 +8,7 @@ interface LogoProps {
 }
 
 export default function CreatibuzLogo({ className = "", size = "md" }: LogoProps) {
-  const widthClass = size === "sm" ? "w-28" : size === "lg" ? "w-48" : "w-36";
+  const widthClass = size === "sm" ? "w-28" : size === "lg" ? "w-55" : "w-36";
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>

@@ -5,11 +5,25 @@ import {
   generateContractualIds,
   listAgreements,
   saveAgreement,
+  findAgreementById,
   toAgreementSummary,
 } from "@/lib/agreementStore";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (id) {
+      const agreement = await findAgreementById(id);
+      if (!agreement) {
+        return NextResponse.json(
+          { error: "Agreement not found." },
+          { status: 404 },
+        );
+      }
+      return NextResponse.json(agreement);
+    }
+
     const agreements = await listAgreements();
     return NextResponse.json({
       success: true,
@@ -33,6 +47,7 @@ export async function POST(request: Request) {
       docSettings,
       docType = "contractual",
       agreementTemplate,
+      letterPDFdata,
     } = body;
 
     const resolvedTemplate =
@@ -72,31 +87,70 @@ export async function POST(request: Request) {
       resolvedDocType = "Intern Offer Letter";
     }
 
-    const updatedSecondParty = isContractual
-      ? { ...secondParty, contractualId: partnerId, partnerId }
-      : { ...secondParty, partnerId };
+    if (isContractual) {
+      const issueDate =
+        docSettings?.date?.trim() ||
+        new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
 
-    const updatedDocSettings = {
-      ...docSettings,
-      agreementTemplate: resolvedTemplate,
-      ...(isContractual
-        ? { contractualRefId: agreementId, contractualId: partnerId }
-        : isHrHiring
+      const positionName = secondParty?.position || "Senior Full Stack Developer";
+      const employmentModel = docSettings?.employmentType || "Project-Based Contract";
+      const contractSubject =
+        docSettings?.contractSubject?.trim() ||
+        `${positionName} For A ${employmentModel}`;
+
+      // Strictly the user's requested schema — no companyDetails in DB, no extra fields
+      const contractualPayload = {
+        docType: "Contractual Offer",
+        issueDate,
+        contractRef: agreementId,
+        employmentType: employmentModel,
+        contractSubject,
+        candidateDetails: {
+          employeeId: partnerId,
+          fullName: secondParty?.fullName || "",
+          email: secondParty?.email || "",
+          contactNumber: secondParty?.mobileNumber || "",
+          livingAddress: secondParty?.presentAddress || "",
+          position: positionName,
+          signatureImg: secondParty?.signatureImg || "",
+          signatureDate: secondParty?.signatureImg ? new Date() : null,
+        },
+        isFounderSigned: true,
+        isCandidateSigned: false,
+        status: "PENDING_PARTNER_SIGNATURE",
+        letterPDFdata: letterPDFdata || "",
+        isFinalletterSentToBoth: false,
+      };
+
+      await saveAgreement(contractualPayload);
+    } else {
+      const updatedSecondParty = { ...secondParty, partnerId };
+      const updatedDocSettings = {
+        ...docSettings,
+        agreementTemplate: resolvedTemplate,
+        ...(isHrHiring
           ? { hrNoticeRefId: agreementId, hrNoticeId: partnerId }
           : { internRefId: agreementId, internId: partnerId }),
-    };
+      };
 
-    await saveAgreement({
-      agreementId,
-      partnerId,
-      docType: resolvedDocType,
-      status: "PENDING_PARTNER_SIGNATURE",
-      founderSigned: true,
-      partnerSigned: false,
-      firstParty,
-      secondParty: updatedSecondParty,
-      docSettings: updatedDocSettings,
-    });
+      await saveAgreement({
+        agreementId,
+        partnerId,
+        docType: resolvedDocType,
+        status: isHrHiring ? "FULLY_EXECUTED" : "PENDING_PARTNER_SIGNATURE",
+        founderSigned: true,
+        partnerSigned: isHrHiring ? true : false,
+        signedAt: isHrHiring ? new Date() : undefined,
+        firstParty,
+        secondParty: updatedSecondParty,
+        docSettings: updatedDocSettings,
+        ...(letterPDFdata ? { letterPDFdata } : {}),
+      });
+    }
 
     console.log(`[Next.js API] Agreement saved (${storage}): ${agreementId}`);
     return NextResponse.json({

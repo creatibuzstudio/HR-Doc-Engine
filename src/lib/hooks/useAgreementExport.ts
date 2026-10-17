@@ -92,10 +92,11 @@ export function useAgreementExport({
           return;
         }
 
-        const res = await fetch(`/api/offers/${offerId}/sign`, {
+        const res = await fetch(`/api/offers/sign`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            offerId,
             signatureImg: secondParty.signatureImg,
             letterPDFdata: pdfData,
           }),

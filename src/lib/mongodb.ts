@@ -26,7 +26,7 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      dbName: "jevxo-doc-engine",
+      dbName: process.env.MONGODB_DB_NAME || "HR-Doc-Engine_CBS",
       // Raised from 5 s → 30 s to handle Atlas cold-start / serverless wake-up
       serverSelectionTimeoutMS: 30000,
       connectTimeoutMS: 30000,

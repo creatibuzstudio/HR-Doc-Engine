@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       if (hrName) candidateName = hrName;
     }
 
-    const ctaLink = `${getBaseUrl()}/?candidateView=${offerId}`;
+    const ctaLink = `${getBaseUrl()}/?candidateView=${encodeURIComponent(offerId)}`;
     const sender = getResendFromAddress();
 
     const subject = isContractual

@@ -21,7 +21,7 @@ export async function POST(
     }
 
     const { firstParty, secondParty, docSettings } = agreement;
-    const ctaLink = `${getBaseUrl()}/?candidateView=${id}`;
+    const ctaLink = `${getBaseUrl()}/?candidateView=${encodeURIComponent(id)}`;
     const company = firstParty.companyName || "Creatibuz Studio";
 
     const emailHtml = `

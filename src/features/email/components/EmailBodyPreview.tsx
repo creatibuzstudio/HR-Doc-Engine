@@ -188,8 +188,9 @@ export function EmailBodyPreview({
       </div>
 
       <p>
-        Should you have any questions, feel free to contact us at{" "}
-        {firstParty.mobileNumber} or reply directly to this email.
+        Should you have any questions or need support, please contact{" "}
+        <strong className="text-primary font-bold">support@creatibuzstudio.com</strong> or call{" "}
+        {firstParty.mobileNumber || "+8801968657353"}.
       </p>
       <p className="pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">
         Best Regards,

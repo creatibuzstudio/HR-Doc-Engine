@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 const DEFAULT_BASE_URL = "http://localhost:3000";
-const DEFAULT_FROM_ADDRESS = "Creatibuz Studio <info@creatibuzstudio.com>";
+const DEFAULT_FROM_ADDRESS = "Creatibuz Studio <hr@creatibuzstudio.com>";
 const DEFAULT_FOUNDER_EMAIL = "info@creatibuzstudio.com";
 
 function isUsableEmail(value: string | undefined): value is string {

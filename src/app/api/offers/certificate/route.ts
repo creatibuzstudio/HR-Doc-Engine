@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       secondParty,
       docSettings,
       docType = "Intern Certificate",
+      letterPDFdata,
     } = body;
 
     // Generate unique sequential IDs for the certificate
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
       firstParty,
       secondParty,
       docSettings: certificateDocSettings,
+      ...(letterPDFdata ? { letterPDFdata } : {}),
     });
 
     // Mutate the original internship agreement to keep details perfectly synced

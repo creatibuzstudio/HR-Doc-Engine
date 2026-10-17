@@ -9,7 +9,7 @@ import { FirstPartyTab, SecondPartyTab } from "./sidebar/PartiesTab";
 // ─── Main sidebar tabs configuration ─────────────────────────────────────────
 const CONTRACT_TABS = [
   { id: "settings", label: "Contract Terms", icon: Settings },
-  { id: "secondParty", label: "Contractor Info", icon: User },
+  { id: "secondParty", label: "Candidate Info", icon: User },
   { id: "firstParty", label: "Issuer (Creatibuz)", icon: BookOpen },
 ];
 

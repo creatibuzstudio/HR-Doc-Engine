@@ -7,10 +7,17 @@ async function ensureDir() {
   await fs.mkdir(DATA_DIR, { recursive: true });
 }
 
+function toSafeFilename(id: string): string {
+  return `${id.replace(/[/\\?%*:|"<>]/g, "_")}.json`;
+}
+
 export async function fileSaveAgreement(agreement: Record<string, unknown>) {
   await ensureDir();
-  const id = agreement.agreementId as string;
-  const filePath = path.join(DATA_DIR, `${id}.json`);
+  const id =
+    (agreement.contractRef as string) ||
+    (agreement.agreementId as string) ||
+    "unknown";
+  const filePath = path.join(DATA_DIR, toSafeFilename(id));
   const payload = {
     ...agreement,
     createdAt: agreement.createdAt || new Date().toISOString(),
@@ -23,13 +30,19 @@ export async function fileSaveAgreement(agreement: Record<string, unknown>) {
 export async function fileFindAgreement(id: string) {
   await ensureDir();
   try {
-    const filePath = path.join(DATA_DIR, `${id}.json`);
+    const filePath = path.join(DATA_DIR, toSafeFilename(id));
     const raw = await fs.readFile(filePath, "utf-8");
     return JSON.parse(raw);
   } catch {
     const all = await fileListAgreements();
     return (
-      all.find((a) => a.agreementId === id || a.partnerId === id) || null
+      all.find(
+        (a) =>
+          a.contractRef === id ||
+          a.agreementId === id ||
+          a.partnerId === id ||
+          a.candidateDetails?.employeeId === id,
+      ) || null
     );
   }
 }

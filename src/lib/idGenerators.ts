@@ -1,5 +1,5 @@
 import dbConnect from "./mongodb";
-import Agreement from "./models/Agreement";
+import { getAllAgreementModels } from "./models/Agreement";
 import * as fileStore from "./fileAgreementStore";
 
 async function tryMongo<T>(fn: () => Promise<T>): Promise<T | null> {
@@ -16,16 +16,14 @@ async function tryMongo<T>(fn: () => Promise<T>): Promise<T | null> {
 }
 
 function extractMaxSeq(
-  items: { agreementId?: string }[],
+  items: { agreementId?: string; contractRef?: string }[],
   prefix: string,
 ): number {
   let max = 0;
   for (const item of items) {
-    if (
-      typeof item.agreementId === "string" &&
-      item.agreementId.startsWith(prefix)
-    ) {
-      const parts = item.agreementId.split(/[-/]/);
+    const val = item.contractRef || item.agreementId;
+    if (typeof val === "string" && val.startsWith(prefix)) {
+      const parts = val.split(/[-/]/);
       const seq = parseInt(parts[parts.length - 1], 10);
       if (!isNaN(seq) && seq > max) max = seq;
     }
@@ -36,10 +34,21 @@ function extractMaxSeq(
 async function generatePrefixedIdPair(refPrefix: string, entityPrefix: string) {
   const escapedPrefix = refPrefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const mongoResult = await tryMongo(async () => {
-    const docs = await Agreement.find(
-      { agreementId: new RegExp(`^${escapedPrefix}`) },
-      "agreementId",
+    const models = getAllAgreementModels();
+    const results = await Promise.all(
+      models.map(({ model }) =>
+        model.find(
+          {
+            $or: [
+              { contractRef: new RegExp(`^${escapedPrefix}`) },
+              { agreementId: new RegExp(`^${escapedPrefix}`) },
+            ],
+          },
+          "contractRef agreementId",
+        ),
+      ),
     );
+    const docs = results.flat();
     const maxSeq = extractMaxSeq(docs, refPrefix);
     const seq = (maxSeq + 1).toString().padStart(3, "0");
     return {
