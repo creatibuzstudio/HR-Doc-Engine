@@ -61,21 +61,20 @@ export default function ContractualFormWizard({
           employmentType: p.employmentType || "Project-Based Contract",
           contractSubject:
             p.contractSubject ||
-            `Subject: ${secondParty.position || "Full Stack Developer"} For A ${
-              p.employmentType || "Project-Based Contract"
+            `Subject: ${secondParty.position || "Full Stack Developer"} For A ${p.employmentType || "Project-Based Contract"
             }`,
           scopeOfWork:
             p.scopeOfWork ||
-            "You Agree To Complete The Assigned Tasks, Deliverables, Revisions, And Documentation Specified In The Approved Project Scope. Any Substantial Change To The Scope, Timeline, Or Deliverables Must Be Approved By Both Parties Before Implementation.",
+            "Assigned deliverables will be completed per the approved project scope. Substantial scope, timeline, or deliverable changes require prior mutual approval.",
           compensationDetails:
             p.compensationDetails ||
-            "The Agency Will Pay The Agreed Project Fee According To The Payment Schedule Specified In This Offer. Payment Milestones, Acceptance Criteria, And Any Applicable Deductions Must Be Agreed Upon In Writing. Approved Additional Work May Be Compensated Separately.",
+            "The Agency will issue payments per the agreed schedule, milestones, and written acceptance criteria. Approved out-of-scope work will be compensated separately.",
           confidentialityTerms:
             p.confidentialityTerms ||
-            "You Must Protect All Confidential Information, Client Data, Credentials, Business Documents, Project Files, And Internal Communications. Such Information Must Not Be Disclosed, Misused, Or Shared With Unauthorized Individuals During Or After The Engagement, Subject To Applicable Law.",
+            "All confidential information, client data, credentials, and project assets must remain strictly protected and non-disclosed to unauthorized parties during and after the engagement, per applicable law.",
           ipOwnershipTerms:
             p.ipOwnershipTerms ||
-            "Ownership And Transfer Of Project Deliverables, Including Designs, Source Files, Code, And Other Work Products, Will Be Governed By The Written Agreement And Applicable Law. Unless Otherwise Agreed, The Transfer Of Ownership To The Agency Or Its Client Will Take Effect Upon Receipt Of The Agreed Payment For The Relevant Deliverables. Pre-Existing Tools, Third-Party Assets, And Properly Licensed Materials Remain Subject To Their Applicable Rights And Licenses.",
+            "Ownership of deliverables transfers upon receipt of full payment for the relevant work. Pre-existing tools, third-party assets, and licensed materials remain subject to their respective rights and licenses.",
         }));
       })
       .catch(console.error);
@@ -114,9 +113,8 @@ export default function ContractualFormWizard({
           {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
             <div
               key={idx}
-              className={`h-full flex-1 transition-all duration-300 ${
-                idx + 1 <= activeStep ? "bg-primary" : "bg-transparent"
-              } ${idx < TOTAL_STEPS - 1 ? "border-r border-border" : ""}`}
+              className={`h-full flex-1 transition-all duration-300 ${idx + 1 <= activeStep ? "bg-primary" : "bg-transparent"
+                } ${idx < TOTAL_STEPS - 1 ? "border-r border-border" : ""}`}
             />
           ))}
         </div>
@@ -126,13 +124,12 @@ export default function ContractualFormWizard({
           {STEP_LABELS.map((label, idx) => (
             <span
               key={idx}
-              className={`text-[10px] font-bold px-3 py-1 rounded-full border transition ${
-                idx + 1 === activeStep
-                  ? "bg-primary border-primary text-primary-foreground"
-                  : idx + 1 < activeStep
+              className={`text-[10px] font-bold px-3 py-1 rounded-full border transition ${idx + 1 === activeStep
+                ? "bg-primary border-primary text-primary-foreground"
+                : idx + 1 < activeStep
                   ? "bg-secondary border-border text-primary"
                   : "bg-secondary/40 border-border text-muted-foreground"
-              }`}
+                }`}
             >
               {idx + 1 < activeStep ? (
                 <span className="inline-flex items-center gap-1">

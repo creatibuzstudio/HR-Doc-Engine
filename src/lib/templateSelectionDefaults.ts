@@ -81,21 +81,20 @@ export function getTemplateSelectionConfig(
       employmentType: prev.employmentType || "Project-Based Contract",
       contractSubject:
         prev.contractSubject ||
-        `Subject: ${secondParty.position || "Full Stack Developer"} For A ${
-          prev.employmentType || "Project-Based Contract"
+        `Subject: ${secondParty.position || "Full Stack Developer"} For A ${prev.employmentType || "Project-Based Contract"
         }`,
       scopeOfWork:
         prev.scopeOfWork ||
-        "You Agree To Complete The Assigned Tasks, Deliverables, Revisions, And Documentation Specified In The Approved Project Scope. Any Substantial Change To The Scope, Timeline, Or Deliverables Must Be Approved By Both Parties Before Implementation.",
+        "Assigned deliverables will be completed per the approved project scope. Substantial scope, timeline, or deliverable changes require prior mutual approval.",
       compensationDetails:
         prev.compensationDetails ||
-        "The Agency Will Pay The Agreed Project Fee According To The Payment Schedule Specified In This Offer. Payment Milestones, Acceptance Criteria, And Any Applicable Deductions Must Be Agreed Upon In Writing. Approved Additional Work May Be Compensated Separately.",
+        "The Agency will issue payments per the agreed schedule, milestones, and written acceptance criteria. Approved out-of-scope work will be compensated separately.",
       confidentialityTerms:
         prev.confidentialityTerms ||
-        "You Must Protect All Confidential Information, Client Data, Credentials, Business Documents, Project Files, And Internal Communications. Such Information Must Not Be Disclosed, Misused, Or Shared With Unauthorized Individuals During Or After The Engagement, Subject To Applicable Law.",
+        "All confidential information, client data, credentials, and project assets must remain strictly protected and non-disclosed to unauthorized parties during and after the engagement, per applicable law.",
       ipOwnershipTerms:
         prev.ipOwnershipTerms ||
-        "Ownership And Transfer Of Project Deliverables, Including Designs, Source Files, Code, And Other Work Products, Will Be Governed By The Written Agreement And Applicable Law. Unless Otherwise Agreed, The Transfer Of Ownership To The Agency Or Its Client Will Take Effect Upon Receipt Of The Agreed Payment For The Relevant Deliverables. Pre-Existing Tools, Third-Party Assets, And Properly Licensed Materials Remain Subject To Their Applicable Rights And Licenses.",
+        "Ownership of deliverables transfers upon receipt of full payment for the relevant work. Pre-existing tools, third-party assets, and licensed materials remain subject to their respective rights and licenses.",
     },
   };
 }

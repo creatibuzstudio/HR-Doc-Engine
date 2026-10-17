@@ -24,7 +24,7 @@ export default function ContractualOfferSignatures({
   email,
 }: ContractualOfferSignaturesProps) {
   return (
-    <div className="relative z-10 pt-4 pb-2 border-t border-[#E2E8F0] mt-3">
+    <div className="relative z-10 pt-4 border-t border-[#E2E8F0] mt-3">
       <div className="flex items-end justify-between gap-6">
         {/* Dual Signature Area */}
         <div className="flex items-end gap-10">
