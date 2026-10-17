@@ -1,7 +1,10 @@
 export const siteConfig = {
   name: "Creatibuz Studio",
   description: "Official Document & Agreement Engine for Creatibuz Studio.",
-  url: process.env.BASE_URL || "https://www.creatibuzstudio.com",
+  url:
+    process.env.BASE_URL ||
+    process.env.FALLBACK_BASE_URL ||
+    "https://hr-doc-engine.creatibuzstudio.com",
   founder: {
     name: "Md Abdul Hakim",
     role: "Founder & CEO",

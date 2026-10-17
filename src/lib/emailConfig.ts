@@ -9,7 +9,11 @@ function isUsableEmail(value: string | undefined): value is string {
 }
 
 export function getBaseUrl() {
-  return process.env.BASE_URL?.trim() || DEFAULT_BASE_URL;
+  return (
+    process.env.BASE_URL?.trim() ||
+    process.env.FALLBACK_BASE_URL?.trim() ||
+    DEFAULT_BASE_URL
+  );
 }
 
 export function getResendFromAddress() {

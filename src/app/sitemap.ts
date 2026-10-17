@@ -1,7 +1,10 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.BASE_URL || "https://www.creatibuzstudio.com";
+  const baseUrl =
+    process.env.BASE_URL ||
+    process.env.FALLBACK_BASE_URL ||
+    "https://hr-doc-engine.creatibuzstudio.com";
 
   return [
     {

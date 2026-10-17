@@ -1,7 +1,7 @@
 const DEFAULT_ORIGIN =
-  typeof process !== "undefined" && process.env.BASE_URL
-    ? process.env.BASE_URL.replace(/\/$/, "")
-    : "https://www.creatibuzstudio.com";
+  typeof process !== "undefined" && (process.env.BASE_URL || process.env.FALLBACK_BASE_URL)
+    ? (process.env.BASE_URL || process.env.FALLBACK_BASE_URL)!.replace(/\/$/, "")
+    : "https://hr-doc-engine.creatibuzstudio.com";
 
 export function normalizeVerifyId(id: string): string {
   return decodeURIComponent(id).trim();

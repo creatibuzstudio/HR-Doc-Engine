@@ -65,8 +65,8 @@ export default function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
           <div className="cursor-pointer" onClick={onBackToHome}>
             <Logo />
           </div>
-          <h2 className="text-xl font-bold text-foreground mt-4">CEO &amp; Founder Login</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-xl font-bold text-foreground mt-4">Founder &amp; CEO Login</h2>
+          <p className="text-xs text-muted-foreground max-w-[75%]">
             Authenticate to generate and manage official Creatibuz Studio agreements.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="email"
-                placeholder="info@creatibuzstudio.com"
+                placeholder="someone@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
@@ -103,7 +103,7 @@ export default function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
 
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-header-text uppercase tracking-wide">
-              Security Token / Password
+              Password
             </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
