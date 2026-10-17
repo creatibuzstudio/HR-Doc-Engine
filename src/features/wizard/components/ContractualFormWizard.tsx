@@ -57,6 +57,11 @@ export default function ContractualFormWizard({
         setDocSettings((p) => ({
           ...p,
           refId: data.contractualRefId,
+          contractRefId: data.contractualRefId,
+          contractualRefId: data.contractualRefId,
+          contractRef: data.contractualRefId,
+          contractualId: data.contractualId,
+          contractId: data.contractualId,
           refIdSerial: refSerial,
           employmentType: p.employmentType || "Project-Based Contract",
           contractSubject:

@@ -19,15 +19,19 @@ async function dbConnect() {
     throw new Error("MONGODB_URI is not configured.");
   }
 
-  if (cached.conn) {
+  if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
+  }
+
+  if (cached.conn && cached.conn.connection.readyState !== 1) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false,
+      bufferCommands: true,
       dbName: process.env.MONGODB_DB_NAME || "HR-Doc-Engine_CBS",
-      // Raised from 5 s → 30 s to handle Atlas cold-start / serverless wake-up
       serverSelectionTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       socketTimeoutMS: 45000,
@@ -40,6 +44,7 @@ async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     // Reset so the next request retries the connection
+    cached.conn = null;
     cached.promise = null;
     throw e;
   }

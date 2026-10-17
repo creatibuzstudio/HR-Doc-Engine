@@ -73,8 +73,16 @@ export async function POST(request: Request) {
     } else {
       const generated = await generateContractualIds();
       agreementId =
-        docSettings?.contractualRefId || generated.contractualRefId;
-      partnerId = docSettings?.contractualId || generated.contractualId;
+        docSettings?.contractRef ||
+        docSettings?.contractRefId ||
+        docSettings?.contractualRefId ||
+        docSettings?.refId ||
+        generated.contractualRefId;
+      partnerId =
+        docSettings?.contractualId ||
+        docSettings?.contractId ||
+        secondParty?.partnerId ||
+        generated.contractualId;
       storage = generated.storage;
     }
 
@@ -126,7 +134,8 @@ export async function POST(request: Request) {
         isFinalletterSentToBoth: false,
       };
 
-      await saveAgreement(contractualPayload);
+      const saveRes = await saveAgreement(contractualPayload);
+      if (saveRes?.storage) storage = saveRes.storage;
     } else {
       const updatedSecondParty = { ...secondParty, partnerId };
       const updatedDocSettings = {
@@ -137,7 +146,7 @@ export async function POST(request: Request) {
           : { internRefId: agreementId, internId: partnerId }),
       };
 
-      await saveAgreement({
+      const saveRes = await saveAgreement({
         agreementId,
         partnerId,
         docType: resolvedDocType,
@@ -150,6 +159,7 @@ export async function POST(request: Request) {
         docSettings: updatedDocSettings,
         ...(letterPDFdata ? { letterPDFdata } : {}),
       });
+      if (saveRes?.storage) storage = saveRes.storage;
     }
 
     console.log(`[Next.js API] Agreement saved (${storage}): ${agreementId}`);

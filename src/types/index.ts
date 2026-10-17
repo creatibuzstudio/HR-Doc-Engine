@@ -98,8 +98,11 @@ export interface DocSettings {
   certificateGenerated?: boolean;
   // ── Contractual-specific ─────────────────────────────────────────────────
   contractId?: string;
+  contractualId?: string;
   contractIdSerial?: string;
   contractRefId?: string;
+  contractualRefId?: string;
+  contractRef?: string;
   contractRefIdSerial?: string;
   employmentType?: "Project-Based Contract" | "Full-Time Contract";
   contractSubject?: string;

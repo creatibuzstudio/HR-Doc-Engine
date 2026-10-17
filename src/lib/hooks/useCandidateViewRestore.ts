@@ -45,8 +45,21 @@ export function useCandidateViewRestore({
       .then((data) => {
         setFirstParty(data.firstParty);
         setSecondParty(data.secondParty);
+        const refNo = data.contractRef || data.agreementId || candidateViewId;
+        const empId =
+          data.candidateDetails?.employeeId ||
+          data.partnerId ||
+          data.secondParty?.partnerId;
+
         setDocSettings({
           ...data.docSettings,
+          refId: refNo,
+          contractRefId: refNo,
+          contractualRefId: refNo,
+          contractRef: refNo,
+          contractualId: empId,
+          contractId: empId,
+          partnerId: empId,
           ...(data.signedAt
             ? {
                 partnerSignedDate: new Date(data.signedAt).toLocaleDateString(
@@ -81,8 +94,21 @@ export function useCandidateViewRestore({
           try {
             const data = JSON.parse(stored);
             setFirstParty(data.firstParty);
-            setSecondParty(data.secondParty);
-            setDocSettings(data.docSettings);
+            const refNo = data.contractRef || data.agreementId || candidateViewId;
+            const empId =
+              data.candidateDetails?.employeeId ||
+              data.partnerId ||
+              data.secondParty?.partnerId;
+            setDocSettings({
+              ...data.docSettings,
+              refId: refNo,
+              contractRefId: refNo,
+              contractualRefId: refNo,
+              contractRef: refNo,
+              contractualId: empId,
+              contractId: empId,
+              partnerId: empId,
+            });
             setAgreementTemplate(
               (data.agreementTemplate as AgreementTemplate) ||
                 data.docSettings?.agreementTemplate ||

@@ -49,7 +49,12 @@ function normalizeDoc(doc: Record<string, any> | null): Record<string, any> | nu
       docSettings: {
         agreementTemplate: "contractual",
         contractualRefId: doc.contractRef,
+        contractRefId: doc.contractRef,
+        refId: doc.contractRef,
+        contractRef: doc.contractRef,
         contractualId: candidate.employeeId,
+        contractId: candidate.employeeId,
+        partnerId: candidate.employeeId,
         employmentType: doc.employmentType || "Project-Based Contract",
         contractSubject: doc.contractSubject || "",
         date: doc.issueDate || "",
@@ -81,6 +86,30 @@ export async function saveAgreement(data: Record<string, unknown>) {
   return { agreement: normalizeDoc(fileDoc), storage: "file" as const };
 }
 
+export async function syncFileToMongoIfMissing(fileDoc: Record<string, any>) {
+  if (!fileDoc) return;
+  const ref = fileDoc.contractRef || fileDoc.agreementId;
+  if (!ref) return;
+
+  await tryMongo(async () => {
+    const models = getAllAgreementModels();
+    for (const { model } of models) {
+      const existing = await model.findOne({
+        $or: [
+          { contractRef: ref },
+          { agreementId: ref },
+          { "candidateDetails.employeeId": ref },
+        ],
+      });
+      if (existing) return;
+    }
+    const Model = getAgreementModel(fileDoc.docType || fileDoc.agreementTemplate);
+    const doc = new Model(fileDoc);
+    await doc.save();
+    console.log(`[sync] Successfully synced local offer to MongoDB: ${ref}`);
+  });
+}
+
 export async function findAgreementById(id: string) {
   const normalized = decodeURIComponent(id).trim();
 
@@ -101,10 +130,20 @@ export async function findAgreementById(id: string) {
   });
 
   if (mongoDoc) return normalizeDoc(mongoDoc);
-  return normalizeDoc(await fileStore.fileFindAgreement(normalized));
+
+  const fileDoc = await fileStore.fileFindAgreement(normalized);
+  if (fileDoc) {
+    syncFileToMongoIfMissing(fileDoc).catch((err) =>
+      console.warn("[sync] Background sync failed:", err.message),
+    );
+    return normalizeDoc(fileDoc);
+  }
+  return null;
 }
 
 export async function listAgreements() {
+  const fileList = await fileStore.fileListAgreements();
+
   const mongoList = await tryMongo(async () => {
     const models = getAllAgreementModels();
     const results = await Promise.all(
@@ -127,12 +166,29 @@ export async function listAgreements() {
       .filter((d): d is Record<string, any> => d !== null);
   });
 
-  if (mongoList) return mongoList;
+  if (mongoList) {
+    // If local files exist that are missing from MongoDB, sync them
+    const mongoIds = new Set(
+      mongoList
+        .map((m) => m.contractRef || m.agreementId)
+        .filter(Boolean),
+    );
+
+    for (const f of fileList) {
+      const fId = f.contractRef || f.agreementId;
+      if (fId && !mongoIds.has(fId)) {
+        syncFileToMongoIfMissing(f).catch(() => {});
+        const normalized = normalizeDoc(f);
+        if (normalized) mongoList.push(normalized);
+      }
+    }
+
+    return mongoList;
+  }
 
   console.warn(
     "[listAgreements] MongoDB unavailable — serving local file store.",
   );
-  const fileList = await fileStore.fileListAgreements();
   return fileList
     .map(
       ({ letterPDFdata: _letter, cardPDFdata: _card, ...rest }) =>

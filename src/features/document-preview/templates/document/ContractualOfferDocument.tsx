@@ -147,8 +147,17 @@ export default function ContractualOfferDocument({
           phone={phone}
           website={website}
           email={email}
-          idNo={secondParty.partnerId}
-          refNo={settings.refId}
+          idNo={
+            secondParty.partnerId ||
+            settings.contractualId ||
+            settings.contractId
+          }
+          refNo={
+            settings.contractRef ||
+            settings.contractRefId ||
+            settings.contractualRefId ||
+            settings.refId
+          }
         />
       </div>
 
