@@ -1,285 +1,213 @@
-# JEVXO Automated Appointment Letter & Partnership Agreement System
+# 📄 HR-Doc-Engine — Creatibuz Studio
 
-A modern HR automation platform developed for JEVXO to streamline partner onboarding, appointment letter generation, partnership agreements, digital signatures, employee ID card generation, PDF export, and email-based document delivery.
+<div align="center">
 
----
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)
+![Resend](https://img.shields.io/badge/Resend-Email_API-000000?style=for-the-badge&logo=resend)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-## Overview
+**Next-Generation HR Automation Platform for Contractual Offers, Digital Signatures, and Verified Document Delivery**
 
-The JEVXO Automated Documentation System enables founders and administrators to generate legally structured onboarding documents, collect digital signatures, and distribute agreements electronically through a secure workflow.
-
-The platform eliminates manual document preparation and provides a scalable onboarding process for future partners, employees, and stakeholders.
-
----
-
-## Core Features
-
-### Appointment Letter Generation
-
-Generate professional appointment letters dynamically using partner information.
-
-Supported Fields:
-
-* Partner Name
-* Position / Role
-* Date of Birth
-* National ID
-* Mobile Number
-* Email Address
-* Present Address
-* Permanent Address
-* Guardian Information
-* Equity Percentage
-* Probation Period
-* Notice Period
+[Overview](#-overview) • [Core Features](#-core-features) • [Workflow](#-system-workflow) • [Tech Stack](#-technology-stack) • [Environment Setup](#-environment-variables) • [Getting Started](#-getting-started) • [API Routes](#-api-reference)
 
 ---
 
-### Partnership Agreement Generation
+</div>
 
-Automatically generate partnership agreements with dynamic company and partner information.
+## 🌟 Overview
+
+**HR-Doc-Engine** is a specialized HR document lifecycle platform developed for **Creatibuz Studio**. It automates the end-to-end recruitment documentation pipeline: from structured contractual offer letter generation, legally binding dual-signature workflows, and cloud database persistence, to automated transactional email notifications powered by **Resend**.
+
+The system completely eliminates manual PDF editing and scattered communications, delivering a seamless corporate experience for both founders and candidates.
 
 ---
 
-### Digital Signature Workflow
+## ✨ Core Features
 
-#### Founder Signature
+### 📝 Contractual Offer Letter & Work Agreement
+- Dynamic, legal-grade contractual agreements tailored for software engineers and corporate team members.
+- Configurable terms including probation period, equity share, notice period, and monthly service compensation.
+- Automated sequence assignment with formatted reference numbers (`CBS/REF-YY/NNN`) and unique Employee IDs (`CBS-EMP-NNN`).
 
-Supports:
+### ✍️ Dual Digital Signature Workflow
+- **Founder Signature**: Pre-rendered or dynamically signed via touch/mouse signature pad, authenticated by company executive seals.
+- **Candidate Signature**: Secured candidate portal allowing candidates to sign directly on any mobile device or desktop without account creation.
+- Exact signature timestamping with full audit-ready tracking.
 
-* Draw Signature
-* Upload Signature Image
+### 🚀 Automated Transactional Email Engine (Resend)
+- **Phase 1 (Invitation)**: Candidates receive a sleek, modern corporate invitation email featuring a personalized one-click portal access link.
+- **Phase 2 (Final Execution)**: Once countersigned by the candidate, the engine automatically attaches the high-resolution finalized PDF and dispatches celebration notices to **both the Founder and Candidate** in real time.
 
-Stored as:
+### 🗄️ Resilient Cloud & Local Data Engine
+- **MongoDB Atlas Primary**: Cloud persistence storing offer status, candidate details, signature milestones, and compiled PDF data.
+- **Fail-Safe Fallback**: Automatic local storage caching ensures zero downtime even during intermittent network drops.
+- **Strict Domain Models**: Clean data models (`CompanyDetails`, `CandidateDetails`, `ContractualOfferData`) free of legacy clutter.
 
-```javascript
-firstParty.signatureImg
+### 🖨️ Precision A4 Corporate PDF Engine
+- Scaled vector rendering using `jsPDF` and `html2canvas-pro`.
+- Multi-page page breaks, official letterhead styling, corporate watermarks, dynamic QR verification codes, and authentic signature blocks.
+
+---
+
+## 🔄 System Workflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Founder as Founder / CEO
+    participant Engine as HR-Doc-Engine (Next.js)
+    participant DB as MongoDB Atlas
+    participant Resend as Resend API
+    actor Candidate as Candidate
+
+    Founder->>Engine: Configure Offer Details & Founder Sign
+    Engine->>DB: Save Offer (Status: PENDING_CANDIDATE_SIGNATURE)
+    Founder->>Engine: Click "Send Offer"
+    Engine->>Resend: Dispatch Portal Link Email
+    Resend-->>Candidate: Receives Offer Email with Portal Link
+    Candidate->>Engine: Opens /?candidateView={refId}
+    Candidate->>Engine: Reviews Document & Submits Digital Signature
+    Engine->>DB: Update Offer (Status: EXECUTED + Signed At)
+    Engine->>Resend: Dispatch Executed Document + Attached PDF
+    Resend-->>Founder: Execution Notification + Final PDF
+    Resend-->>Candidate: Welcome & Executed Copy + Final PDF
 ```
 
-#### Partner Signature
+---
 
-Partners can digitally sign agreements through a dedicated candidate portal.
+## 🛠️ Technology Stack
 
-Stored as:
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Framework** | [Next.js](https://nextjs.org/) (App Router) | Full-stack React framework with SSR and API routes |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) | Type-safe domain models and strict linting |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) | Modern corporate UI styling and responsive layouts |
+| **Animation** | [Motion](https://motion.dev/) (Framer Motion) | Micro-interactions, animated transitions, and modal dialogs |
+| **Database** | [MongoDB Atlas](https://www.mongodb.com/atlas) + Mongoose | Cloud document database for offer lifecycle storage |
+| **Email Delivery** | [Resend](https://resend.com/) | Transactional email delivery with PDF attachments |
+| **PDF Generation** | `jsPDF` & `html2canvas-pro` | High-fidelity A4 document compilation |
+| **Icons** | [Lucide React](https://lucide.dev/) | Clean corporate UI iconography |
 
-```javascript
-secondParty.signatureImg
+---
+
+## ⚙️ Environment Variables
+
+Create a single `.env` file in the project root with the following configuration:
+
+```env
+# ─── Application Configuration ────────────────────────────────────────────────
+PORT=3000
+NODE_ENV=development
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# ─── Resend Transactional Email API ──────────────────────────────────────────
+RESEND_API_KEY=re_your_api_key_here
+RESEND_FROM_EMAIL=Creatibuz Studio <hr@creatibuzstudio.com>
+FOUNDER_EMAIL=founder@creatibuzstudio.com
+
+# ─── MongoDB Atlas Database ──────────────────────────────────────────────────
+# Ensure database name is explicitly declared (HR-Doc-Engine_CBS)
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/HR-Doc-Engine_CBS?retryWrites=true&w=majority
+```
+
+> [!IMPORTANT]
+> The `.env` file is git-ignored by default. Never commit production API keys or database connection strings to public repositories.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- **Node.js**: `v18.17.0` or higher
+- **npm** or **yarn** or **pnpm**
+- **MongoDB Atlas** cluster URL
+
+### 2. Installation
+```bash
+# Clone the repository
+git clone https://github.com/creatibuzstudio/HR-Doc-Engine.git
+
+# Navigate into the project directory
+cd HR-Doc-Engine
+
+# Install dependencies
+npm install
+```
+
+### 3. Run the Development Server
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to access the application.
+
+### 4. Build for Production
+```bash
+npm run build
+npm run start
 ```
 
 ---
 
-### PDF Generation
+## 🔌 API Reference
 
-Generate production-ready A4 PDFs using:
-
-* jsPDF
-* html2canvas-pro
-
-Features:
-
-* Multi-page document rendering
-* Watermark support
-* Dynamic signatures
-* Corporate document formatting
-* High-resolution export
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/offers` | `POST` | Saves or updates a contractual offer in MongoDB Atlas. |
+| `/api/offers?id={ref}` | `GET` | Fetches an agreement by `contractRef` or `_id`. |
+| `/api/send-offer-email` | `POST` | Sends the candidate portal invitation link via Resend. |
+| `/api/offers/[id]/sign` | `POST` | Submits candidate signature, compiles executed PDF, and triggers celebration emails. |
+| `/api/check-id` | `GET` | Verifies whether a given reference number or employee ID already exists. |
 
 ---
 
-### Employee ID Card Generator
-
-Generate employee ID cards directly from onboarding information.
-
-Front Side:
-
-* Employee Photo
-* Employee Name
-* Position
-* Blood Group
-* Employee ID
-* Employee Verification QR
-
-Back Side:
-
-* Company Information
-* Verification QR
-* Important Information
-
-Export Formats:
-
-* PDF
-* PNG
-
----
-
-### Candidate Portal
-
-Secure onboarding experience for candidates.
-
-Features:
-
-* No login required
-* Personalized invitation links
-* View appointment documents
-* Sign agreements digitally
-* Download countersigned PDF
-
-URL Structure:
+## 📂 Project Architecture
 
 ```txt
-/?candidateView={token}
+src/
+├── app/                        # Next.js App Router & API routes
+│   ├── api/
+│   │   ├── check-id/           # ID validation endpoints
+│   │   ├── offers/             # Offer creation, retrieval & signing
+│   │   └── send-offer-email/   # Resend email dispatch route
+│   ├── layout.tsx              # Root HTML layout and metadata
+│   └── page.tsx                # Main application entry point
+├── components/                 # Reusable UI components & layouts
+├── data/                       # Default configurations & demo constants
+│   └── defaults.ts             # Company & candidate baseline details
+├── features/                   # Domain-driven feature modules
+│   ├── admin/                  # Management dashboard & preview modal
+│   ├── auth/                   # Authentication & founder login
+│   ├── candidate-portal/       # Candidate signing interface
+│   ├── doc-select/             # Document type selector
+│   ├── document-preview/       # Live A4 document templates & previewers
+│   ├── email/                  # Email previewers & dispatch modals
+│   └── wizard/                 # Multi-step offer creation wizard
+├── lib/                        # Core utilities & service providers
+│   ├── agreementStore.ts       # MongoDB & local store abstraction layer
+│   ├── emailConfig.ts          # Resend client initializer
+│   ├── emailOfferTemplates.ts   # Responsive HTML email templates
+│   ├── idGenerators.ts         # CBS/REF & CBS-EMP sequence generators
+│   └── mongodb.ts              # Mongoose connection pool manager
+└── types/                      # TypeScript interface declarations
+    └── index.ts                # Domain models & document state types
 ```
 
 ---
 
-### Email Delivery System
+## 🏢 Organization
 
-Integrated with Resend Email API.
+**Creatibuz Studio**  
+*Building cutting-edge digital experiences and enterprise tools.*
 
-Capabilities:
-
-* Direct document invitation emails
-* Personalized onboarding links
-* Automated candidate communication
-* Company-branded email delivery
-
-Supported Sender:
-
-```txt
-info@jevxo.com
-```
-
-Fallback Sender:
-
-```txt
-onboarding@resend.dev
-```
+* **Website**: [www.creatibuzstudio.com](https://www.creatibuzstudio.com)
+* **Email**: [info@creatibuzstudio.com](mailto:info@creatibuzstudio.com)
+* **Office**: Delduar Road, Tangail Shadar, Dhaka, Bangladesh
 
 ---
 
-## Technology Stack
+## 📄 License
 
-### Frontend
-
-* Next.js
-* TypeScript
-* Tailwind CSS v4
-
-### UI & Animations
-
-* Lucide React
-* Framer Motion
-
-### Document Generation
-
-* jsPDF
-* html2canvas-pro
-
-### Email Service
-
-* Resend API
-
-### QR Generation
-
-* qrcode.react
-
----
-
-## Workflow
-
-### Founder Workflow
-
-```txt
-Login
-    ↓
-Fill Partner Information
-    ↓
-Configure Agreement Terms
-    ↓
-Attach Founder Signature
-    ↓
-Generate Documents
-    ↓
-Send Offer Email
-```
-
----
-
-### Candidate Workflow
-
-```txt
-Receive Email
-    ↓
-Open Invitation Link
-    ↓
-Review Documents
-    ↓
-Provide Signature
-    ↓
-Download Signed PDF
-```
-
----
-
-## Local Storage Strategy
-
-Document data is temporarily stored using:
-
-```txt
-jevxo_offer_{id}
-```
-
-Stored Data:
-
-* First Party Information
-* Second Party Information
-* Document Settings
-* Signature Assets
-
----
-
-## Security Notes
-
-* Founder workspace is login protected.
-* Candidate access is token based.
-* Sensitive API keys should be stored in environment variables.
-* Production deployment should use secure backend APIs instead of exposing secret keys in frontend code.
-
----
-
-## Future Roadmap
-
-### Phase 2
-
-* Database Integration
-* Employee Management Dashboard
-* Verification Portal
-* Automated Employee IDs
-* Offer Tracking System
-* HR Analytics
-
-### Phase 3
-
-* Multi-Company Support
-* E-Signature Audit Logs
-* Partner Performance Tracking
-* Equity Management Dashboard
-* Document Versioning
-
----
-
-## Developed For
-
-JEVXO
-
-- A global subscription-based digital business ecosystem.
-
-Official Email:
-[info@jevxo.com](mailto:info@jevxo.com)
-
----
-
-## License
-
-Internal Proprietary Software
-
-This software is developed exclusively for JEVXO and is not intended for public redistribution without authorization.
+This repository and its codebase are **proprietary and confidential** to **Creatibuz Studio**. Unauthorized copying, redistribution, or modification is strictly prohibited.
