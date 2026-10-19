@@ -59,14 +59,16 @@ export default function ContractualOfferDocument({
 
       {/* ── BODY CONTENT ──────────────────────────────────────────────────── */}
       <div className="relative px-12.5 pt-8.5 pb-7.5 flex-1 flex flex-col justify-between">
-        {/* Subtle Watermark in background */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 w-[340px] h-[340px] pointer-events-none opacity-[0.045] select-none z-0">
+        {/* Subtle Central Watermark in background */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] pointer-events-none opacity-10 select-none z-0 flex items-center justify-center">
           <Image
-            src="/creatibuz-symbol.png"
-            alt="Watermark"
-            width={340}
-            height={340}
-            className="w-full h-full object-contain"
+            src="/watermark.png"
+            alt="Creatibuz Watermark"
+            width={420}
+            height={420}
+            priority
+            unoptimized
+            className="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
 
