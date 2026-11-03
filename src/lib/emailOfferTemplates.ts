@@ -405,7 +405,7 @@ export function renderFinalExecutedEmail({
             </td>
             <td align="right" valign="top">
               <span style="background-color: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #22c55e; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;">
-                &check; Fully Executed
+                Fully Executed
               </span>
             </td>
           </tr>
@@ -447,7 +447,7 @@ export function renderFinalExecutedEmail({
             <tr>
               <td style="padding: 5px 0; font-weight: 600;">Status:</td>
               <td style="padding: 5px 0; text-align: right; font-weight: 700; color: #16A34A;">
-                &check; Dual-Signed &amp; Legally Binding
+                Dual-Signed &amp; Legally Binding
               </td>
             </tr>
             <tr>
