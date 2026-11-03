@@ -68,25 +68,32 @@ export function DataCacheProvider({ children }: { children: React.ReactNode }) {
 
     const fetchAgreements = useCallback(async (): Promise<AgreementSummary[]> => {
         const res = await fetch("/api/offers");
-        if (!res.ok) throw new Error("Failed to load agreements.");
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(data.error || data.message || "Failed to load agreements.");
+        }
         return (data.agreements as AgreementSummary[]) || [];
     }, []);
 
     const fetchNextIds = useCallback(async (): Promise<NextIds> => {
         const res = await fetch("/api/check-id?action=next");
-        if (!res.ok) throw new Error("Failed to fetch next IDs.");
-        return res.json() as Promise<NextIds>;
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(data.error || data.message || "Failed to fetch next IDs.");
+        }
+        return data as NextIds;
     }, []);
 
     const fetchInternsList = useCallback(async (): Promise<InternOption[]> => {
         const res = await fetch("/api/offers/interns-list");
-        if (!res.ok) throw new Error("Failed to fetch interns list.");
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(data.error || data.message || "Failed to fetch interns list.");
+        }
         return (data.internsList as InternOption[]) || [];
     }, []);
 
-    /** Fire requests in parallel right after login. */
+    /** Fire requests in parallel right after login with resilient allSettled. */
     const prefetch = useCallback(async () => {
         if (prefetchedRef.current) return; // already done — don't re-fetch
         prefetchedRef.current = true;
@@ -95,12 +102,21 @@ export function DataCacheProvider({ children }: { children: React.ReactNode }) {
         setPrefetchError(null);
 
         try {
-            const [agreements, nextIds, internsList] = await Promise.all([
+            const [agreementsRes, nextIdsRes, internsListRes] = await Promise.allSettled([
                 fetchAgreements(),
                 fetchNextIds(),
                 fetchInternsList(),
             ]);
-            setCache({ agreements, nextIds, internsList });
+
+            setCache((prev) => ({
+                agreements: agreementsRes.status === "fulfilled" ? agreementsRes.value : prev.agreements,
+                nextIds: nextIdsRes.status === "fulfilled" ? nextIdsRes.value : prev.nextIds,
+                internsList: internsListRes.status === "fulfilled" ? internsListRes.value : prev.internsList,
+            }));
+
+            if (agreementsRes.status === "rejected") {
+                setPrefetchError((agreementsRes.reason as Error)?.message ?? "Failed to load agreements.");
+            }
         } catch (err: unknown) {
             setPrefetchError((err as Error).message ?? "Prefetch failed.");
             prefetchedRef.current = false; // allow retry on next attempt
@@ -127,7 +143,9 @@ export function DataCacheProvider({ children }: { children: React.ReactNode }) {
             // Allow prefetch to re-run if called again (e.g. after logout/login)
             prefetchedRef.current = false;
         } catch (err: unknown) {
-            setPrefetchError((err as Error).message ?? "Refresh failed.");
+            const msg = (err as Error).message ?? "Refresh failed.";
+            setPrefetchError(msg);
+            throw err;
         }
     }, [fetchAgreements]);
 

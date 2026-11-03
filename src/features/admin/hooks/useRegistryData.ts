@@ -60,14 +60,19 @@ function matchesDocType(a: AgreementSummary, docType: DocTypeFilter): boolean {
   return true;
 }
 
+function isExecutedStatus(status: string): boolean {
+  return status === "FULLY_EXECUTED" || status === "FINALISED";
+}
+
 function matchesStatus(a: AgreementSummary, status: StatusFilter): boolean {
   if (status === "all") return true;
   // HR hiring notices have no signing flow — treat them as always executed
   const isHrHiring =
     a.agreementTemplate === "hrHiringNotice" ||
     a.docType === "HR Hiring Notice";
-  if (status === "pending") return !isHrHiring && a.status !== "FULLY_EXECUTED";
-  if (status === "executed") return isHrHiring || a.status === "FULLY_EXECUTED";
+  const executed = isHrHiring || isExecutedStatus(a.status) || a.partnerSigned === true;
+  if (status === "pending") return !executed;
+  if (status === "executed") return executed;
   return true;
 }
 
@@ -108,23 +113,35 @@ export function useRegistryData() {
   const loading =
     cache.agreements === null ? isPrefetching || localLoading : false;
 
-  // Only fetch locally when cache is empty AND prefetch hasn't started
-  useEffect(() => {
-    if (cache.agreements !== null || isPrefetching) return;
+  const loadAgreementsDirectly = useCallback(async () => {
     setLocalLoading(true);
     setError("");
-    fetch("/api/offers")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load agreements.");
-        return res.json();
-      })
-      .then((data) => setLocalAgreements(data.agreements || []))
-      .catch((e: unknown) =>
-        setError((e as Error).message || "Failed to load agreements."),
-      )
-      .finally(() => setLocalLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    try {
+      const res = await fetch("/api/offers");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to load agreements.");
+      }
+      const list = (data.agreements as AgreementSummary[]) || [];
+      setLocalAgreements(list);
+      if (data.meta?.mongoConfigured === false && list.length === 0) {
+        setError(
+          "MongoDB Atlas connection string (MONGODB_URI) is not configured in .env.local. The dashboard is currently connected to empty local file storage. Please configure MONGODB_URI to load your cloud database agreements.",
+        );
+      }
+    } catch (e: unknown) {
+      setError((e as Error).message || "Failed to load agreements.");
+    } finally {
+      setLocalLoading(false);
+    }
   }, []);
+
+  // Fetch when cache is empty and prefetch is not actively running
+  useEffect(() => {
+    if (cache.agreements === null && !isPrefetching) {
+      void loadAgreementsDirectly();
+    }
+  }, [cache.agreements, isPrefetching, loadAgreementsDirectly]);
 
   const reload = useCallback(async () => {
     setError("");
@@ -173,16 +190,20 @@ export function useRegistryData() {
     return { list: paginated, total, totalPages, safePage };
   }, [allAgreements, filters]);
 
-  const stats = useMemo(
-    () => ({
+  const stats = useMemo(() => {
+    const executed = allAgreements.filter(
+      (a) =>
+        a.agreementTemplate === "hrHiringNotice" ||
+        a.docType === "HR Hiring Notice" ||
+        isExecutedStatus(a.status) ||
+        a.partnerSigned === true,
+    ).length;
+    return {
       total: allAgreements.length,
-      pending: allAgreements.filter((a) => a.status !== "FULLY_EXECUTED")
-        .length,
-      executed: allAgreements.filter((a) => a.status === "FULLY_EXECUTED")
-        .length,
-    }),
-    [allAgreements],
-  );
+      pending: Math.max(0, allAgreements.length - executed),
+      executed,
+    };
+  }, [allAgreements]);
 
   return {
     loading,

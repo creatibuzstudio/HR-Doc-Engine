@@ -88,13 +88,24 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
     setDeletingId(agreementId);
     try {
-      const res = await fetch(`/api/offers/${agreementId}`, {
+      let res = await fetch(`/api/offers/${encodeURIComponent(agreementId)}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ pin, agreementId }),
       });
+
+      if (res.status === 404) {
+        res = await fetch(`/api/offers?id=${encodeURIComponent(agreementId)}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pin, agreementId }),
+        });
+      }
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed.");
 

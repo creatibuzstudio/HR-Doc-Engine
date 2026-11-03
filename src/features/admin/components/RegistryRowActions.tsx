@@ -24,9 +24,16 @@ export function RegistryRowActions({
   onPreview,
   onDelete,
 }: RegistryRowActionsProps) {
+  const isExecuted =
+    a.status === "FULLY_EXECUTED" ||
+    a.status === "FINALISED" ||
+    a.agreementTemplate === "hrHiringNotice" ||
+    a.docType === "HR Hiring Notice" ||
+    a.partnerSigned === true;
+
   return (
     <div className="flex items-center justify-start gap-2.5 flex-wrap">
-      {a.status !== "FULLY_EXECUTED" && (
+      {!isExecuted && (
         <button
           onClick={() => onResend(a.agreementId)}
           disabled={resendingId === a.agreementId}

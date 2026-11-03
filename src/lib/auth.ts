@@ -85,59 +85,85 @@ export async function getSession(request?: Request): Promise<SessionUser | null>
  * Seeds or verifies the founder in MongoDB Atlas with a secure bcrypt hash
  */
 export async function ensureFounderAccount(): Promise<void> {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const founderEmail = (
-    process.env.FOUNDER_EMAIL || "info@creatibuzstudio.com"
-  ).trim().toLowerCase();
+    const founderEmail = (
+      process.env.FOUNDER_EMAIL || "info@creatibuzstudio.com"
+    ).trim().toLowerCase();
 
-  const existing = await Admin.findOne({ email: founderEmail });
-  if (existing) return;
+    const existing = await Admin.findOne({ email: founderEmail });
+    if (existing) return;
 
-  // Use the environment password to seed initial bcrypt hash, or default strong password
-  const initialPassword = process.env.FOUNDER_PASSWORD || "Hakim@2026";
-  const salt = await bcrypt.genSalt(12);
-  const passwordHash = await bcrypt.hash(initialPassword, salt);
+    // Use the environment password to seed initial bcrypt hash, or default strong password
+    const initialPassword = process.env.FOUNDER_PASSWORD || "Hakim@2026";
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(initialPassword, salt);
 
-  await Admin.create({
-    email: founderEmail,
-    passwordHash,
-    name: "Md. Abdul Hakim",
-    role: "FOUNDER",
-  });
+    await Admin.create({
+      email: founderEmail,
+      passwordHash,
+      name: "Md. Abdul Hakim",
+      role: "FOUNDER",
+    });
 
-  console.log(`[auth] Initial Founder account secured in MongoDB: ${founderEmail}`);
+    console.log(`[auth] Initial Founder account secured in MongoDB: ${founderEmail}`);
+  } catch (err: unknown) {
+    console.warn("[auth] MongoDB unavailable for seeding founder account:", (err as Error).message);
+  }
 }
 
 /**
- * Validates credentials against MongoDB Atlas bcrypt hash
+ * Validates credentials against MongoDB Atlas bcrypt hash with resilient founder credentials fallback
  */
 export async function authenticateAdmin(
   email: string,
   plainPassword: string,
 ): Promise<SessionUser | null> {
-  await dbConnect();
-  await ensureFounderAccount();
-
   const cleanEmail = email.trim().toLowerCase();
-  const admin = await Admin.findOne({ email: cleanEmail });
+  const founderEmail = (
+    process.env.FOUNDER_EMAIL || "info@creatibuzstudio.com"
+  ).trim().toLowerCase();
+  const fallbackPassword = process.env.FOUNDER_PASSWORD || "Hakim@2026";
 
-  if (!admin) {
+  try {
+    await dbConnect();
+    await ensureFounderAccount();
+
+    const admin = await Admin.findOne({ email: cleanEmail });
+    if (!admin) {
+      return null;
+    }
+
+    const isMatch = await bcrypt.compare(plainPassword, admin.passwordHash);
+    if (!isMatch) {
+      return null;
+    }
+
+    // Update last login
+    admin.lastLogin = new Date();
+    await admin.save().catch(() => {});
+
+    return {
+      email: admin.email,
+      name: admin.name,
+      role: admin.role,
+    };
+  } catch (err: unknown) {
+    console.warn(
+      "[auth] MongoDB unavailable during authentication, verifying against founder credentials:",
+      (err as Error).message,
+    );
+
+    // Fallback: If MongoDB is offline, unconfigured, or unreachable, allow founder login
+    if (cleanEmail === founderEmail && plainPassword === fallbackPassword) {
+      return {
+        email: founderEmail,
+        name: "Md. Abdul Hakim",
+        role: "FOUNDER",
+      };
+    }
+
     return null;
   }
-
-  const isMatch = await bcrypt.compare(plainPassword, admin.passwordHash);
-  if (!isMatch) {
-    return null;
-  }
-
-  // Update last login
-  admin.lastLogin = new Date();
-  await admin.save();
-
-  return {
-    email: admin.email,
-    name: admin.name,
-    role: admin.role,
-  };
 }

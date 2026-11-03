@@ -21,33 +21,91 @@ async function tryMongo<T>(fn: () => Promise<T>): Promise<T | null> {
 function normalizeDoc(doc: Record<string, any> | null): Record<string, any> | null {
   if (!doc) return null;
 
-  // If it's a strict contractual offer document
+  // 1. If it has strict contractual offer properties
   if (doc.contractRef || doc.candidateDetails) {
-    const candidate = doc.candidateDetails || {};
+    const candidate = doc.candidateDetails || doc.secondParty || {};
+    const ds = doc.docSettings || {};
     return {
       _id: doc._id,
       docType: doc.docType || "Contractual Offer",
-      issueDate: doc.issueDate || "",
-      contractRef: doc.contractRef,
-      employmentType: doc.employmentType || "Project-Based Contract",
-      contractSubject: doc.contractSubject || "",
+      issueDate: doc.issueDate || ds.date || "",
+      contractRef: doc.contractRef || doc.agreementId,
+      employmentType: doc.employmentType || ds.employmentType || "Project-Based Contract",
+      contractSubject: doc.contractSubject || ds.contractSubject || "",
       candidateDetails: {
-        employeeId: candidate.employeeId || "",
-        fullName: candidate.fullName || "",
+        employeeId: candidate.employeeId || candidate.partnerId || doc.partnerId || "",
+        fullName: candidate.fullName || candidate.name || "",
         email: candidate.email || "",
-        contactNumber: candidate.contactNumber || "",
-        livingAddress: candidate.livingAddress || "",
+        contactNumber: candidate.contactNumber || candidate.mobileNumber || "",
+        livingAddress: candidate.livingAddress || candidate.presentAddress || "",
         position: candidate.position || "",
         signatureImg: candidate.signatureImg || "",
-        signatureDate: candidate.signatureDate || null,
+        signatureDate: candidate.signatureDate || doc.signedAt || null,
       },
-      isFounderSigned: doc.isFounderSigned ?? true,
-      isCandidateSigned: doc.isCandidateSigned ?? false,
-      status: doc.status || (doc.isCandidateSigned ? "FINALISED" : "PENDING_CANDIDATE_SIGNATURE"),
+      isFounderSigned: doc.isFounderSigned ?? doc.founderSigned ?? true,
+      isCandidateSigned: doc.isCandidateSigned ?? doc.partnerSigned ?? false,
+      status:
+        doc.status ||
+        (doc.isCandidateSigned || doc.partnerSigned
+          ? "FINALISED"
+          : "PENDING_CANDIDATE_SIGNATURE"),
       letterPDFdata: doc.letterPDFdata || "",
-      isFinalletterSentToBoth: doc.isFinalletterSentToBoth ?? false,
+      isFinalletterSentToBoth: doc.isFinalletterSentToBoth ?? doc.letterSentToBoth ?? false,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
+      agreementId: doc.agreementId || doc.contractRef,
+      partnerId: candidate.employeeId || candidate.partnerId || doc.partnerId,
+      secondParty: doc.secondParty,
+      firstParty: doc.firstParty,
+      docSettings: doc.docSettings,
+    };
+  }
+
+  // 2. If it's a legacy contractual offer (e.g. from docsAgreement collection)
+  const docTypeStr = String(doc.docType || "").toLowerCase();
+  const tmplStr = String(
+    doc.docSettings?.agreementTemplate || doc.agreementTemplate || "",
+  ).toLowerCase();
+  const isContractualLegacy =
+    docTypeStr.includes("contractual") ||
+    docTypeStr.includes("joining offer") ||
+    tmplStr === "contractual";
+
+  if (isContractualLegacy) {
+    const candidate = doc.secondParty || doc.candidateDetails || {};
+    const ds = doc.docSettings || {};
+    return {
+      _id: doc._id,
+      docType: "Contractual Offer",
+      issueDate: doc.issueDate || ds.date || "",
+      contractRef: doc.contractRef || doc.agreementId || ds.contractRef,
+      employmentType: doc.employmentType || ds.employmentType || "Project-Based Contract",
+      contractSubject: doc.contractSubject || ds.contractSubject || "",
+      candidateDetails: {
+        employeeId: candidate.employeeId || candidate.partnerId || doc.partnerId || "",
+        fullName: candidate.fullName || candidate.name || "",
+        email: candidate.email || "",
+        contactNumber: candidate.contactNumber || candidate.mobileNumber || "",
+        livingAddress: candidate.livingAddress || candidate.presentAddress || "",
+        position: candidate.position || "",
+        signatureImg: candidate.signatureImg || "",
+        signatureDate: candidate.signatureDate || doc.signedAt || null,
+      },
+      isFounderSigned: doc.isFounderSigned ?? doc.founderSigned ?? true,
+      isCandidateSigned: doc.isCandidateSigned ?? doc.partnerSigned ?? false,
+      status:
+        doc.status === "FULLY_EXECUTED" || doc.partnerSigned || doc.isCandidateSigned
+          ? "FINALISED"
+          : doc.status || "PENDING_CANDIDATE_SIGNATURE",
+      letterPDFdata: doc.letterPDFdata || "",
+      isFinalletterSentToBoth: doc.isFinalletterSentToBoth ?? doc.letterSentToBoth ?? false,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      agreementId: doc.agreementId || doc.contractRef,
+      partnerId: candidate.employeeId || candidate.partnerId || doc.partnerId,
+      secondParty: doc.secondParty,
+      firstParty: doc.firstParty,
+      docSettings: doc.docSettings,
     };
   }
 
@@ -149,9 +207,24 @@ export async function listAgreements() {
       const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return timeB - timeA;
     });
-    return combined
-      .map((d) => normalizeDoc(d.toObject()))
-      .filter((d): d is Record<string, any> => d !== null);
+
+    const seenIds = new Set<string>();
+    const deduplicated: Record<string, any>[] = [];
+    for (const d of combined) {
+      const obj = d.toObject ? d.toObject() : d;
+      const ref = (
+        obj.contractRef ||
+        obj.agreementId ||
+        obj._id?.toString() ||
+        ""
+      ).trim();
+      if (!ref || !seenIds.has(ref)) {
+        if (ref) seenIds.add(ref);
+        const normalized = normalizeDoc(obj);
+        if (normalized) deduplicated.push(normalized);
+      }
+    }
+    return deduplicated;
   });
 
   if (mongoList) {
@@ -180,7 +253,10 @@ export async function listAgreements() {
   return fileList
     .map(
       ({ letterPDFdata: _letter, cardPDFdata: _card, ...rest }) =>
-        normalizeDoc(rest),
+        normalizeDoc({
+          ...rest,
+          hasPdf: Boolean(_letter || rest.hasPdf),
+        }),
     )
     .filter((d): d is Record<string, any> => d !== null);
 }
@@ -277,7 +353,10 @@ export async function updateAgreement(
 
 export function toAgreementSummary(agreement: Record<string, unknown>) {
   const isContractual =
-    agreement.docType === "Contractual Offer" || Boolean(agreement.contractRef);
+    agreement.docType === "Contractual Offer" ||
+    Boolean(agreement.contractRef) ||
+    (agreement.docSettings as any)?.agreementTemplate === "contractual" ||
+    agreement.agreementTemplate === "contractual";
 
   if (isContractual) {
     const candidate =
@@ -290,7 +369,11 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
       partnerId: candidate.employeeId || candidate.partnerId || (agreement.partnerId as string),
       docType: "Contractual Offer",
       agreementTemplate: "contractual",
-      status: (agreement.status as string) || (agreement.isCandidateSigned ? "FINALISED" : "PENDING_CANDIDATE_SIGNATURE"),
+      status:
+        ((agreement.status as string) ||
+          (agreement.isCandidateSigned
+            ? "FINALISED"
+            : "PENDING_CANDIDATE_SIGNATURE")) as any,
       founderSigned: (agreement.isFounderSigned ?? true) as boolean,
       partnerSigned: (agreement.isCandidateSigned ?? false) as boolean,
       signedAt: candidate.signatureDate || (agreement.signedAt as Date | undefined),
@@ -299,7 +382,12 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
       partnerEmail: candidate.email || "",
       companyName: "Creatibuz Studio",
       position: candidate.position || "",
-      hasPdf: Boolean(agreement.letterPDFdata),
+      hasPdf: Boolean(
+        agreement.hasPdf ||
+        agreement.letterPDFdata ||
+        agreement.status === "FINALISED" ||
+        agreement.isCandidateSigned,
+      ),
     };
   }
 
@@ -345,23 +433,42 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
 
 export async function deleteAgreement(id: string): Promise<boolean> {
   const normalized = decodeURIComponent(id).trim();
+  const idVariants = Array.from(
+    new Set([
+      normalized,
+      normalized.replace(/\//g, "-"),
+      normalized.replace(/-/g, "/"),
+    ]),
+  );
+
+  const orConditions: Record<string, any>[] = [
+    { contractRef: { $in: idVariants } },
+    { agreementId: { $in: idVariants } },
+    { "candidateDetails.employeeId": { $in: idVariants } },
+    { partnerId: { $in: idVariants } },
+  ];
+
+  try {
+    const mongoose = await import("mongoose");
+    if (mongoose.default.Types.ObjectId.isValid(normalized)) {
+      orConditions.push({
+        _id: new mongoose.default.Types.ObjectId(normalized),
+      });
+    }
+  } catch {}
 
   const mongoDeleted = await tryMongo(async () => {
     const models = getAllAgreementModels();
     for (const { model } of models) {
-      const res = await model.deleteOne({
-        $or: [
-          { contractRef: normalized },
-          { "candidateDetails.employeeId": normalized },
-          { agreementId: normalized },
-          { partnerId: normalized },
-        ],
-      });
-      if (res.deletedCount > 0) return true;
+      try {
+        const res = await model.deleteOne({ $or: orConditions });
+        if (res && res.deletedCount > 0) return true;
+      } catch {}
     }
     return false;
   });
 
-  if (mongoDeleted !== null) return mongoDeleted;
-  return fileStore.fileDeleteAgreement(normalized);
+  const fileDeleted = await fileStore.fileDeleteAgreement(normalized);
+  if (mongoDeleted || fileDeleted) return true;
+  return false;
 }

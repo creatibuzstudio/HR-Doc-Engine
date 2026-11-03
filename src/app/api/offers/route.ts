@@ -6,9 +6,11 @@ import {
   listAgreements,
   saveAgreement,
   findAgreementById,
+  deleteAgreement,
   toAgreementSummary,
 } from "@/lib/agreementStore";
 import { getSession } from "@/lib/auth";
+import { verifyDeletePin } from "@/lib/security/deletePin";
 
 export async function GET(request: Request) {
   try {
@@ -34,10 +36,21 @@ export async function GET(request: Request) {
       );
     }
 
+    const hasMongoUri = Boolean(process.env.MONGODB_URI);
+    if (!hasMongoUri) {
+      console.warn(
+        "[Next.js API] WARNING: MONGODB_URI is not configured in .env.local! Falling back to local storage.",
+      );
+    }
+
     const agreements = await listAgreements();
     return NextResponse.json({
       success: true,
       agreements: agreements.map(toAgreementSummary),
+      meta: {
+        mongoConfigured: hasMongoUri,
+        count: agreements.length,
+      },
     });
   } catch (err: unknown) {
     console.error("[Next.js API] Error listing agreements:", err);
@@ -47,6 +60,7 @@ export async function GET(request: Request) {
     );
   }
 }
+
 
 export async function POST(request: Request) {
   try {
@@ -200,3 +214,67 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSession(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized: Admin session required." },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const queryId = searchParams.get("id");
+
+    let pin = "";
+    let bodyId = "";
+    try {
+      const body = await request.json();
+      pin = body?.pin || "";
+      bodyId = body?.agreementId || body?.id || "";
+    } catch {}
+
+    const targetId = (bodyId || queryId || "").trim();
+    if (!targetId) {
+      return NextResponse.json(
+        { error: "Agreement ID is required." },
+        { status: 400 }
+      );
+    }
+
+    const clientIdentifier =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      session.email ||
+      "admin-session";
+
+    const pinVerification = await verifyDeletePin(pin, clientIdentifier);
+    if (!pinVerification.valid) {
+      return NextResponse.json(
+        { error: pinVerification.error || "Forbidden: Invalid security PIN." },
+        { status: 403 }
+      );
+    }
+
+    const success = await deleteAgreement(targetId);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Agreement not found or already deleted." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Agreement deleted successfully.",
+    });
+  } catch (err: unknown) {
+    console.error("[Next.js API] Error deleting agreement:", err);
+    return NextResponse.json(
+      { error: "Failed to delete agreement." },
+      { status: 500 }
+    );
+  }
+}
+

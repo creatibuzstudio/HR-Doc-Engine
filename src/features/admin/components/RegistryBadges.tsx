@@ -15,7 +15,7 @@ export function StatusBadge({
   const isHrHiring =
     agreementTemplate === "hrHiringNotice" || docType === "HR Hiring Notice";
 
-  if (isHrHiring || status === "FULLY_EXECUTED") {
+  if (isHrHiring || status === "FULLY_EXECUTED" || status === "FINALISED") {
     return (
       <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
         <CheckCircle2 className="w-3 h-3" /> Executed

@@ -148,7 +148,7 @@ export function getAllAgreementModels(): {
   collectionName: string;
   model: mongoose.Model<any>;
 }[] {
-  return Object.entries(COLLECTION_MAP).map(([docTypeKey, collectionName]) => {
+  const primary = Object.entries(COLLECTION_MAP).map(([docTypeKey, collectionName]) => {
     const isContractual = collectionName === COLLECTION_MAP.contractual;
     const modelName = isContractual ? "ContractualOffer" : `Agreement_${collectionName}`;
     const schema = isContractual ? ContractualOfferSchema : AgreementSchema;
@@ -157,6 +157,19 @@ export function getAllAgreementModels(): {
       mongoose.model(modelName, schema, collectionName);
     return { docTypeKey, collectionName, model };
   });
+
+  const legacyCollections = ["docsAgreement", "agreements", "contractualoffers"];
+  const legacy = legacyCollections.map((collectionName) => {
+    const isContractual = collectionName === "contractualoffers";
+    const modelName = `Legacy_${collectionName}`;
+    const schema = isContractual ? ContractualOfferSchema : AgreementSchema;
+    const model =
+      mongoose.models[modelName] ||
+      mongoose.model(modelName, schema, collectionName);
+    return { docTypeKey: collectionName, collectionName, model };
+  });
+
+  return [...primary, ...legacy];
 }
 
 // Default export uses the contractual_offers collection model

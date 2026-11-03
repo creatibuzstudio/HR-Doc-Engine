@@ -20,23 +20,40 @@ export async function GET(
       );
     }
 
-    const isExecuted = agreement.status === "FULLY_EXECUTED";
+    const candidate =
+      agreement.candidateDetails || agreement.secondParty || {};
+
+    const isExecuted =
+      agreement.status === "FULLY_EXECUTED" ||
+      agreement.status === "FINALISED" ||
+      Boolean(agreement.isCandidateSigned);
+
+    const refId = agreement.contractRef || agreement.agreementId || id;
+    const empId = candidate.employeeId || agreement.partnerId || "";
+
+    const signedAtDate = candidate.signatureDate || agreement.signedAt;
+    const createdAtDate = agreement.createdAt;
 
     return NextResponse.json({
       valid: isExecuted,
       status: agreement.status,
-      agreementId: agreement.agreementId,
-      partnerId: agreement.partnerId,
-      docType: agreement.docType || "contractual",
+      agreementId: refId,
+      partnerId: empId,
+      docType: agreement.docType || "Contractual Offer",
       agreementTemplate:
-        agreement.docSettings?.agreementTemplate || "contractual",
-      companyName: agreement.firstParty?.companyName || "",
-      partnerName: agreement.secondParty?.fullName || "",
-      position: agreement.secondParty?.position || "",
-      signedAt: agreement.signedAt?.toISOString?.() || null,
-      createdAt: agreement.createdAt?.toISOString?.() || null,
-      founderSigned: agreement.founderSigned,
-      partnerSigned: agreement.partnerSigned,
+        agreement.docSettings?.agreementTemplate ||
+        (agreement.contractRef ? "contractual" : "contractual"),
+      companyName: agreement.firstParty?.companyName || "Creatibuz Studio",
+      partnerName: candidate.fullName || "",
+      position: candidate.position || "",
+      signedAt: signedAtDate
+        ? new Date(signedAtDate).toISOString()
+        : null,
+      createdAt: createdAtDate
+        ? new Date(createdAtDate).toISOString()
+        : null,
+      founderSigned: Boolean(agreement.isFounderSigned ?? agreement.founderSigned ?? true),
+      partnerSigned: Boolean(agreement.isCandidateSigned ?? agreement.partnerSigned),
       message: isExecuted
         ? "This document is authentic and fully executed."
         : "This document exists but is not yet fully executed.",

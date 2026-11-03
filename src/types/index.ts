@@ -128,7 +128,9 @@ export type AppState =
 
 export type AgreementStatus =
   | "PENDING_PARTNER_SIGNATURE"
-  | "FULLY_EXECUTED";
+  | "FULLY_EXECUTED"
+  | "PENDING_CANDIDATE_SIGNATURE"
+  | "FINALISED";
 
 export interface AgreementSummary {
   agreementId: string;

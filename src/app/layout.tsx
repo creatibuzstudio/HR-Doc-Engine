@@ -35,7 +35,7 @@ export default function RootLayout({
         />
         <style dangerouslySetInnerHTML={{ __html: `:root { ${fontVariables} }` }} />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F8FAFC]">
+      <body className="min-h-full flex flex-col bg-[#F8FAFC]" suppressHydrationWarning>
         {children}
         <ToastProvider />
       </body>

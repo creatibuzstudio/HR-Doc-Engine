@@ -12,6 +12,21 @@ declare global {
 const cached: MongooseCache =
   global.mongooseCache ?? (global.mongooseCache = { conn: null, promise: null });
 
+function resolveDbName(uri: string): string {
+  if (process.env.MONGODB_DB_NAME) {
+    return process.env.MONGODB_DB_NAME;
+  }
+  try {
+    const parsed = new URL(uri);
+    const path = parsed.pathname.replace(/^\//, "");
+    if (path) return decodeURIComponent(path);
+  } catch {
+    const match = uri.match(/mongodb(?:\+srv)?:\/\/[^/]+\/([^?]+)/);
+    if (match && match[1]) return match[1];
+  }
+  return "HR-Doc-Engine_CBS";
+}
+
 async function dbConnect() {
   const mongodbUri = process.env.MONGODB_URI;
 
@@ -29,9 +44,10 @@ async function dbConnect() {
   }
 
   if (!cached.promise) {
+    const targetDb = resolveDbName(mongodbUri);
     const opts = {
       bufferCommands: true,
-      dbName: process.env.MONGODB_DB_NAME || "HR-Doc-Engine_CBS",
+      dbName: targetDb,
       serverSelectionTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       socketTimeoutMS: 45000,
