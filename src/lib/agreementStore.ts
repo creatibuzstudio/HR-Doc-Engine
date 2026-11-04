@@ -188,20 +188,31 @@ export async function findAgreementById(id: string) {
 }
 
 export async function listAgreements() {
-  const fileList = await fileStore.fileListAgreements();
-
   const mongoList = await tryMongo(async () => {
     const models = getAllAgreementModels();
-    const results = await Promise.all(
-      models.map(({ model }) =>
-        model
-          .find({}, "-letterPDFdata -cardPDFdata")
-          .sort({ createdAt: -1 })
-          .limit(200)
-          .exec(),
-      ),
+    const settled = await Promise.allSettled(
+      models.map(async ({ model }) => {
+        try {
+          return await model
+            .find({}, "-letterPDFdata -cardPDFdata")
+            .sort({ createdAt: -1 })
+            .limit(200)
+            .lean()
+            .exec();
+        } catch (colErr) {
+          console.warn("[listAgreements] Collection query failed:", colErr);
+          return [];
+        }
+      }),
     );
-    const combined = results.flat();
+
+    const combined: any[] = [];
+    for (const res of settled) {
+      if (res.status === "fulfilled" && Array.isArray(res.value)) {
+        combined.push(...res.value);
+      }
+    }
+
     combined.sort((a, b) => {
       const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -227,20 +238,28 @@ export async function listAgreements() {
     return deduplicated;
   });
 
-  if (mongoList) {
-    // If local files exist that are missing from MongoDB, sync them
-    const mongoIds = new Set(
-      mongoList
-        .map((m) => m.contractRef || m.agreementId)
-        .filter(Boolean),
-    );
+  let fileList: any[] = [];
+  try {
+    fileList = await fileStore.fileListAgreements();
+  } catch {
+    fileList = [];
+  }
 
-    for (const f of fileList) {
-      const fId = f.contractRef || f.agreementId;
-      if (fId && !mongoIds.has(fId)) {
-        syncFileToMongoIfMissing(f).catch(() => {});
-        const normalized = normalizeDoc(f);
-        if (normalized) mongoList.push(normalized);
+  if (mongoList) {
+    if (fileList.length > 0) {
+      const mongoIds = new Set(
+        mongoList
+          .map((m) => m.contractRef || m.agreementId)
+          .filter(Boolean),
+      );
+
+      for (const f of fileList) {
+        const fId = f.contractRef || f.agreementId;
+        if (fId && !mongoIds.has(fId)) {
+          syncFileToMongoIfMissing(f).catch(() => {});
+          const normalized = normalizeDoc(f);
+          if (normalized) mongoList.push(normalized);
+        }
       }
     }
 
@@ -351,7 +370,26 @@ export async function updateAgreement(
   return normalizeDoc(await fileStore.fileUpdateAgreement(normalizedId, updates));
 }
 
-export function toAgreementSummary(agreement: Record<string, unknown>) {
+export function toAgreementSummary(
+  agreement: Record<string, unknown> | null | undefined,
+) {
+  if (!agreement || typeof agreement !== "object") {
+    return {
+      agreementId: "unknown",
+      partnerId: "unknown",
+      docType: "contractual",
+      status: "PENDING_CANDIDATE_SIGNATURE",
+      founderSigned: false,
+      partnerSigned: false,
+      createdAt: new Date(),
+      partnerName: "",
+      partnerEmail: "",
+      companyName: "Creatibuz Studio",
+      position: "",
+      hasPdf: false,
+    };
+  }
+
   const isContractual =
     agreement.docType === "Contractual Offer" ||
     Boolean(agreement.contractRef) ||
@@ -365,8 +403,15 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
       {};
 
     return {
-      agreementId: (agreement.contractRef as string) || (agreement.agreementId as string),
-      partnerId: candidate.employeeId || candidate.partnerId || (agreement.partnerId as string),
+      agreementId:
+        (agreement.contractRef as string) ||
+        (agreement.agreementId as string) ||
+        (agreement._id ? String(agreement._id) : "unknown"),
+      partnerId:
+        candidate.employeeId ||
+        candidate.partnerId ||
+        (agreement.partnerId as string) ||
+        "",
       docType: "Contractual Offer",
       agreementTemplate: "contractual",
       status:
@@ -377,7 +422,7 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
       founderSigned: (agreement.isFounderSigned ?? true) as boolean,
       partnerSigned: (agreement.isCandidateSigned ?? false) as boolean,
       signedAt: candidate.signatureDate || (agreement.signedAt as Date | undefined),
-      createdAt: agreement.createdAt,
+      createdAt: agreement.createdAt || new Date(),
       partnerName: candidate.fullName || "",
       partnerEmail: candidate.email || "",
       companyName: "Creatibuz Studio",
@@ -398,17 +443,20 @@ export function toAgreementSummary(agreement: Record<string, unknown>) {
     agreement.docType === "HR Hiring Notice";
 
   return {
-    agreementId: agreement.agreementId,
-    partnerId: agreement.partnerId,
+    agreementId:
+      (agreement.agreementId as string) ||
+      (agreement.contractRef as string) ||
+      (agreement._id ? String(agreement._id) : "unknown"),
+    partnerId: (agreement.partnerId as string) || "",
     docType: agreement.docType || "contractual",
     agreementTemplate:
       (ds as Record<string, string> | undefined)?.agreementTemplate ||
       undefined,
-    status: agreement.status,
-    founderSigned: agreement.founderSigned,
-    partnerSigned: agreement.partnerSigned,
+    status: agreement.status || "PENDING_PARTNER_SIGNATURE",
+    founderSigned: (agreement.founderSigned ?? true) as boolean,
+    partnerSigned: (agreement.partnerSigned ?? false) as boolean,
     signedAt: agreement.signedAt,
-    createdAt: agreement.createdAt,
+    createdAt: agreement.createdAt || new Date(),
     partnerName: isHrHiring
       ? (ds?.hrRecipientName as string) || sp?.fullName || sp?.name || ""
       : sp?.fullName || sp?.name || "",

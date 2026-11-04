@@ -44,18 +44,32 @@ export async function GET(request: Request) {
     }
 
     const agreements = await listAgreements();
+    const summaries = (agreements || [])
+      .map((a) => {
+        try {
+          return toAgreementSummary(a);
+        } catch (e) {
+          console.warn("[Next.js API] Failed to summarize agreement:", e);
+          return null;
+        }
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null);
+
     return NextResponse.json({
       success: true,
-      agreements: agreements.map(toAgreementSummary),
+      agreements: summaries,
       meta: {
         mongoConfigured: hasMongoUri,
-        count: agreements.length,
+        count: summaries.length,
       },
     });
   } catch (err: unknown) {
     console.error("[Next.js API] Error listing agreements:", err);
     return NextResponse.json(
-      { error: "Failed to list agreements." },
+      {
+        error: "Failed to list agreements.",
+        details: err instanceof Error ? err.message : String(err),
+      },
       { status: 500 },
     );
   }

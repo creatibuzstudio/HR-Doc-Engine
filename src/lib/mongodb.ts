@@ -46,11 +46,11 @@ async function dbConnect() {
   if (!cached.promise) {
     const targetDb = resolveDbName(mongodbUri);
     const opts = {
-      bufferCommands: true,
+      bufferCommands: false,
       dbName: targetDb,
-      serverSelectionTimeoutMS: 30000,
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 30000,
     };
 
     cached.promise = mongoose.connect(mongodbUri, opts).then((m) => m);
