@@ -72,6 +72,13 @@ function MainApp() {
     handleHeaderBack,
   } = useAppOrchestrator();
 
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
+  const [sessionUser, setSessionUser] = React.useState<{
+    email: string;
+    name: string;
+    role: string;
+  } | null>(null);
+
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("candidateView")) return;
@@ -80,12 +87,40 @@ function MainApp() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.authenticated) {
+          setIsAuthenticated(true);
+          setSessionUser(data.user);
           void prefetch();
           setAppState("docTypeSelect");
+        } else {
+          setIsAuthenticated(false);
+          setSessionUser(null);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsAuthenticated(false);
+        setSessionUser(null);
+      });
   }, [prefetch, setAppState]);
+
+  const handleHeroStart = () => {
+    if (isAuthenticated) {
+      setAppState("docTypeSelect");
+    } else {
+      setAppState("login");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("[Logout Error]:", err);
+    } finally {
+      setIsAuthenticated(false);
+      setSessionUser(null);
+      setAppState("home");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
@@ -99,6 +134,8 @@ function MainApp() {
         getBackLabel={getBackLabel}
         handleHeaderBack={handleHeaderBack}
         setActiveStep={setActiveStep}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
       />
 
       {/* Main Content */}
@@ -107,7 +144,8 @@ function MainApp() {
           {appState === "home" && (
             <Hero
               key="home"
-              onStart={() => setAppState("login")}
+              isAuthenticated={isAuthenticated}
+              onStart={handleHeroStart}
               onDemo={() => {
                 setSecondParty((prev) => ({
                   ...prev,
@@ -136,7 +174,9 @@ function MainApp() {
           {appState === "login" && (
             <Login
               key="login"
-              onLoginSuccess={() => {
+              onLoginSuccess={(user) => {
+                setIsAuthenticated(true);
+                if (user) setSessionUser(user);
                 void prefetch();
                 setAppState("docTypeSelect");
               }}

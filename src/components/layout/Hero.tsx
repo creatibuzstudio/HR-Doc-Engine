@@ -12,9 +12,10 @@ import {
 interface HeroProps {
   onStart: () => void;
   onDemo: () => void;
+  isAuthenticated?: boolean;
 }
 
-export default function Hero({ onStart, onDemo }: HeroProps) {
+export default function Hero({ onStart, onDemo, isAuthenticated }: HeroProps) {
   return (
     <motion.section
       key="home"
@@ -56,7 +57,7 @@ export default function Hero({ onStart, onDemo }: HeroProps) {
             onClick={onStart}
             className="w-full sm:w-auto px-8 py-4 bg-primary hover:opacity-95 text-primary-foreground font-bold rounded-2xl shadow-lg shadow-primary/25 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group text-base cursor-pointer"
           >
-            Create Agreements &amp; Offers
+            {isAuthenticated ? "Continue to Document Engine" : "Create Agreements & Offers"}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
           </button>
           <button

@@ -15,6 +15,8 @@ interface AppHeaderProps {
   getBackLabel: () => string | null;
   handleHeaderBack: () => void;
   setActiveStep: (step: number) => void;
+  isAuthenticated?: boolean;
+  onLogout?: () => void;
 }
 
 export default function AppHeader({
@@ -27,6 +29,8 @@ export default function AppHeader({
   getBackLabel,
   handleHeaderBack,
   setActiveStep,
+  isAuthenticated = false,
+  onLogout,
 }: AppHeaderProps) {
   return (
     <>
@@ -141,8 +145,8 @@ export default function AppHeader({
             <Mail className="w-3.5 h-3.5" /> Support
           </a>
 
-          {/* Agreement Registry — visible in docTypeSelect, form, workspace, adminDashboard */}
-          {appState !== "candidatePortal" && appState !== "home" && appState !== "login" && (
+          {/* Agreement Registry — visible when authenticated (except candidatePortal) or in internal states */}
+          {appState !== "candidatePortal" && appState !== "login" && (isAuthenticated || appState !== "home") && (
             <button
               onClick={() => setAppState("adminDashboard")}
               className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition cursor-pointer ${
@@ -156,13 +160,27 @@ export default function AppHeader({
             </button>
           )}
 
-          {/* Logout button */}
-          {appState !== "candidatePortal" && appState !== "home" && appState !== "login" && (
+          {/* Login button — shown on home page when NOT authenticated */}
+          {!isAuthenticated && appState === "home" && (
+            <button
+              onClick={() => setAppState("login")}
+              className="text-xs font-semibold px-4 py-2 border border-border hover:border-primary hover:bg-secondary text-foreground rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+            >
+              Login
+            </button>
+          )}
+
+          {/* Logout button — shown whenever authenticated and not in candidate portal */}
+          {isAuthenticated && appState !== "candidatePortal" && (
             <button
               onClick={() => {
-                fetch("/api/auth/logout", { method: "POST" }).finally(() => {
-                  setAppState("home");
-                });
+                if (onLogout) {
+                  onLogout();
+                } else {
+                  fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+                    setAppState("home");
+                  });
+                }
               }}
               title="Logout session"
               className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-destructive/30 text-destructive bg-destructive/10 hover:bg-destructive/20 transition cursor-pointer"

@@ -119,7 +119,7 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
                   Internal recruitment circular addressed to CEO/CTO/Founder with position details, skills, and HR sign-off.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Recruitment Details", "Skills Matrix", "PDF Export", "Email Dispatch", "HR Signature"].map((tag) => (
+                  {["Recruitment Details", "PDF Export", "Email Dispatch", "HR Signature"].map((tag) => (
                     <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
                   ))}
                 </div>
@@ -147,7 +147,7 @@ export default function DocTypeSelector({ onSelect, onOpenAdmin }: DocTypeSelect
                   Generate premium, digital-signed completion certificates for interns. Mutates database and notifies intern via automated email.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Landscape A4", "Database Sync", "CEO Signature", "Email Dispatch", "Completion Letter"].map((tag) => (
+                  {["Landscape A4", "CEO Signature", "Email Dispatch", "Completion Letter"].map((tag) => (
                     <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border">{tag}</span>
                   ))}
                 </div>

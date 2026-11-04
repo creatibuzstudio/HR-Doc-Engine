@@ -6,7 +6,7 @@ import { Lock, Mail, ArrowRight, ShieldAlert } from "lucide-react";
 import Logo from "@/components/layout/Logo";
 
 interface LoginProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (user?: any) => void;
   onBackToHome: () => void;
 }
 
@@ -40,7 +40,7 @@ export default function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
         return;
       }
 
-      onLoginSuccess();
+      onLoginSuccess(data.user);
     } catch {
       setError("Network error occurred. Please try again.");
     } finally {
