@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Award, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Award, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
 import { CertificateLookupStep } from "../steps/certificate/CertificateLookupStep";
 import { CertificateSignatureStep } from "../steps/certificate/CertificateSignatureStep";
@@ -63,25 +63,28 @@ export default function InternCertificateWizard({
       transition={{ duration: 0.3 }}
       className="max-w-4xl mx-auto w-full px-4 py-8 md:py-12"
     >
+      {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl md:text-2xl font-bold text-[#0F172A] flex items-center gap-2">
-            <Award className="text-[#6366F1] w-6 h-6" />
-            Intern Certificate Wizard
+          <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
+            <div className="p-2 bg-primary/20 text-primary rounded-xl">
+              <Award className="w-5 h-5 text-primary" />
+            </div>
+            Internship Certificate of Completion
           </h2>
-          <span className="text-xs bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full text-[#6366F1] font-bold">
+          <span className="text-xs bg-secondary border border-border px-3 py-1 rounded-full text-primary font-bold">
             Step {activeStep} of {TOTAL_STEPS}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div className="w-full bg-[#DBEAFE] h-2 rounded-full overflow-hidden flex">
+        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden flex border border-border">
           {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
             <div
               key={idx}
               className={`h-full flex-1 transition-all duration-300 ${
-                idx + 1 <= activeStep ? "bg-[#6366F1]" : "bg-[#DBEAFE]"
-              } ${idx < TOTAL_STEPS - 1 ? "border-r border-white" : ""}`}
+                idx + 1 <= activeStep ? "bg-primary" : "bg-transparent"
+              } ${idx < TOTAL_STEPS - 1 ? "border-r border-border" : ""}`}
             />
           ))}
         </div>
@@ -93,10 +96,10 @@ export default function InternCertificateWizard({
               key={idx}
               className={`text-[10px] font-bold px-3 py-1 rounded-full border transition ${
                 idx + 1 === activeStep
-                  ? "bg-[#6366F1] border-[#6366F1] text-white"
+                  ? "bg-primary border-primary text-primary-foreground"
                   : idx + 1 < activeStep
-                  ? "bg-indigo-50 border-[#6366F1] text-[#6366F1]"
-                  : "bg-white border-[#DBEAFE] text-[#94A3B8]"
+                  ? "bg-secondary border-border text-primary"
+                  : "bg-secondary/40 border-border text-muted-foreground"
               }`}
             >
               {idx + 1 < activeStep ? (
@@ -113,10 +116,16 @@ export default function InternCertificateWizard({
       </div>
 
       {/* Content box */}
-      <div className="bg-white border border-[#DBEAFE] rounded-3xl p-6 md:p-8 shadow-sm min-h-[340px]">
+      <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm min-h-[380px]">
         {validationError && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl">
-            {validationError}
+          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold rounded-2xl flex items-center justify-between">
+            <span>{validationError}</span>
+            <button
+              onClick={onClearError}
+              className="text-rose-400 hover:text-rose-300 ml-2"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         )}
         {stepContent}
@@ -127,13 +136,13 @@ export default function InternCertificateWizard({
         <button
           onClick={onPrev}
           disabled={activeStep === 1}
-          className="flex items-center gap-2 px-5 py-3 border border-[#DBEAFE] hover:border-[#6366F1] text-[#334155] font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className="flex items-center gap-2 px-5 py-3 border border-border bg-secondary hover:bg-accent text-foreground font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
           onClick={onNext}
-          className="flex items-center gap-2 px-7 py-3 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-bold text-sm rounded-2xl transition shadow-md shadow-[#6366F1]/20 cursor-pointer"
+          className="flex items-center gap-2 px-7 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-2xl transition shadow-lg shadow-primary/25 cursor-pointer"
         >
           {activeStep === TOTAL_STEPS ? (
             <>

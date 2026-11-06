@@ -31,8 +31,26 @@ export function InternStep3({ firstParty, setFirstParty, onClearError }: InternS
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <StepHeader
         title="Section 3: Founder & CEO Authorization"
-        desc="Sign the offer letter as the issuing authority."
+        desc="Authorize and endorse the internship offer letter (Md. Abdul Hakim, Founder & CEO)."
       />
+
+      {/* Authorizing Executive Box */}
+      <div className="p-4 bg-secondary/60 border border-primary/30 rounded-2xl flex items-center justify-between">
+        <div>
+          <span className="text-xs font-bold text-header-text block">
+            Authorizing Executive
+          </span>
+          <span className="text-sm font-extrabold text-primary">
+            {firstParty.representedBy || "Md. Abdul Hakim"} (Founder &amp; CEO)
+          </span>
+          <span className="text-[11px] text-muted-foreground block mt-0.5">
+            Creatibuz Studio &middot; {firstParty.ceoMobile || "+8801968657353"}
+          </span>
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-3 py-1 rounded-full shadow-sm">
+          Issuer
+        </span>
+      </div>
 
       <SignaturePad
         onSave={(dataUrl) => {
@@ -43,60 +61,53 @@ export function InternStep3({ firstParty, setFirstParty, onClearError }: InternS
         savedImage={firstParty.signatureImg}
       />
 
-      <div className="flex items-center gap-4 my-2 text-[#64748B] text-xs font-bold uppercase tracking-wider">
-        <div className="flex-1 h-[1px] bg-[#DBEAFE]" />
-        <span>Or</span>
-        <div className="flex-1 h-[1px] bg-[#DBEAFE]" />
+      <div className="flex items-center gap-4 my-2 text-muted-foreground text-xs font-bold uppercase tracking-wider">
+        <div className="flex-1 h-[1px] bg-border" />
+        <span>Or Upload Signature File</span>
+        <div className="flex-1 h-[1px] bg-border" />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">
-          Option B: Upload Signature Photo File
-        </label>
-        <div className="relative border-2 border-dashed border-[#DBEAFE] hover:border-[#2563EB]/50 rounded-2xl p-6 bg-[#F8FAFC]/50 hover:bg-[#F8FAFC] transition-all flex flex-col items-center justify-center text-center gap-2 cursor-pointer group">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleUpload}
-            className="absolute inset-0 opacity-0 cursor-pointer z-10"
-          />
-          <Upload className="w-8 h-8 text-[#64748B] group-hover:text-[#2563EB] transition transform group-hover:scale-105" />
-          <p className="text-xs text-[#334155] font-semibold uppercase tracking-wider">
-            Drag &amp; drop or select
-          </p>
-          <p className="text-[10px] text-[#64748B] leading-relaxed max-w-[280px]">
-            PNG, JPG, or SVG — clear ink signature.
-          </p>
-        </div>
+      <div className="relative border-2 border-dashed border-border hover:border-primary/60 rounded-2xl p-6 bg-secondary/50 hover:bg-secondary transition-all flex flex-col items-center justify-center text-center gap-2 cursor-pointer group">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+        />
+        <Upload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition transform group-hover:scale-105" />
+        <p className="text-xs text-foreground font-semibold uppercase tracking-wider">
+          Click or drag &amp; drop signature image
+        </p>
+        <p className="text-[10px] text-muted-foreground">PNG, JPG, or SVG transparent signature.</p>
+      </div>
 
-        {firstParty.signatureImg && (
-          <div className="mt-4 p-4 bg-[#F8FAFC] border border-[#DBEAFE] rounded-2xl flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white border border-[#DBEAFE] rounded-xl shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={firstParty.signatureImg}
-                  alt="Signature Preview"
-                  className="w-12 h-8 object-contain bg-white rounded-md"
-                />
-              </div>
-              <div>
-                <p className="text-xs text-[#2563EB] font-bold flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5" /> Signature Active
-                </p>
-                <p className="text-[10px] text-[#64748B]">Export-ready image synced</p>
-              </div>
+      {firstParty.signatureImg && (
+        <div className="p-4 bg-secondary border border-border rounded-2xl flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-card border border-border rounded-xl shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={firstParty.signatureImg}
+                alt="Founder Signature Preview"
+                className="w-16 h-8 object-contain"
+              />
             </div>
-            <button
-              type="button"
-              onClick={() => setFirstParty((p) => ({ ...p, signatureImg: "" }))}
-              className="text-xs text-rose-600 hover:text-rose-500 font-semibold px-2 py-1 cursor-pointer"
-            >
-              Remove
-            </button>
+            <div>
+              <p className="text-xs text-emerald-500 font-bold flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 stroke-[3]" /> Founder Signature Active
+              </p>
+              <p className="text-[10px] text-muted-foreground">Export-ready signature verified</p>
+            </div>
           </div>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={() => setFirstParty((p) => ({ ...p, signatureImg: "" }))}
+            className="text-xs text-destructive hover:opacity-80 font-semibold px-2 py-1 cursor-pointer"
+          >
+            Remove
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }

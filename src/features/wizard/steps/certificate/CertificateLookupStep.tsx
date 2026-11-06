@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check } from "lucide-react";
+import {
+  Award,
+  Briefcase,
+  Building2,
+  Calendar,
+  Check,
+  AlertCircle,
+  User,
+  Hash,
+  Info,
+  ChevronDown,
+} from "lucide-react";
 import { SecondParty, DocSettings } from "@/types";
 import { useDataCache, InternOption } from "@/lib/context/DataCacheContext";
 import { toISODate, toDisplayDate, getTodayISO } from "@/lib/utils/dateUtils";
+import { Field, IconInput, IconSelect, StepHeader } from "@/components/forms/FormPrimitives";
 
 const PERFORMANCE_GRADES = [
   "Outstanding",
@@ -16,31 +28,6 @@ const PERFORMANCE_GRADES = [
 ];
 
 type FetchedIntern = InternOption;
-
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <label className="block text-xs font-semibold text-[#334155] uppercase tracking-wide">
-    {label}
-    <span className="block mt-1.5">{children}</span>
-  </label>
-);
-
-const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    className={`w-full bg-[#F8FAFC] border border-[#DBEAFE] focus:border-[#6366F1] rounded-xl py-3 px-4 text-sm text-[#0F172A] focus:outline-none transition ${
-      props.className || ""
-    }`}
-  />
-);
-
-const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
-  <select
-    {...props}
-    className={`w-full bg-[#F8FAFC] border border-[#DBEAFE] focus:border-[#6366F1] rounded-xl py-3 px-4 text-sm text-[#0F172A] focus:outline-none transition cursor-pointer ${
-      props.className || ""
-    }`}
-  />
-);
 
 export interface CertificateLookupStepProps {
   secondParty: SecondParty;
@@ -61,7 +48,9 @@ export function CertificateLookupStep({
   const interns: FetchedIntern[] = cache.internsList ?? [];
   const loading = cache.internsList === null;
 
-  const [selectedInternId, setSelectedInternId] = useState("");
+  const [selectedInternId, setSelectedInternId] = useState(
+    docSettings.certInternId || secondParty.partnerId || ""
+  );
   const [customGrade, setCustomGrade] = useState("");
 
   const handleInternChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -116,23 +105,18 @@ export function CertificateLookupStep({
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#DBEAFE] pb-4">
-        <h3 className="text-[#0F172A] font-bold text-base">
-          Select Intern &amp; Review Details
-        </h3>
-        <p className="text-[#64748B] text-xs mt-1">
-          Select an intern with a fully-executed agreement to load their details. You
-          can modify these values if needed.
-        </p>
-      </div>
+      <StepHeader
+        title="Section 1: Select Intern & Hydrate Certificate"
+        desc="Select a completed intern directly from the agreement database. All profile details will be auto-loaded and can be adjusted before certificate generation."
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="md:col-span-2">
-          <Field label="Intern ID Lookup *">
+          <Field label="Select Executed Intern Record *">
             {loading ? (
-              <div className="w-full flex items-center justify-center py-3 bg-[#F8FAFC] border border-[#DBEAFE] rounded-xl text-xs text-slate-400 font-medium">
+              <div className="w-full flex items-center justify-center py-4 bg-secondary border border-border rounded-xl text-xs text-muted-foreground font-medium">
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-4 w-4 text-[#6366F1]"
+                  className="animate-spin -ml-1 mr-3 h-4 w-4 text-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -150,29 +134,72 @@ export function CertificateLookupStep({
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                   />
                 </svg>
-                Fetching executed interns...
+                Fetching executed interns from database...
               </div>
             ) : interns.length === 0 ? (
-              <div className="w-full text-center py-3.5 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-xl">
-                ⚠️ No fully executed internship offer letters found in database.
+              <div className="w-full p-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+                <span>
+                  No finalized or executed internship offer letters found in the database. You can manually enter details below or verify agreement statuses in the Dashboard.
+                </span>
               </div>
             ) : (
-              <Select value={selectedInternId} onChange={handleInternChange}>
-                <option value="">— Select Intern —</option>
-                {interns.map((i) => (
-                  <option key={i.internId} value={i.internId}>
-                    {i.internId} — {i.fullName} ({i.position})
+              <div className="relative">
+                <select
+                  value={selectedInternId}
+                  onChange={handleInternChange}
+                  className="w-full bg-secondary border border-border focus:border-primary rounded-xl py-3 pl-4 pr-10 text-sm text-foreground focus:outline-none transition cursor-pointer appearance-none"
+                >
+                  <option value="" className="bg-card text-foreground">
+                    — Choose an Intern from Database —
                   </option>
-                ))}
-              </Select>
+                  {interns.map((i) => (
+                    <option
+                      key={i.internId}
+                      value={i.internId}
+                      className="bg-card text-foreground"
+                    >
+                      {i.internId} — {i.fullName} ({i.position || "Intern"})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
             )}
           </Field>
         </div>
 
-        {selectedInternId && (
+        {selectedInternId ? (
           <>
-            <Field label="Intern Name *">
-              <Input
+            <div className="md:col-span-2 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-start gap-3">
+              <div className="p-2 bg-primary/20 rounded-xl text-primary shrink-0 mt-0.5">
+                <Check className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-primary uppercase tracking-wide">
+                  Intern Record Loaded &amp; Synchronized
+                </p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
+                  <span>
+                    Intern ID:{" "}
+                    <strong className="text-foreground font-mono">
+                      {docSettings.certInternId || selectedInternId}
+                    </strong>
+                  </span>
+                  <span>&middot;</span>
+                  <span>
+                    Agreement Ref:{" "}
+                    <strong className="text-foreground font-mono">
+                      {docSettings.certOriginalAgreementId || "N/A"}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Field label="Intern Full Name *">
+              <IconInput
+                icon={User}
                 value={secondParty.fullName || ""}
                 onChange={(e) =>
                   setSecondParty((p) => ({ ...p, fullName: e.target.value }))
@@ -181,8 +208,9 @@ export function CertificateLookupStep({
               />
             </Field>
 
-            <Field label="Internship Position/Role *">
-              <Input
+            <Field label="Internship Position / Track *">
+              <IconInput
+                icon={Briefcase}
                 value={secondParty.position || ""}
                 onChange={(e) =>
                   setSecondParty((p) => ({ ...p, position: e.target.value }))
@@ -192,17 +220,19 @@ export function CertificateLookupStep({
             </Field>
 
             <Field label="Department *">
-              <Input
+              <IconInput
+                icon={Building2}
                 value={secondParty.department || ""}
                 onChange={(e) =>
                   setSecondParty((p) => ({ ...p, department: e.target.value }))
                 }
-                placeholder="e.g. Development Department"
+                placeholder="e.g. Engineering & Product"
               />
             </Field>
 
-            <Field label="Performance Grade *">
-              <Select
+            <Field label="Performance Rating *">
+              <IconSelect
+                icon={Award}
                 value={
                   docSettings.certPerformanceGrade === customGrade
                     ? "Other"
@@ -218,28 +248,31 @@ export function CertificateLookupStep({
                 }}
               >
                 {PERFORMANCE_GRADES.map((g) => (
-                  <option key={g} value={g}>
+                  <option key={g} value={g} className="bg-card text-foreground">
                     {g}
                   </option>
                 ))}
-              </Select>
+              </IconSelect>
               {(docSettings.certPerformanceGrade === customGrade ||
                 !PERFORMANCE_GRADES.includes(docSettings.certPerformanceGrade || "")) && (
-                <Input
-                  className="mt-2"
-                  value={customGrade}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setCustomGrade(val);
-                    setDocSettings((p) => ({ ...p, certPerformanceGrade: val }));
-                  }}
-                  placeholder="Enter custom grade (e.g. A+, Outstanding Extraordinaire)"
-                />
+                <div className="mt-2">
+                  <IconInput
+                    icon={Award}
+                    value={customGrade}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCustomGrade(val);
+                      setDocSettings((p) => ({ ...p, certPerformanceGrade: val }));
+                    }}
+                    placeholder="Enter custom grade (e.g. Magna Cum Laude, A+)"
+                  />
+                </div>
               )}
             </Field>
 
             <Field label="Internship Start Date *">
-              <Input
+              <IconInput
+                icon={Calendar}
                 type="date"
                 max={getTodayISO()}
                 value={toISODate(docSettings.certStartDate || "")}
@@ -252,8 +285,9 @@ export function CertificateLookupStep({
               />
             </Field>
 
-            <Field label="Internship End Date *">
-              <Input
+            <Field label="Internship Completion Date *">
+              <IconInput
+                icon={Calendar}
                 type="date"
                 max={getTodayISO()}
                 min={toISODate(docSettings.certStartDate || "")}
@@ -266,22 +300,22 @@ export function CertificateLookupStep({
                 }
               />
             </Field>
-
-            <div className="md:col-span-2 p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
-              <p className="text-[11px] font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-indigo-600" /> Database
-                Synchronization Enabled
+          </>
+        ) : (
+          <div className="md:col-span-2 p-8 border border-dashed border-border rounded-2xl bg-secondary/20 flex flex-col items-center justify-center text-center gap-3">
+            <div className="p-3 bg-secondary rounded-2xl border border-border text-muted-foreground">
+              <Info className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground">
+                No Intern Record Selected Yet
               </p>
-              <p className="text-[10px] text-indigo-700/80 mt-1 leading-relaxed">
-                Edits made to name, role, department, or dates will update the original
-                agreement (ID:{" "}
-                <strong className="font-mono">
-                  {docSettings.certOriginalAgreementId}
-                </strong>
-                ) upon finalizing, maintaining consistent records.
+              <p className="text-xs text-muted-foreground max-w-md mt-1">
+                Choose an intern from the dropdown above to automatically load their
+                name, role, department, and tenure for the certificate.
               </p>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

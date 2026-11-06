@@ -158,3 +158,37 @@ export function SliderField({
     </div>
   );
 }
+
+// ─── Icon Select ───────────────────────────────────────────────────────────────
+export interface IconSelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  icon?: React.ComponentType<{ className?: string }>;
+}
+
+export function IconSelect({
+  icon: Icon,
+  children,
+  className,
+  ...props
+}: IconSelectProps) {
+  return (
+    <div className="relative">
+      {Icon && (
+        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      )}
+      <select
+        className={`w-full bg-secondary border border-border focus:border-primary rounded-xl py-3 ${
+          Icon ? "pl-10" : "pl-4"
+        } pr-8 text-sm text-foreground focus:outline-none transition cursor-pointer appearance-none ${
+          className || ""
+        }`}
+        {...props}
+      >
+        {children}
+      </select>
+      <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground text-[10px]">
+        ▼
+      </div>
+    </div>
+  );
+}

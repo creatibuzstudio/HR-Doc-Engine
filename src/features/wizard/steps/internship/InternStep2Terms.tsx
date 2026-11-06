@@ -2,9 +2,9 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { Calendar, Hash } from "lucide-react";
+import { Calendar, Hash, Building2, Banknote, Clock } from "lucide-react";
 import { SecondParty, DocSettings } from "@/types";
-import { Field, IconInput, StepHeader } from "@/components/forms/FormPrimitives";
+import { Field, IconInput, IconSelect, StepHeader } from "@/components/forms/FormPrimitives";
 import { toISODate, toDisplayDate, getTodayISO } from "@/lib/utils/dateUtils";
 
 export interface InternStep2Props {
@@ -12,6 +12,7 @@ export interface InternStep2Props {
   setDocSettings: React.Dispatch<React.SetStateAction<DocSettings>>;
   secondParty: SecondParty;
   setSecondParty: React.Dispatch<React.SetStateAction<SecondParty>>;
+  onClearError?: () => void;
 }
 
 export function InternStep2({
@@ -19,17 +20,18 @@ export function InternStep2({
   setDocSettings,
   secondParty,
   setSecondParty,
+  onClearError,
 }: InternStep2Props) {
   const currentYearStr = new Date().getFullYear().toString().slice(-2);
   const [internWarning, setInternWarning] = React.useState("");
   const [refWarning, setRefWarning] = React.useState("");
 
   const buildInternId = React.useCallback(
-    (serial: string) => (serial ? `JVX-INT-${currentYearStr}-${serial.padStart(3, "0")}` : ""),
+    (serial: string) => (serial ? `CBS-INT-${currentYearStr}-${serial.padStart(3, "0")}` : ""),
     [currentYearStr],
   );
   const buildRefId = React.useCallback(
-    (serial: string) => (serial ? `JVX-INT-REF-${currentYearStr}-${serial.padStart(3, "0")}` : ""),
+    (serial: string) => (serial ? `CBS/INT-REF-${currentYearStr}/${serial.padStart(3, "0")}` : ""),
     [currentYearStr],
   );
 
@@ -39,15 +41,29 @@ export function InternStep2({
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        const internSerial = data.internId?.split("-").pop() || "001";
-        const refSerial = data.internRefId?.split("-").pop() || "001";
-        setSecondParty((p) => ({ ...p, partnerId: data.internId, partnerIdSerial: internSerial }));
+        const internSerial = data.internId?.split(/[-/]/).pop() || "001";
+        const refSerial = data.internRefId?.split(/[-/]/).pop() || "001";
+        const assignedInternId = data.internId || `CBS-INT-${currentYearStr}-${internSerial}`;
+        const assignedRefId = data.internRefId || `CBS/INT-REF-${currentYearStr}/${refSerial}`;
+
+        setSecondParty((p) => ({
+          ...p,
+          partnerId: assignedInternId,
+          partnerIdSerial: internSerial,
+        }));
         setDocSettings((p) => ({
           ...p,
-          internId: data.internId,
+          internId: assignedInternId,
           internIdSerial: internSerial,
-          internRefId: data.internRefId,
+          internRefId: assignedRefId,
           internRefIdSerial: refSerial,
+          internshipDuration: p.internshipDuration || "3",
+          isPaid: p.isPaid ?? true,
+          date: p.date || new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
         }));
       })
       .catch(console.error);
@@ -86,6 +102,7 @@ export function InternStep2({
   }, [docSettings.internRefId]);
 
   const handleInternSerialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onClearError?.();
     const serial = e.target.value.replace(/\D/g, "").slice(0, 3);
     const id = buildInternId(serial);
     setSecondParty((p) => ({ ...p, partnerIdSerial: serial, partnerId: id }));
@@ -93,6 +110,7 @@ export function InternStep2({
   };
 
   const handleRefSerialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onClearError?.();
     const serial = e.target.value.replace(/\D/g, "").slice(0, 3);
     setDocSettings((p) => ({ ...p, internRefIdSerial: serial, internRefId: buildRefId(serial) }));
   };
@@ -109,172 +127,213 @@ export function InternStep2({
     setDocSettings((p) => ({ ...p, internRefIdSerial: serial, internRefId: buildRefId(serial) }));
   };
 
+  const updateDuration = (months: number) => {
+    onClearError?.();
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + months);
+    const expiryStr = expiry.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    setDocSettings((p) => ({
+      ...p,
+      internshipDuration: String(months),
+      internExpiryDate: expiryStr,
+    }));
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <StepHeader
-        title="Section 2: Internship Terms"
-        desc="Set the offer date, duration, compensation type, and unique identifiers."
+        title="Section 2: Internship Specifications & Terms"
+        desc="Configure the term duration, compensation model, department, and document tracking IDs."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="col-span-1 md:col-span-2">
-          <Field label="Offer Date *">
-            <IconInput
-              icon={Calendar}
-              type="date"
-              max={getTodayISO()}
-              value={toISODate(docSettings.date || "")}
-              onChange={(e) => setDocSettings((p) => ({ ...p, date: toDisplayDate(e.target.value) }))}
-            />
-          </Field>
-        </div>
 
-        <div className="col-span-1 md:col-span-2 p-4 bg-[#F8FAFC] border border-[#DBEAFE] rounded-2xl flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <label className="text-[11px] font-bold text-[#334155] uppercase tracking-wider">
-              Internship Duration
-            </label>
-            <span className="text-sm text-[#2563EB] font-extrabold bg-[#EFF6FF] px-2 py-0.5 border border-[#DBEAFE] rounded-md">
-              {Number(docSettings.internshipDuration) || 1} Months
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min={1}
-              max={12}
-              value={Number(docSettings.internshipDuration) || 1}
-              onChange={(e) => {
-                const months = parseInt(e.target.value, 10);
-                const expiry = new Date();
-                expiry.setMonth(expiry.getMonth() + months);
-                const expiryStr = expiry.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                });
-                setDocSettings((p) => ({
-                  ...p,
-                  internshipDuration: String(months),
-                  internExpiryDate: expiryStr,
-                }));
-              }}
-              className="flex-1 accent-[#2563EB] cursor-pointer"
-            />
-            <input
-              type="number"
-              min={1}
-              max={12}
-              value={Number(docSettings.internshipDuration) || 1}
-              onChange={(e) => {
-                const months = Math.min(12, Math.max(1, parseInt(e.target.value) || 1));
-                const expiry = new Date();
-                expiry.setMonth(expiry.getMonth() + months);
-                const expiryStr = expiry.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                });
-                setDocSettings((p) => ({
-                  ...p,
-                  internshipDuration: String(months),
-                  internExpiryDate: expiryStr,
-                }));
-              }}
-              className="w-[60px] text-center bg-white border border-[#DBEAFE] rounded-xl py-1.5 text-[#0F172A] text-xs font-bold focus:outline-none focus:border-[#2563EB]"
-            />
-          </div>
-          <p className="text-[10px] text-[#64748B] italic">
-            Term expiry auto-set to:{" "}
-            <strong className="text-[#2563EB]">{docSettings.internExpiryDate || "—"}</strong>
-          </p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Field label="Offer Issue Date *">
+          <IconInput
+            icon={Calendar}
+            type="text"
+            placeholder="e.g. November 06, 2026"
+            value={docSettings.date || ""}
+            onChange={(e) => {
+              onClearError?.();
+              setDocSettings((p) => ({ ...p, date: e.target.value }));
+            }}
+          />
+        </Field>
 
-        <Field label="Compensation Type *">
-          <div className="grid grid-cols-2 gap-2">
+        <Field label="Assigned Department">
+          <IconSelect
+            icon={Building2}
+            value={secondParty.department || "Software Engineering"}
+            onChange={(e) => {
+              onClearError?.();
+              setSecondParty((p) => ({ ...p, department: e.target.value }));
+              setDocSettings((p) => ({ ...p, internDepartment: e.target.value }));
+            }}
+          >
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Full-Stack Web Development">Full-Stack Web Development</option>
+            <option value="Creative & UI/UX Design">Creative &amp; UI/UX Design</option>
+            <option value="Digital Marketing & Growth">Digital Marketing &amp; Growth</option>
+            <option value="Product Operations">Product Operations</option>
+          </IconSelect>
+        </Field>
+      </div>
+
+      {/* Duration slider */}
+      <div className="p-5 bg-secondary/60 border border-border rounded-2xl flex flex-col gap-3">
+        <div className="flex justify-between items-center">
+          <label className="text-xs font-semibold text-header-text uppercase tracking-wider flex items-center gap-2">
+            <Clock className="w-4 h-4 text-primary" />
+            Internship Duration
+          </label>
+          <span className="text-xs text-primary font-bold bg-primary/10 px-3 py-1 border border-primary/20 rounded-full">
+            {Number(docSettings.internshipDuration) || 3} Months Tenor
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <input
+            type="range"
+            min={1}
+            max={12}
+            value={Number(docSettings.internshipDuration) || 3}
+            onChange={(e) => updateDuration(parseInt(e.target.value, 10))}
+            className="flex-1 accent-primary cursor-pointer h-2 bg-secondary rounded-lg"
+          />
+          <input
+            type="number"
+            min={1}
+            max={12}
+            value={Number(docSettings.internshipDuration) || 3}
+            onChange={(e) =>
+              updateDuration(Math.min(12, Math.max(1, parseInt(e.target.value) || 1)))
+            }
+            className="w-16 text-center bg-card border border-border rounded-xl py-2 text-foreground text-xs font-bold focus:outline-none focus:border-primary"
+          />
+        </div>
+        <div className="flex justify-between items-center text-[11px] text-muted-foreground pt-1 border-t border-border/50">
+          <span>Expected Completion:</span>
+          <span className="font-semibold text-foreground">
+            {docSettings.internExpiryDate || "Calculated upon selection"}
+          </span>
+        </div>
+      </div>
+
+      {/* Compensation Type & Stipend */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Field label="Compensation Structure *">
+          <div className="grid grid-cols-2 gap-2 h-11">
             {[true, false].map((paid) => (
               <button
                 key={String(paid)}
                 type="button"
-                onClick={() => setDocSettings((p) => ({ ...p, isPaid: paid }))}
-                className={`py-3 text-xs font-bold rounded-xl border transition cursor-pointer ${
+                onClick={() => {
+                  onClearError?.();
+                  setDocSettings((p) => ({ ...p, isPaid: paid }));
+                }}
+                className={`text-xs font-bold rounded-xl border transition cursor-pointer flex items-center justify-center ${
                   docSettings.isPaid === paid
-                    ? "bg-[#2563EB]/10 border-[#2563EB] text-[#2563EB]"
-                    : "bg-[#F8FAFC] border-[#DBEAFE] text-[#334155] hover:border-[#2563EB]"
+                    ? "bg-primary border-primary text-primary-foreground shadow-sm shadow-primary/20"
+                    : "bg-secondary border-border text-foreground hover:border-primary/50"
                 }`}
               >
-                {paid ? "Paid Internship" : "Unpaid Internship"}
+                {paid ? "Paid Internship" : "Academic / Unpaid"}
               </button>
             ))}
           </div>
         </Field>
 
-        <div className="col-span-1 md:col-span-2 bg-gradient-to-r from-blue-50/50 to-indigo-50/20 border border-blue-100/60 p-5 rounded-2xl">
-          <div className="mb-4">
-            <span className="text-[11px] font-extrabold text-[#2563EB] uppercase tracking-widest flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5" /> UNIQUE IDENTIFIERS
-            </span>
-            <p className="text-[10px] text-slate-500 mt-1">
-              Enter only the last 3 digits. Full IDs are generated automatically.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-6">
-            <div className="flex-1">
-              <label className="text-xs font-semibold text-[#334155] uppercase tracking-wide block mb-1.5">
-                Intern ID
-              </label>
-              <div className="flex items-stretch bg-white border border-[#DBEAFE] focus-within:border-[#2563EB] rounded-xl overflow-hidden h-12">
-                <div className="flex items-center px-3 bg-[#F8FAFC] border-r border-[#DBEAFE] text-slate-400 font-bold font-mono text-sm select-none">
-                  JVX-INT-{currentYearStr}-
-                </div>
-                <input
-                  type="text"
-                  maxLength={3}
-                  value={docSettings.internIdSerial || ""}
-                  onChange={handleInternSerialChange}
-                  onBlur={normalizeInternSerial}
-                  className="flex-1 bg-transparent px-4 text-sm font-mono font-black focus:outline-none"
-                  placeholder="001"
-                />
+        <Field label={docSettings.isPaid ? "Monthly Stipend (BDT) *" : "Monthly Stipend"}>
+          <IconInput
+            icon={Banknote}
+            type="text"
+            placeholder={docSettings.isPaid ? "e.g. 10,000 BDT" : "Not applicable (Unpaid)"}
+            disabled={!docSettings.isPaid}
+            value={docSettings.internStipend || (docSettings.isPaid ? "10,000 BDT" : "None")}
+            onChange={(e) => {
+              onClearError?.();
+              setDocSettings((p) => ({ ...p, internStipend: e.target.value }));
+            }}
+          />
+        </Field>
+      </div>
+
+      {/* Unique Identifiers */}
+      <div className="bg-secondary/40 border border-border p-5 rounded-2xl">
+        <div className="mb-4">
+          <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+            <Hash className="w-4 h-4" /> Unique Identification &amp; Reference Codes
+          </span>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Enter 3 digits for custom serial, or use the pre-generated sequence.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label className="text-xs font-semibold text-header-text uppercase tracking-wide block mb-1.5">
+              Internee ID
+            </label>
+            <div className="flex items-stretch bg-card border border-border focus-within:border-primary rounded-xl overflow-hidden h-11">
+              <div className="flex items-center px-3 bg-secondary border-r border-border text-muted-foreground font-mono text-xs font-bold select-none">
+                CBS-INT-{currentYearStr}-
               </div>
-              <div className="flex justify-between items-center mt-1.5">
-                <p
-                  className={`text-xs font-mono font-bold ${
-                    internWarning ? "text-rose-600" : "text-emerald-600"
-                  }`}
-                >
-                  {docSettings.internId}
-                </p>
-                {internWarning && <p className="text-[10px] text-rose-600 font-bold">{internWarning}</p>}
-              </div>
+              <input
+                type="text"
+                maxLength={3}
+                value={docSettings.internIdSerial || ""}
+                onChange={handleInternSerialChange}
+                onBlur={normalizeInternSerial}
+                className="flex-1 bg-transparent px-3 text-sm font-mono font-bold text-foreground focus:outline-none"
+                placeholder="001"
+              />
             </div>
-            <div className="flex-1">
-              <label className="text-xs font-semibold text-[#334155] uppercase tracking-wide block mb-1.5">
-                Reference ID
-              </label>
-              <div className="flex items-stretch bg-white border border-[#DBEAFE] focus-within:border-[#2563EB] rounded-xl overflow-hidden h-12">
-                <div className="flex items-center px-3 bg-[#F8FAFC] border-r border-[#DBEAFE] text-slate-400 font-bold font-mono text-xs select-none">
-                  JVX-INT-REF-{currentYearStr}-
-                </div>
-                <input
-                  type="text"
-                  maxLength={3}
-                  value={docSettings.internRefIdSerial || ""}
-                  onChange={handleRefSerialChange}
-                  onBlur={normalizeRefSerial}
-                  className="flex-1 bg-transparent px-4 text-sm font-mono font-black focus:outline-none"
-                  placeholder="001"
-                />
+            <div className="flex justify-between items-center mt-1.5">
+              <p
+                className={`text-xs font-mono font-bold ${
+                  internWarning ? "text-destructive" : "text-emerald-500"
+                }`}
+              >
+                {docSettings.internId || `CBS-INT-${currentYearStr}-001`}
+              </p>
+              {internWarning && (
+                <p className="text-[10px] text-destructive font-bold">{internWarning}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-header-text uppercase tracking-wide block mb-1.5">
+              Agreement Reference ID
+            </label>
+            <div className="flex items-stretch bg-card border border-border focus-within:border-primary rounded-xl overflow-hidden h-11">
+              <div className="flex items-center px-3 bg-secondary border-r border-border text-muted-foreground font-mono text-xs font-bold select-none">
+                CBS/INT-REF-{currentYearStr}/
               </div>
-              <div className="flex justify-between items-center mt-1.5">
-                <p
-                  className={`text-xs font-mono font-bold ${
-                    refWarning ? "text-rose-600" : "text-emerald-600"
-                  }`}
-                >
-                  {docSettings.internRefId}
-                </p>
-                {refWarning && <p className="text-[10px] text-rose-600 font-bold">{refWarning}</p>}
-              </div>
+              <input
+                type="text"
+                maxLength={3}
+                value={docSettings.internRefIdSerial || ""}
+                onChange={handleRefSerialChange}
+                onBlur={normalizeRefSerial}
+                className="flex-1 bg-transparent px-3 text-sm font-mono font-bold text-foreground focus:outline-none"
+                placeholder="001"
+              />
+            </div>
+            <div className="flex justify-between items-center mt-1.5">
+              <p
+                className={`text-xs font-mono font-bold ${
+                  refWarning ? "text-destructive" : "text-emerald-500"
+                }`}
+              >
+                {docSettings.internRefId || `CBS/INT-REF-${currentYearStr}/001`}
+              </p>
+              {refWarning && (
+                <p className="text-[10px] text-destructive font-bold">{refWarning}</p>
+              )}
             </div>
           </div>
         </div>

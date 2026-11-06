@@ -14,9 +14,16 @@ export async function GET() {
       .filter((a) => {
         const ds = a.docSettings as Record<string, unknown> | undefined;
         const template = ds?.agreementTemplate || a.agreementTemplate;
-        const isInternship = template === "internship";
+        const isInternship =
+          template === "internship" ||
+          a.docType === "Internship Offer" ||
+          (a.docType as string)?.toLowerCase().includes("intern");
         const hasCertificate = ds?.certificateGenerated === true;
-        return a.status === "FULLY_EXECUTED" && isInternship && !hasCertificate;
+        const isExecuted =
+          a.status === "FULLY_EXECUTED" ||
+          a.status === "FINALISED" ||
+          Boolean(a.partnerSigned && a.founderSigned);
+        return isExecuted && isInternship && !hasCertificate;
       })
       .map((a) => {
         const sp = a.secondParty as Record<string, string> | undefined;

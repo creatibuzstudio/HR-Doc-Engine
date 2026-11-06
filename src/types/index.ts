@@ -36,6 +36,7 @@ export interface SecondParty {
   signatureImg: string;
   signatureDate?: Date | string | null;
   department?: string;
+  university?: string;
   performanceGrade?: string;
 }
 
@@ -60,7 +61,10 @@ export interface DocSettings {
   internRefIdSerial?: string;
   internshipDuration?: string;
   isPaid?: boolean;
+  internStipend?: string;
+  internStartDate?: string;
   internExpiryDate?: string;
+  internDepartment?: string;
   // ── HR Hiring Notice-specific ────────────────────────────────────────────
   hrNoticeId?: string;
   hrNoticeIdSerial?: string;

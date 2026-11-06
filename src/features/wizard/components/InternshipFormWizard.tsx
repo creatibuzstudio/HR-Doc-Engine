@@ -2,11 +2,11 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { FileText, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { GraduationCap, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { InternStep1, InternStep2, InternStep3 } from "@/features/wizard/steps/internship/InternshipWizardSteps";
 import { FirstParty, SecondParty, DocSettings } from "@/types";
 
-const STEP_LABELS = ["1. Personal Info", "2. Terms", "3. Signature"];
+const STEP_LABELS = ["1. Intern Candidate", "2. Internship Terms", "3. Authorization"];
 const TOTAL_STEPS = 3;
 
 interface InternshipFormWizardProps {
@@ -48,23 +48,25 @@ export default function InternshipFormWizard({
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl md:text-2xl font-bold text-[#0F172A] flex items-center gap-2">
-            <FileText className="text-[#0EA5E9] w-6 h-6" />
-            Internship Offer Details
+          <h2 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
+            <div className="p-2 bg-primary/20 text-primary rounded-xl">
+              <GraduationCap className="w-5 h-5 text-primary" />
+            </div>
+            Internship Offer Letter &amp; Agreement
           </h2>
-          <span className="text-xs bg-[#F0F9FF] border border-[#BAE6FD] px-3 py-1 rounded-full text-[#0EA5E9] font-bold">
+          <span className="text-xs bg-secondary border border-border px-3 py-1 rounded-full text-primary font-bold">
             Step {activeStep} of {TOTAL_STEPS}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div className="w-full bg-[#BAE6FD] h-2 rounded-full overflow-hidden flex">
+        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden flex border border-border">
           {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
             <div
               key={idx}
               className={`h-full flex-1 transition-all duration-300 ${
-                idx + 1 <= activeStep ? "bg-[#0EA5E9]" : "bg-[#BAE6FD]"
-              } ${idx < TOTAL_STEPS - 1 ? "border-r border-white" : ""}`}
+                idx + 1 <= activeStep ? "bg-primary" : "bg-transparent"
+              } ${idx < TOTAL_STEPS - 1 ? "border-r border-border" : ""}`}
             />
           ))}
         </div>
@@ -76,10 +78,10 @@ export default function InternshipFormWizard({
               key={idx}
               className={`text-[10px] font-bold px-3 py-1 rounded-full border transition ${
                 idx + 1 === activeStep
-                  ? "bg-[#0EA5E9] border-[#0EA5E9] text-white"
+                  ? "bg-primary border-primary text-primary-foreground"
                   : idx + 1 < activeStep
-                  ? "bg-[#F0F9FF] border-[#0EA5E9] text-[#0EA5E9]"
-                  : "bg-white border-[#BAE6FD] text-[#94A3B8]"
+                  ? "bg-secondary border-border text-primary"
+                  : "bg-secondary/40 border-border text-muted-foreground"
               }`}
             >
               {idx + 1 < activeStep ? (
@@ -96,10 +98,16 @@ export default function InternshipFormWizard({
       </div>
 
       {/* Step content */}
-      <div className="bg-white border border-[#DBEAFE] rounded-3xl p-6 md:p-8 shadow-sm min-h-[340px]">
+      <div className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm min-h-[380px]">
         {validationError && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl">
-            {validationError}
+          <div className="mb-5 p-3.5 bg-destructive/15 border border-destructive/30 text-destructive text-xs font-semibold rounded-xl flex items-center justify-between">
+            <span>{validationError}</span>
+            <button
+              onClick={onClearError}
+              className="text-destructive hover:opacity-80 text-xs font-bold cursor-pointer"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
@@ -107,6 +115,7 @@ export default function InternshipFormWizard({
           <InternStep1
             secondParty={secondParty}
             setSecondParty={setSecondParty}
+            onClearError={onClearError}
           />
         )}
         {activeStep === 2 && (
@@ -115,6 +124,7 @@ export default function InternshipFormWizard({
             setDocSettings={setDocSettings}
             secondParty={secondParty}
             setSecondParty={setSecondParty}
+            onClearError={onClearError}
           />
         )}
         {activeStep === 3 && (
@@ -126,26 +136,26 @@ export default function InternshipFormWizard({
         )}
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Buttons */}
       <div className="flex justify-between mt-6 gap-3">
         <button
           onClick={onPrev}
           disabled={activeStep === 1}
-          className="flex items-center gap-2 px-5 py-3 border border-[#DBEAFE] hover:border-[#0EA5E9] text-[#334155] font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className="flex items-center gap-2 px-5 py-3 border border-border hover:border-primary text-foreground bg-secondary hover:bg-accent font-bold text-sm rounded-2xl transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
           onClick={onNext}
-          className="flex items-center gap-2 px-7 py-3 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-bold text-sm rounded-2xl transition shadow-md shadow-[#0EA5E9]/20 cursor-pointer"
+          className="flex items-center gap-2 px-7 py-3 bg-primary hover:opacity-95 text-primary-foreground font-bold text-sm rounded-2xl transition shadow-lg shadow-primary/25 cursor-pointer"
         >
           {activeStep === TOTAL_STEPS ? (
             <>
-              <Check className="w-4 h-4" /> Preview Offer Letter
+              Preview Agreement <ChevronRight className="w-4 h-4" />
             </>
           ) : (
             <>
-              Next <ChevronRight className="w-4 h-4" />
+              Continue <ChevronRight className="w-4 h-4" />
             </>
           )}
         </button>
